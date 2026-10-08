@@ -127,9 +127,18 @@ def fase1(clips, videos=None):
                     break
                 frames.append(im)
         else:
-            cajas, cuadros, W, H, T, frames = EP.detecta_clip(yolo, cap, cv2)
+            ex = {}
+            cajas, cuadros, W, H, T, frames = EP.detecta_clip(yolo, cap, cv2, extra=ex)
             with open(ca, "wb") as fh:
                 pickle.dump((cajas, cuadros, W, H, T), fh)
+            np.savez_compressed(
+                PRUEBAS / ("detx_%s.npz" % cid),
+                conf=(np.concatenate(ex["conf"]) if ex.get("conf") else np.zeros(0)).astype("float16"),
+                kp=(np.concatenate(ex["kp"]) if ex.get("kp") else np.zeros((0, 17, 3))).astype("float16"))
+            """LO QUE YOLO VE Y ANTES SE TIRABA (2026-10-08): la confianza y los 17 puntos de CADA
+            persona detectada, arbitro y publico incluidos, en el orden de `cajas`. Con esto la
+            pareja se puede volver a elegir sin GPU con algo mas que cajas; sin esto, cambiar la
+            seleccion obligaba a repetir la etapa 1. ~50 KB por clip."""
         cap.release()
         gris = [cv2.cvtColor(cv2.resize(f, (160, 90)), cv2.COLOR_BGR2GRAY).astype("float32")
                 for f in frames]

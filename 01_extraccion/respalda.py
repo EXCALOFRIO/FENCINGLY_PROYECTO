@@ -36,19 +36,57 @@ import lotes as LO  # noqa: E402
 ETAPAS = (1, 4, 7, 9, 11)
 
 
+REGISTRO = LO.RU.TRABAJO / "respaldo_subido.csv"
+"""clip -> fecha de modificacion MAS NUEVA de sus salidas cuando se subio. Sin esto, un clip REHECHO
+(p. ej. los 89 de la puerta de tallas del 08/10) figuraba en el remoto como hecho y no se volvia a
+subir nunca: el respaldo se quedaba con la version equivocada en silencio."""
+
+
+def _mtime(c):
+    fs = [LO.RU.TRABAJO / (p % c) for p in ("revision_%s.npz", "poses_%s.npz", "lights_%s.csv",
+                                            "zona_%s.csv")] + LO._sal_pista(c)
+    return max((f.stat().st_mtime for f in fs if f.is_file()), default=0.0)
+
+
+def lee_registro():
+    out = {}
+    if REGISTRO.is_file():
+        for linea in REGISTRO.read_text(encoding="utf-8").splitlines()[1:]:
+            c, _, t = linea.partition(",")
+            out[c] = max(out.get(c, 0.0), float(t or 0))
+    return out
+
+
+def apunta(clips):
+    nuevo = not REGISTRO.is_file()
+    with open(REGISTRO, "a", encoding="utf-8") as fh:
+        if nuevo:
+            fh.write("clip,mtime\n")
+        for c in clips:
+            fh.write("%s,%.3f\n" % (c, _mtime(c)))
+
+
 def vuelta(conjunto, maximo=500, etapas=ETAPAS):
     ids = LO.conjunto(conjunto)
     remoto = LO.estado_remoto(recarga=True)
+    reg = lee_registro()
+    if not reg and remoto:
+        """ARRANQUE DEL REGISTRO: lo que el remoto ya tiene se da por subido con su fecha de HOY.
+        Solo pasa una vez; desde ahi manda el registro."""
+        apunta([c for c in ids if set(etapas) <= (remoto.get(c) or set())])
+        reg = lee_registro()
     pend = [c for c in ids
             if LO.hechas(c, etapas) == set(etapas)
-            and not set(etapas) <= (remoto.get(c) or set())]
-    print("%s  %d clips completos en disco sin respaldo" % (time.strftime("%Y-%m-%d %H:%M"),
-                                                          len(pend)), flush=True)
+            and (c not in reg or _mtime(c) > reg[c] + 1.0)]
+    print("%s  %d clips completos en disco sin respaldo (o rehechos desde que se subieron)"
+          % (time.strftime("%Y-%m-%d %H:%M"), len(pend)), flush=True)
     ok = 0
     for i in range(0, len(pend), maximo):
         trozo = pend[i:i + maximo]
         r = LO.sube(trozo, list(etapas), etiqueta=time.strftime("%Y%m%d-%H%M%S"))
-        ok += r.get("clips", 0) if r.get("ok") else 0
+        if r.get("ok"):
+            apunta(trozo)
+            ok += r.get("clips", 0)
     print("   subidos en esta vuelta: %d" % ok, flush=True)
     return ok
 

@@ -27,6 +27,7 @@ version pareada igualmente porque es la comparacion correcta, pero NO es lo que 
 from __future__ import annotations
 
 import itertools
+import os
 
 import numpy as np
 
@@ -74,6 +75,14 @@ son **1,29x** el limite nuevo. Las tres parejas malas con `dpie` entre 0,138 y 0
 este limite sino la puerta de separacion: dos son cajas duplicadas sobre la misma persona (0,08
 alturas) y la otra cruza dos pistas (3,77 alturas)."""
 CRUZA_MAX = 0.25
+RAZON_TALLA_MAX = float(os.environ.get("FENCINGLY_TALLA_MAX", "1.8"))
+"""RAZON MAXIMA ENTRE LAS TALLAS (mediana del alto de caja) DE LOS DOS DE LA PAREJA. ADOPTADA el
+2026-10-08 (ESTADO_2026-10-08 §8). El arbitro o un espectador en primer plano sale mucho mas grande
+que el tirador del fondo, ninguna de las tres puertas geometricas lo miraba, y encima la puntuacion
+PREMIA la talla. Medido sobre 5.343 clips rehechos en CPU: cambia la pareja en 89 (1,7 %); a ojo,
+24 de ellos en dos muestras: 15 pasan de mal a bien, 0 de bien a mal, 9 siguen mal.
+Por que 1,8 y no menos: entre 1,3 y 1,5 los 9 de 9 mirados eran tiradores de verdad con camara en
+diagonal; entre 1,5 y 1,8, 3 de 9 lo eran. `FENCINGLY_TALLA_MAX=inf` devuelve el camino anterior."""
 """Fraccion de cuadros en que se invierte quien esta a la izquierda. Dos tiradores no se atraviesan.
 Medido: pareja filmada 0,00, dos cajas duplicadas sobre la misma persona 0,93."""
 FRENTE_MIN = 0.40
@@ -309,6 +318,10 @@ def elige_pareja(trayectorias, W, H, T, min_frac=0.02, fusionar=True) -> dict:
         dpie = float(np.median(np.abs(pa[m] - pb[m])))
         talla = float(np.median(alt))
         dpie_rel = dpie / max(talla, 1e-6)
+        ha, hb = float(np.median(aa[m])), float(np.median(ab[m]))
+        razon_talla = max(ha, hb) / max(min(ha, hb), 1e-6)
+        if razon_talla > RAZON_TALLA_MAX:
+            continue
         signo = np.sign(xa[m] - xb[m])
         cruza = float(np.mean(signo != np.median(signo)))
         if not (SEP_ALTURAS[0] <= sepalt <= SEP_ALTURAS[1]):

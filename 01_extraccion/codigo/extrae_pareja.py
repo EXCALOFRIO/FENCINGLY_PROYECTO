@@ -109,11 +109,14 @@ GPU compartida: **1,53x** (fp16 solo: 1,19x; el lote es lo que paga).
 `FENCINGLY_YOLO_HALF=0 FENCINGLY_YOLO_LOTE=1` devuelve el camino anterior, cuadro a cuadro en fp32."""
 
 
-def detecta_clip(yolo, cap, cv2) -> tuple:
+def detecta_clip(yolo, cap, cv2, extra=None) -> tuple:
     """QUE HACE: pasa el detector por todos los cuadros y devuelve cajas, cuadros y los fotogramas.
 
     Se devuelven los fotogramas porque los pasos 6 y las capas densas los necesitan, y volver a
     decodificar el video cuesta mas que tenerlos.
+
+    `extra`, si se pasa un dict, recibe `conf` (n,) y `kp` (n, 17, 3) de CADA caja, en el mismo orden
+    que `cajas`. Ver `fase1`, que lo guarda en `detx_<clip>.npz`.
     """
     W = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     H = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -139,6 +142,10 @@ def detecta_clip(yolo, cap, cv2) -> tuple:
                 for i in range(len(b)):
                     cajas.append(b[i])
                     cuadros.append(k)
+                if extra is not None:
+                    extra.setdefault("conf", []).append(r.boxes.conf.cpu().numpy())
+                    kp = r.keypoints.data.cpu().numpy() if r.keypoints is not None                         else np.full((len(b), 17, 3), np.nan, "float32")
+                    extra.setdefault("kp", []).append(kp)
             k += 1
     return (np.asarray(cajas, "float32"), np.asarray(cuadros, "int32"), W, H, k, frames)
 

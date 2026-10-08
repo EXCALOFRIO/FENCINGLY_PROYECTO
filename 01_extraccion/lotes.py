@@ -483,7 +483,7 @@ def sube(clips, etapas, repo=None, etiqueta=None, verboso=True):
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="fz_sube_"))
     rutas_ = []
     for c in hechos:
-        for p in ("revision_%s.npz", "poses_%s.npz", "etiquetas_%s.csv", "lights_%s.csv",
+        for p in ("revision_%s.npz", "poses_%s.npz", "detx_%s.npz", "etiquetas_%s.csv", "lights_%s.csv",
                   "zona_%s.csv", "pista_vacia_%s.txt"):
             """lights_, zona_ y pista_vacia_ se anadieron el 2026-10-08 con las etapas 9 y 11:
             sin ellos el remoto decia "etapas 9,11 hechas" sin llevar su salida."""

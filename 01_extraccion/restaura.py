@@ -30,7 +30,7 @@ import respaldo as RSP  # noqa: E402
 import rutas as RU  # noqa: E402
 
 A_PISTA = ("serie_eventos_", "posicion_clip_", "eventos_")
-A_TRABAJO = ("revision_", "poses_", "etiquetas_", "lights_", "zona_", "pista_vacia_")
+A_TRABAJO = ("revision_", "poses_", "detx_", "etiquetas_", "lights_", "zona_", "pista_vacia_")
 NOMBRE = re.compile(r"^[A-Za-z0-9_\-]+\.(npz|csv|txt)$")
 
 
@@ -84,7 +84,12 @@ def main():
     api = ses["api"]
     from huggingface_hub import hf_hub_download
     fich = api.list_repo_files(repo_id=LO.REPO, repo_type="dataset")
-    tars = sorted(f for f in fich if f.startswith("data/lotes/") and f.endswith(".tar.gz"))
+    tars = sorted((f for f in fich if f.startswith("data/lotes/") and f.endswith(".tar.gz")),
+                  reverse=True)
+    """DEL MAS NUEVO AL MAS VIEJO, y como no se sobrescribe, GANA LA VERSION MAS NUEVA de cada
+    fichero. En orden ascendente ganaba la mas vieja: un clip rehecho (p. ej. por la puerta de
+    tallas del 08/10) volveria con la pareja equivocada. El nombre lleva la fecha, asi que ordenar
+    por nombre es ordenar por fecha."""
     if a.lote:
         tars = [t for t in tars if t.endswith(a.lote)]
     print("%d tars en %s -> %s , %s" % (len(tars), LO.REPO, trabajo, pista), flush=True)
