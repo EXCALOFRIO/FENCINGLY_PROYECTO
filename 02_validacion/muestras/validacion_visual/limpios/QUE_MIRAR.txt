@@ -1,0 +1,12 @@
+Estos casos son clips que MI algoritmo declara LIMPIOS. Si encuentras aqui un arbitro, un
+espectador, alguien de otra pista, un oficial de traje o un esqueleto sobre una pared, es un
+FALSO NEGATIVO mio, y eso vale mas que confirmar cualquiera de mis positivos.
+
+Mira sobre todo los DOS RECORTES AMPLIADOS de la derecha: ahi se ve si en la caja hay un
+tirador o hay pared. El cuadro completo de la izquierda solo sirve para situarlos.
+
+Hay 3 CONTROLES CIEGOS mezclados: casos que ya se sabe que estan MAL. Si los das por buenos,
+la revision no es fiable y hay que repetirla. La clave esta fuera de esta carpeta, en
+NO_ABRIR_clave_de_los_ciegos.csv, y no se abre hasta haber rellenado TUS_VEREDICTOS.csv.
+
+En TUS_VEREDICTOS.csv rellena `tu_veredicto` con: ok / intruso / pose_sobre_nada / otro.

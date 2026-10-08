@@ -1,0 +1,463 @@
+clip,cuadro,verdad,detector,base,conf,regla,confianza_anotacion
+AliveIgnorantBarebirdbat,64,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,65,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,66,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,67,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,68,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,69,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,70,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,71,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,72,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,73,1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,74,1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,75,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,76,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,77,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,78,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,79,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,80,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,81,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,82,1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,83,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,84,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,85,1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media
+AliveIgnorantBarebirdbat,274,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+AliveIgnorantBarebirdbat,275,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+AliveIgnorantBarebirdbat,276,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+AliveIgnorantBarebirdbat,277,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+AliveIgnorantBarebirdbat,278,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+AliveIgnorantBarebirdbat,279,-1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,280,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,281,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,282,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,283,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,284,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,285,1,-1,0,0.4,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,286,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,287,1,-1,0,0.4,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,288,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,289,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,290,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,291,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,292,1,-1,0,1.0,"t.89.2 accion simultanea, no hay prioridad",media-alta
+AliveIgnorantBarebirdbat,293,1,-1,0,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media-alta
+AliveIgnorantBarebirdbat,294,1,-1,0,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media-alta
+AliveIgnorantBarebirdbat,295,1,-1,0,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media-alta
+AliveIgnorantBarebirdbat,198,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,199,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,200,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,201,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,202,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,203,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,204,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,205,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,206,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,207,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,208,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,209,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,210,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,211,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,212,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,213,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,214,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,215,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,216,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,217,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,218,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+AliveIgnorantBarebirdbat,219,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,317,-1,1,-1,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+BlissfulTiredAiredale,318,-1,1,-1,0.3,t.84.3 ataque sobre la preparacion del adversario,alta
+BlissfulTiredAiredale,319,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,320,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,321,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,322,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,323,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,324,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,325,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,326,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,327,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,328,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,329,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,330,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,331,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,332,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,333,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,334,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,335,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,336,-1,1,-1,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+BlissfulTiredAiredale,337,-1,1,-1,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+BlissfulTiredAiredale,338,-1,1,-1,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+BlissfulTiredAiredale,372,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,373,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,374,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,375,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,376,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,377,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,378,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,379,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,380,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,381,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,382,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,383,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,384,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,385,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,386,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,387,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,388,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,389,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,390,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,391,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,392,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,393,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+BlissfulTiredAiredale,201,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,202,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,203,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,204,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,205,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,206,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,207,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,208,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,209,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,210,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,211,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,212,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,213,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,214,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,215,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,216,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,217,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,218,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,219,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,220,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,221,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+BlissfulTiredAiredale,222,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,196,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,197,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,198,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,199,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,200,1,0,1,1.0,"t.83.2.a extension del brazo, sin fondo todavia",media
+ElasticVerifiableAmericancreamdraft,201,1,0,1,1.0,"t.83.2.a extension del brazo, sin fondo todavia",media
+ElasticVerifiableAmericancreamdraft,202,1,0,1,1.0,"t.83.2.a extension del brazo, sin fondo todavia",media
+ElasticVerifiableAmericancreamdraft,203,1,0,1,1.0,"t.83.2.a extension del brazo, sin fondo todavia",media
+ElasticVerifiableAmericancreamdraft,204,1,0,1,1.0,"t.83.2.a extension del brazo, sin fondo todavia",media
+ElasticVerifiableAmericancreamdraft,205,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,206,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,207,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,208,1,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,209,1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+ElasticVerifiableAmericancreamdraft,210,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,211,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,212,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,213,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,214,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,215,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,216,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,217,1,-1,1,1.0,"t.89.2 accion simultanea, no hay prioridad",media
+ElasticVerifiableAmericancreamdraft,73,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,74,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,75,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,76,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,77,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,78,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,79,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,80,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,81,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,82,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,83,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,84,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,85,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,86,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,87,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,88,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,89,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,90,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,91,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,92,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,93,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+ElasticVerifiableAmericancreamdraft,94,-1,-1,1,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+FirsthandSoreGnat,351,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,352,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,353,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,354,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,355,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,356,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,357,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,358,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,359,-1,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,360,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,361,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,362,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,363,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,364,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,365,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,366,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,367,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,368,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,369,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,370,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,371,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,372,-1,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,313,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,314,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,315,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,316,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,317,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,318,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,319,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+FirsthandSoreGnat,320,0,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,321,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,322,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,323,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,324,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,325,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,326,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,327,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,328,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,329,0,-1,1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,330,0,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,331,0,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,332,0,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,333,0,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,334,0,-1,1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+FirsthandSoreGnat,291,-1,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,292,-1,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,293,-1,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,294,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,295,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,296,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,297,-1,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,298,-1,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,299,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,300,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,301,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,302,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,303,-1,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,304,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,305,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,306,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,307,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,308,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,309,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,310,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,311,0,-1,1,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+FirsthandSoreGnat,312,0,-1,1,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+ForcefulAntiqueAlbacoretuna,331,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,332,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,333,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,334,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,335,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,336,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,337,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,338,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,339,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,340,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,341,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,342,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,343,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,344,-1,-1,0,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,345,-1,-1,0,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,alta
+ForcefulAntiqueAlbacoretuna,346,-1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+ForcefulAntiqueAlbacoretuna,347,-1,1,0,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+ForcefulAntiqueAlbacoretuna,348,-1,1,0,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+ForcefulAntiqueAlbacoretuna,349,-1,1,0,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+ForcefulAntiqueAlbacoretuna,350,-1,1,0,0.18,t.84.3 ataque sobre la preparacion del adversario,alta
+ForcefulAntiqueAlbacoretuna,351,-1,1,0,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+ForcefulAntiqueAlbacoretuna,352,-1,1,0,0.6,t.84.3 ataque sobre la preparacion del adversario,alta
+GentleQuerulousElephantseal,267,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,268,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,269,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,270,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,271,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,272,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,273,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,274,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,275,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,276,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,277,0,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media
+GentleQuerulousElephantseal,278,0,0,0,0.8,t.84.3 ataque sobre la preparacion del adversario,media
+GentleQuerulousElephantseal,279,0,0,0,0.8,t.84.3 ataque sobre la preparacion del adversario,media
+GentleQuerulousElephantseal,280,0,0,0,0.8,t.84.3 ataque sobre la preparacion del adversario,media
+GentleQuerulousElephantseal,281,0,0,0,0.8,t.84.3 ataque sobre la preparacion del adversario,media
+GentleQuerulousElephantseal,282,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,283,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,284,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,285,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,286,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,287,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,288,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media
+GentleQuerulousElephantseal,282,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,283,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,284,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,285,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,286,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,287,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,288,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,289,0,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,290,0,0,0,0.48,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,291,-1,0,0,0.48,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,292,-1,0,0,0.48,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,293,-1,0,0,0.24,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,294,-1,0,0,0.24,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,295,-1,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,296,-1,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,297,-1,0,0,0.48,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,298,-1,0,0,0.48,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,299,-1,0,0,0.8,t.89.4.a contraataque: no quita la prioridad al atacante,media-alta
+GentleQuerulousElephantseal,300,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+GentleQuerulousElephantseal,301,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,media-alta
+GentleQuerulousElephantseal,302,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+GentleQuerulousElephantseal,303,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,media-alta
+KindEnchantingKid,215,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,216,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,217,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,218,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,219,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,220,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,221,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,222,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,223,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,alta
+KindEnchantingKid,224,-1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,225,-1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,226,1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,227,1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,228,1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,229,1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,230,1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,231,1,1,0,1.0,t.84.3 ataque sobre la preparacion del adversario,alta
+KindEnchantingKid,232,1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,233,1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,234,1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,235,1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,236,1,1,0,0.3,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,239,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,240,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,241,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,242,-1,1,0,0.6,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,243,-1,1,0,0.6,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,244,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,245,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,246,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,247,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,248,-1,1,0,0.6,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,249,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,250,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,251,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,252,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,253,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,254,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,255,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,256,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,257,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,258,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,259,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+KindEnchantingKid,260,-1,1,0,1.0,t.89.4.a contraataque: no quita la prioridad al atacante,alta
+PotablePossibleIcterinewarbler,227,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,228,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,229,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,230,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,231,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,232,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,233,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,234,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,235,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,236,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,237,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,238,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,239,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,240,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,241,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,242,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,243,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,244,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,245,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,246,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,247,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+PotablePossibleIcterinewarbler,248,-1,-1,0,0.4,t.89.5.d el ataque se acorta o se detiene,baja
+TestyWatchfulBarebirdbat,284,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,285,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,286,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,287,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,288,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,289,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,290,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,291,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,292,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,293,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,294,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,295,-1,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,296,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,297,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,298,-1,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,299,0,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,300,0,-1,0,1.0,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,301,0,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,302,0,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,303,0,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,304,0,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,305,0,-1,0,0.4,ninguna: nadie ha iniciado un ataque correcto,media-alta
+TestyWatchfulBarebirdbat,325,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,326,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,327,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,328,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,329,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,330,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,331,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,332,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,333,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,334,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,335,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,336,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,337,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,338,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,339,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,340,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,341,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,342,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,343,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,344,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,345,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+TestyWatchfulBarebirdbat,346,-1,-1,0,1.0,t.89.5.d el ataque se acorta o se detiene,alta
+UnfortunateColossalLamb,306,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,307,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,308,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,309,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,310,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,311,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,312,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,313,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,314,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,315,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,316,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,317,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,318,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,319,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,320,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,321,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,322,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,323,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,324,-1,-1,-1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media
+UnfortunateColossalLamb,325,-1,-1,-1,0.4,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media
+UnfortunateColossalLamb,326,-1,-1,-1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media
+UnfortunateColossalLamb,327,-1,-1,-1,1.0,t.83.2.a ataque MAL iniciado: el fondo precede a la extension,media
+UnfortunateColossalLamb,102,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,103,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,104,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,105,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,106,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,107,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,108,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,109,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,110,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,111,-1,-1,-1,1.0,ninguna: nadie ha iniciado un ataque correcto,media
+UnfortunateColossalLamb,112,-1,1,-1,1.0,t.84.3 ataque sobre la preparacion del adversario,media
+UnfortunateColossalLamb,113,-1,1,-1,1.0,t.84.3 ataque sobre la preparacion del adversario,media
+UnfortunateColossalLamb,114,-1,1,-1,1.0,t.84.3 ataque sobre la preparacion del adversario,media
+UnfortunateColossalLamb,115,-1,1,-1,1.0,t.84.3 ataque sobre la preparacion del adversario,media
+UnfortunateColossalLamb,116,-1,1,-1,0.3,t.84.3 ataque sobre la preparacion del adversario,media
+UnfortunateColossalLamb,117,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,118,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,119,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,120,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,121,-1,-1,-1,1.0,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,122,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media
+UnfortunateColossalLamb,123,-1,-1,-1,0.4,t.89.5.d el ataque se acorta o se detiene,media

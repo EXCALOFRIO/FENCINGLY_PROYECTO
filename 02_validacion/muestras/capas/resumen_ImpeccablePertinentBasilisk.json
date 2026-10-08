@@ -1,0 +1,33 @@
+{
+ "clip": "ImpeccablePertinentBasilisk",
+ "W": 1920,
+ "H": 1080,
+ "T": 250,
+ "paso": 5,
+ "utilizables": 250,
+ "muestreados": 50,
+ "procesados": 50,
+ "descartados_pintados": 0,
+ "rec_kp": 0.9968484865545019,
+ "rec_desp": 0.048528930142174895,
+ "fuga_arb": 0.0,
+ "fuga_fondo": 0.004163624598541705,
+ "resto_arb_frac": 0.0006556038991395461,
+ "residuo": 0.2378334978209299,
+ "fuga_solape": 0.165218694896607,
+ "ret_oscuro_propio": 0.2992931044140799,
+ "cobertura_cuadro": 0.02630159143518519,
+ "no_validos": 0,
+ "lados": 100,
+ "florete_lados_con_eje": 76,
+ "florete_lados_con_recta": 5,
+ "florete_cuadros_con_recta": 5,
+ "florete_dif_eje_mediana": 14.091723467192637,
+ "florete_dentro_0": 0.06015037593984962,
+ "florete_dentro_90": 0.0,
+ "florete_contaminados": 0,
+ "mano": {
+  "0": "B",
+  "1": "A"
+ }
+}

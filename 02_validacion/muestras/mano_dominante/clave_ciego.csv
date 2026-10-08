@@ -1,0 +1,24 @@
+# CLAVE de la anotacion ciega. NO se mira hasta que la anotacion esta
+# escrita. Orden barajado con random.Random(20260911) sobre los clips en el orden
+# en que se pasaron. Generada el 2026-09-11.
+nn,clip,lado
+01,WholeTallAlpineroadguidetigerbeetle,1
+02,NervousHospitableChick,0
+03,MediumShoddyAmphiuma,1
+04,NervousHospitableChick,1
+05,IdolizedFancyChickadee,0
+06,BountifulSilentEarwig,1
+07,InsecurePettyCreature,0
+08,InsecurePettyCreature,1
+09,NextImmaterialGoldfish,0
+10,GloomyBitterBluegill,1
+11,NextImmaterialGoldfish,1
+12,GloomyBitterBluegill,0
+13,BountifulSilentEarwig,0
+14,CautiousBeneficialLacewing,1
+15,CandidBronzeIndigowingedparrot,0
+16,WholeTallAlpineroadguidetigerbeetle,0
+17,CautiousBeneficialLacewing,0
+18,MediumShoddyAmphiuma,0
+19,CandidBronzeIndigowingedparrot,1
+20,IdolizedFancyChickadee,1

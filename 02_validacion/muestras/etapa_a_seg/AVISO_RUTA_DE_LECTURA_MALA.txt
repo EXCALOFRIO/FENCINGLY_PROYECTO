@@ -1,0 +1,15 @@
+AVISO: LAS IMAGENES DE ESTA CARPETA ESTAN PINTADAS SOBRE EL FOTOGRAMA EQUIVOCADO.
+
+Se generaron leyendo el fotograma `k` del mp4 para la pose `k` del NPZ, pero el NPZ cubre una VENTANA
+del clip que empieza en el fotograma `f0`. Le corresponde `f0 + k`. Medido el 2026-09-10 sobre una
+muestra aleatoria de 300 NPZ: 292 (97,3 %) tienen `f0` distinto de cero, con desfases de 80 a 289
+fotogramas.
+
+Consecuencia: un esqueleto CORRECTO aparece aqui sobre una pared, sobre el publico o sobre un
+oficial, y parece un intruso sin serlo. Los dos casos que se daban por NEGATIVOS verificados
+(SoreEasygoingEmperorshrimp c65 y AltruisticIllfatedDobermanpinscher c54) eran exactamente esto: con
+el desfase aplicado los esqueletos caen sobre los dos tiradores.
+
+NO USAR ESTAS IMAGENES COMO PRUEBA DE NADA. Las buenas estan en
+02_validacion/muestras/validacion_visual/, generadas por
+02_validacion/herramienta/validador_visual.py, que aplica f0 y lo escribe en cada imagen.

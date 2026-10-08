@@ -1,0 +1,17 @@
+{
+ "clip": "defeatedHarlequinRabbitSkinkLizard",
+ "n_cuadros": 67,
+ "rec_kp": 0.981808348046885,
+ "rec_desp": 0.06761610404619911,
+ "fuga_arb": 0.0,
+ "fuga_fondo": 0.0011887550555901036,
+ "residuo": 0.24083868002254266,
+ "fuga_solape": 0.4115971800007745,
+ "ret_oscuro_propio": 0.5947069346612707,
+ "resto_arb_frac": 0.04330851112601483,
+ "cobertura_cuadro": 0.04633628731343283,
+ "n_marcados_no_validos": 2,
+ "n_lados": 134,
+ "rec_kp_validos": 0.9832162186401878,
+ "rec_kp_marcados": 0.8888888888888888
+}

@@ -1,0 +1,1 @@
+Los dos tiradores se INTERCAMBIAN a mitad del clip. Invierte la etiqueta de lado, o sea que corrompe la respuesta correcta, no solo anade ruido. Medido: 0,43 % del corpus.

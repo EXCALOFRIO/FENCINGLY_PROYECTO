@@ -1,0 +1,78 @@
+{
+ "clip": "SeveralSkinnyGenet",
+ "W": 1920,
+ "H": 1080,
+ "T": 250,
+ "paso": 10,
+ "tiempos": {
+  "pose": {
+   "llamadas": 25,
+   "llamadas_por_cuadro": 1.0,
+   "ms_por_llamada": 313.43873999994685,
+   "ms_por_cuadro": 313.43873999994685,
+   "ms_por_cuadro_primera_pasada": 313.43873999994685,
+   "ms_por_cuadro_del_florete": 0.0
+  },
+  "matting": {
+   "llamadas": 82,
+   "llamadas_por_cuadro": 3.28,
+   "ms_por_llamada": 750.9751341463349,
+   "ms_por_cuadro": 2463.1984399999783,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 960.585880000217
+  },
+  "seg": {
+   "llamadas": 82,
+   "llamadas_por_cuadro": 3.28,
+   "ms_por_llamada": 245.77314756107825,
+   "ms_por_cuadro": 806.1359240003367,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 314.563880000278
+  },
+  "normal": {
+   "llamadas": 50,
+   "llamadas_por_cuadro": 2.0,
+   "ms_por_llamada": 311.9300680000015,
+   "ms_por_cuadro": 623.860136000003,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 0.0
+  },
+  "pointmap": {
+   "llamadas": 25,
+   "llamadas_por_cuadro": 1.0,
+   "ms_por_llamada": 485.4706399999486,
+   "ms_por_cuadro": 485.4706399999486,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 0.0
+  },
+  "TODAS": {
+   "ms_por_cuadro": 4692.103880000213
+  }
+ },
+ "utilizables": 250,
+ "muestreados": 25,
+ "procesados": 25,
+ "descartados_pintados": 0,
+ "rec_kp": 0.9541523321956287,
+ "rec_desp": 0.06037850221233253,
+ "fuga_arb": 0.0,
+ "fuga_fondo": 0.005162412568367652,
+ "resto_arb_frac": 0.022725773408197095,
+ "residuo": 0.2411836580205537,
+ "fuga_solape": 0.188102012278632,
+ "ret_oscuro_propio": 0.19875043269264786,
+ "cobertura_cuadro": 0.026405748456790126,
+ "no_validos": 2,
+ "lados": 50,
+ "florete_lados_con_eje": 33,
+ "florete_lados_con_recta": 1,
+ "florete_cuadros_con_recta": 1,
+ "florete_dif_eje_mediana": 8.35992094161324,
+ "florete_dentro_0": 0.007194244604316547,
+ "florete_dentro_90": 0.0,
+ "florete_contaminados": 1,
+ "mano": {
+  "0": "A",
+  "1": "A"
+ }
+}

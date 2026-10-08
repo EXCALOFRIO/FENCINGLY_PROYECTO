@@ -1,0 +1,1 @@
+Los pies caen fuera de la banda de pista activa en mas de la mitad de los cuadros. Descubrio que la banda NO es una puerta dura sino una penalizacion (1,99 %).

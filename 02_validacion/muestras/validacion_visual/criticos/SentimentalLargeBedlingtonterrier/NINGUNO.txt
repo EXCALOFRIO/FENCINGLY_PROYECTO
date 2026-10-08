@@ -1,0 +1,4 @@
+Ningun cuadro de SentimentalLargeBedlingtonterrier cumple el criterio de critico declarado en la cabecera de
+validador_visual.py. Eso NO significa que el clip este bien: significa que mi
+criterio no marca nada. Para buscar mis falsos negativos usa el modo `cuadros` o
+el modo `tira` sobre este mismo clip.

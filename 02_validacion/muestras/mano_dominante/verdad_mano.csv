@@ -1,0 +1,113 @@
+# VERDAD DE REFERENCIA DE LA MANO ARMADA. LA HE HECHO YO, UN AGENTE, MIRANDO LOS MOSAICOS
+# `anota_<clip>_l<lado>.png` de esta misma carpeta. NO LA HA HECHO UN ARBITRO DE ESGRIMA. Cualquier
+# cifra de acierto que se calcule contra este fichero hereda ese limite y hay que decirlo al lado.
+#
+# Fecha 2026-09-11. 17 clips de la lista `corpus_etiquetado.txt`, los dos lados de cada uno = 34
+# tiradores. Los mosaicos son CIEGOS: solo llevan las letras `A` (raiz 21) y `B` (raiz 42), que son
+# identidades de INDICE, y no el veredicto de ningun criterio.
+#
+# DOS PASADAS, y las dos quedan en el fichero:
+#   `mano_p1`  primera pasada, 3 cuadros por tirador.
+#   `mano`     segunda pasada, 6 cuadros, hecha sobre TODOS los tiradores que en la primera quedaron
+#              con `certeza=media` -- o sea, el criterio para volver a mirar fue MI PROPIA duda, no
+#              el veredicto de ningun algoritmo -- mas los dos casos de `certeza=alta` donde la
+#              contradiccion con el criterio (a) era de mas de 60 px de margen.
+#              La revision salio en LAS DOS DIRECCIONES: `KindEnchantingKid l0` cambio a favor del
+#              criterio (a) y `WhiteMarriedGuineafowl l0` y `l1` cambiaron en contra. Eso es lo que
+#              hace que la segunda pasada no sea un ajuste al algoritmo.
+#              17 de 34 tiradores se volvieron a mirar; 3 cambiaron de letra y 2 pasaron a `?`.
+#
+# `mano`     A, B, o `?` si no se puede decir. Los `?` NO cuentan en ningun acierto.
+# `cue`      la evidencia que decidio, en orden de fuerza:
+#              hoja    se ve la recta de la hoja saliendo de esa mano
+#              arma    se ve la cazoleta, el punio oscuro o el pasante negro en esa mano
+#              accion  no se ve el arma, pero esa mano es la que va delante hacia el rival mientras
+#                      la otra queda atras o abajo; es la lectura mas debil y la que MAS SE PARECE
+#                      al criterio (a) que se quiere juzgar, asi que se puede excluir aparte
+#              guante  solo se distingue por el guante -> circular, no se usa como verdad: no hay
+#                      ninguna fila con este cue
+# `certeza`  alta / media
+clip,lado,mano,mano_p1,cue,certeza,nota
+AliveIgnorantBarebirdbat,0,B,B,arma,alta,en k=332 y k=335 la mano B agarra un punio oscuro con el pasante visible
+AliveIgnorantBarebirdbat,1,?,?,,,"con 6 cuadros sigue ambiguo: el brazo A esta levantado en el aire en 5 de 6 y no se ve arma en ninguno; no invento la etiqueta"
+BabyishIdioticCockerspaniel,0,A,A,hoja,alta,hoja visible a 1080p saliendo de A hacia el rival en k=193 y k=197
+BabyishIdioticCockerspaniel,1,?,?,,,"raices colapsadas: sep 3-6 px con r 42-57 px en el 100 % de los cuadros; los dos indices caen sobre LA MISMA mano, asi que la eleccion no esta definida y para el cono es indiferente"
+BlissfulTiredAiredale,0,A,A,hoja,alta,la hoja sale de A hacia arriba-derecha en k=277
+BlissfulTiredAiredale,1,A,A,arma,alta,"2a pasada: mancha oscura de cazoleta pegada a A en los 6 cuadros, y hoja fina en k=244; sube de media a alta"
+ElasticVerifiableAmericancreamdraft,0,B,B,accion,media,"2a pasada con 6 cuadros: B es la mano de delante extendida al rival en 6 de 6 y A queda abajo-atras; sin arma visible"
+ElasticVerifiableAmericancreamdraft,1,A,A,accion,media,2a pasada: espejo del anterior en 6 de 6 cuadros
+FirsthandSoreGnat,0,B,B,accion,media,2a pasada: B delante hacia el rival en 5 de 6
+FirsthandSoreGnat,1,A,A,hoja,alta,linea oscura de la hoja saliendo de A hacia la izquierda en k=253 y k=254
+ForcefulAntiqueAlbacoretuna,0,B,B,hoja,alta,hoja oscura bajando a la derecha desde B en k=95 y k=322
+ForcefulAntiqueAlbacoretuna,1,A,A,accion,media,2a pasada: A delante hacia el rival en 6 de 6; sin arma visible sobre piste azul
+GentleQuerulousElephantseal,0,B,B,hoja,alta,hoja clara saliendo de B a la derecha en k=209
+GentleQuerulousElephantseal,1,A,A,hoja,alta,"2a pasada: hoja clara saliendo de A a la izquierda en k=175, 189 y 201; sube de media a alta"
+KindEnchantingKid,0,A,B,hoja,alta,"CAMBIADO EN LA 2a PASADA. En k=251 se ve una hoja larga y brillante saliendo de A hacia abajo-derecha. En la 1a pasada tome por hoja el propio segmento cian que dibuja la herramienta: error mio de lectura, no del dato"
+KindEnchantingKid,1,A,A,hoja,alta,"2a pasada: en k=264 se ve la hoja saliendo de A con reflejo amarillo; sube de accion/media a hoja/alta"
+LavishDistantDikkops,0,A,?,accion,media,"TRES VERSIONES de esta fila, y las tres quedan escritas. (1) Con el NPZ viejo puse `el tirador esta fuera de cuadro`, que estaba MAL. (2) Mirando el fotograma entero se vio que la caja del lado 0 era una tira pegada al borde izquierdo con el BRAZO DE UN ESPECTADOR dentro y el tirador real sin caja, o sea un NO-TIRADOR entregado, igual que describia la seccion 18.2; medido, la caja tocaba el borde lateral en el 1,000 de sus 273 cuadros y era el UNICO de los 66 que llegaba a 1,000. (3) Con ESA medida el coordinador regenero el NPZ y resulto que el fichero era ANTERIOR al arreglo de `BORDE_SIEMPRE`: ahora la caja toca el borde en el 0,003 de 290 cuadros, el lado 0 es el tirador real (EDIRI) y los cuadros utiles pasan de 7 a 100. Reanotado sobre el NPZ nuevo: en k=210 y k=213, en pleno fondo, A es la mano extendida hacia el rival y B el brazo trasero levantado; sin arma visible, asi que certeza media"
+LavishDistantDikkops,1,A,A,accion,media,"2a pasada: A doblada al pecho en guardia y B en el muslo en 6 de 6. NO ENTRA en el acierto porque el clip solo tiene 7 cuadros utiles y `mano_guante` no lo mide"
+PotablePossibleIcterinewarbler,0,B,B,hoja,alta,hoja saliendo de B a la derecha en k=110
+PotablePossibleIcterinewarbler,1,A,A,hoja,alta,hoja clara saliendo de A a la izquierda en k=58
+PowerfulAllLarva,0,?,?,arbitro,,"NO ES UN TIRADOR: la caja esta sobre el ARBITRO de traje oscuro. Es el error sin arreglar que ya declara la seccion 18.1. El `cue` se dejo vacio al principio y se puso `arbitro` el 2026-09-11 para que el recuento de no-tiradores se pueda hacer con una linea de codigo y no leyendo notas"
+PowerfulAllLarva,1,B,B,arma,alta,"2a pasada: objeto negro compacto pegado a B en los 6 cuadros (k=231..372); sube de media a alta. Y B es la mano MAS LEJOS del rival, o sea que el criterio (a) no puede acertar aqui"
+TestyWatchfulBarebirdbat,0,B,B,hoja,alta,hoja oscura saliendo de B a la derecha en k=175 y k=317
+TestyWatchfulBarebirdbat,1,B,B,arma,media,"con 6 cuadros B es la mano con el objeto oscuro en 5 de 6; con 3 cuadros parecia A, o sea que 3 cuadros no bastaban"
+UglyNiceAplomadofalcon,0,A,A,hoja,alta,"hoja oscura saliendo de A hacia abajo-derecha en k=238 y k=242, y A esta MAS LEJOS del rival que B"
+UglyNiceAplomadofalcon,1,B,B,hoja,alta,"2a pasada con 6 cuadros: la hoja sale de B en k=227, 241, 246 y 257, y B esta MAS LEJOS del rival. Confirmado, no cambia"
+UnevenChiefHippopotamus,0,B,B,arma,alta,"guante OSCURO en B, brazo extendido al rival; caso de guante que NO es blanco"
+UnevenChiefHippopotamus,1,A,A,hoja,alta,guante blanco en A con la hoja saliendo a la izquierda en k=141
+UnfortunateColossalLamb,0,?,A,,,"PASA A `?` EN LA 2a PASADA: con 3 cuadros lei A (mano al pecho) y con 6 el unico cuadro en guardia clara (k=62) ensenia B como mano de delante, sin arma visible en ninguno. Las dos lecturas son mias y se contradicen, asi que no hay verdad"
+UnfortunateColossalLamb,1,?,A,,,"PASA A `?` EN LA 2a PASADA: mancha oscura junto a A en k=348 y junto a B en k=17, sin hoja visible. No hay verdad"
+WhisperedTenderDeinonychus,0,A,A,accion,media,"2a pasada: A es la mano del lado del rival en 4 de 6 y en k=45 tiene una mancha oscura; el criterio (a) falla aqui con margen de 1,5 px, o sea a cara o cruz"
+WhisperedTenderDeinonychus,1,A,A,hoja,alta,hoja oscura saliendo de A hacia arriba-izquierda en k=201
+WhiteMarriedGuineafowl,0,B,A,arma,alta,"CAMBIADO EN LA 2a PASADA. Cazoleta oscura y hoja fina saliendo de B hacia arriba-izquierda en los 6 cuadros (k=280..309). El tirador esta de espaldas y con el arma atras, y por eso la 1a pasada, que solo leyo `cual va delante`, dio A"
+WhiteMarriedGuineafowl,1,B,A,arma,media,"CAMBIADO EN LA 2a PASADA. Con lupa a 6 aumentos (k=220, 224, 228) la mano B es una masa compacta oscura de H 75-80 S 89-112 V 88-126, o sea guante OSCURO o cazoleta, no piel; la A es gris claro. En la 1a pasada lei la mancha como tono de piel y era al contrario"
+# --- AMPLIACION 2026-09-11: 6 clips nuevos, 12 tiradores, TANDA CIEGA -------------
+# Mosaicos `ciego_NN.png` SIN nombre de clip ni de lado, orden barajado con
+# random.Random(20260911), clave en `clave_ciego.csv`, no mirada hasta despues de anotar.
+# Segunda pasada de 6 cuadros sobre los 10 que quedaron en certeza=media.
+# Ninguna letra cambio entre las dos pasadas; 6 subieron de media a alta. En la columna
+# `cue` aparece un valor nuevo, `careta`: el tirador esta SIN CARETA y la lleva en una mano,
+# y por t.115.1 la careta va en la mano NO armada, asi que la armada es la otra. Es evidencia
+# reglamentaria y no depende del guante ni de la posicion del rival.
+AdorableVeneratedDuiker,0,A,A,careta,alta,"TANDA CIEGA nn=10. 2a pasada: el tirador esta SIN CARETA y la careta (masa roja oscura) esta en la cruz de B en k=175, 190, 201 y 212, con un objeto claro en A. Por t.115.1 la careta va en la mano NO armada; sube de media a alta"
+AdorableVeneratedDuiker,1,A,A,arma,alta,"TANDA CIEGA nn=08. 2a pasada: linea fina clara bajando de la cruz de A en k=219, 220, 222 y 223; sube de media a alta"
+HairyCourteousEarwig,0,B,B,arma,alta,TANDA CIEGA nn=02. 2a pasada: objeto claro pegado a la mano B en 4 de 6 cuadros y A al pecho sin nada; sube de media a alta
+HairyCourteousEarwig,1,B,B,arma,alta,TANDA CIEGA nn=04. 2a pasada: objeto oscuro justo en la cruz de B en k=324 y k=326; sube de media a alta
+IlliterateDisloyalFulmar,0,?,A,,,"TANDA CIEGA nn=05. PASA A `?` EN UNA TERCERA MIRADA, y el motivo es el mismo de siempre: en los cuadros de MARCHA la mano del lado del rival es A y en los de GUARDIA la mano al nivel del pecho es B, no se ve arma en ninguno de los 6, y mis dos lecturas se contradicen. Comprobado antes de rendirme que NO es el defecto 21.1: la raiz de mano cae dentro de la caja del rival en menos del 0,03 de los cuadros, o sea que la pose no esta rota, es la postura la que cambia. Se pone `?` a proposito y no lo que dicen los criterios, que aqui coinciden los cuatro en B: corregir la verdad hacia el algoritmo seria fabricar el acierto"
+IlliterateDisloyalFulmar,1,A,A,arma,alta,"TANDA CIEGA nn=11. 2a pasada: objeto oscuro en la cruz de A en k=138 y k=276, y A del lado del rival en 6 de 6; sube de media a alta"
+SeparateHoarseFeline,0,A,A,accion,media,TANDA CIEGA nn=03. 2a pasada: A hacia el rival en 6 de 6 y B es el brazo trasero levantado; sin arma visible
+SeparateHoarseFeline,1,A,A,accion,media,TANDA CIEGA nn=09. 2a pasada: A hacia el rival en 6 de 6; sin arma visible
+VibrantJoyousAsiaticgreaterfreshwaterclam,0,B,B,hoja,alta,TANDA CIEGA nn=06. (no se repaso) hoja fina saliendo de B en k=249
+VibrantJoyousAsiaticgreaterfreshwaterclam,1,A,A,accion,media,"TANDA CIEGA nn=12. 2a pasada: A del lado del rival cuando difieren en x, pero en 3 de 6 A queda DEBAJO de B con la misma x y no se ve arma; sigue media"
+WastefulYawningAmericanquarterhorse,0,B,B,arma,alta,"TANDA CIEGA nn=07. 2a pasada: linea fina oscura bajando de la cruz de B hasta el suelo en k=266, 270, 274 y 280: arma en reposo; sube de media a alta"
+WastefulYawningAmericanquarterhorse,1,A,A,arma,alta,TANDA CIEGA nn=01. (no se repaso: ya era alta) punio claro y hoja oscura saliendo de A
+# --- CONJUNTO RESERVADO 2026-09-11: 10 clips, 20 tiradores -----------------------
+# Elegidos con semilla 20260911, distinta de la 20260910 de todo lo demas, asi que
+# NO se solapan con los 23 clips de entrenamiento y NO han participado en elegir
+# ninguna regla. Anotados a ciegas igual que la tanda anterior: mosaicos sin nombre
+# de clip ni de lado, orden barajado con random.Random(20260911), clave aparte no
+# mirada hasta despues de anotar, y segunda pasada de 6 cuadros sobre los 8 que
+# quedaron en certeza=media. Ninguna letra cambio entre las dos pasadas y 5 subieron
+# de media a alta. La regla que se juzga con ellos esta declarada en el punto 18 del
+# docstring de mano_guante.py, escrito ANTES de anotar y ANTES de medir.
+BountifulSilentEarwig,0,B,B,hoja,alta,RESERVADO nn=13. en k=263 se ve el arma entera con la hoja saliendo de B
+BountifulSilentEarwig,1,A,A,hoja,alta,RESERVADO nn=06. hoja larga y clara saliendo de A hacia arriba-izquierda en k=266
+CandidBronzeIndigowingedparrot,0,A,A,hoja,alta,RESERVADO nn=15. arma con hoja saliendo de A hacia la derecha en k=266
+CandidBronzeIndigowingedparrot,1,A,A,arma,alta,RESERVADO nn=19. objeto metalico circular (cazoleta) justo en A en k=268 y k=322
+CautiousBeneficialLacewing,0,B,B,arma,alta,"RESERVADO nn=17. 2a pasada: arma con hoja fina saliendo de B hacia la derecha en dos cuadros, y B es la de delante en 6 de 6. Sube de media a alta"
+CautiousBeneficialLacewing,1,A,A,hoja,alta,RESERVADO nn=14. linea fina oscura saliendo de A hacia arriba-izquierda en k=235
+GloomyBitterBluegill,0,B,B,hoja,alta,RESERVADO nn=12. hoja clara saliendo de B hacia arriba-derecha en k=148
+GloomyBitterBluegill,1,A,A,accion,media,RESERVADO nn=10. 2a pasada: A del lado del rival en 6 de 6. Habia una mancha tostada junto a B que parecia punio y es el SUELO DE MADERA del fondo: solo aparece cuando el marcador pasa por encima de la madera. Sigue media
+IdolizedFancyChickadee,0,A,A,hoja,alta,RESERVADO nn=05. linea fina oscura saliendo de A hacia la derecha en k=164 y k=178
+IdolizedFancyChickadee,1,?,?,arbitro,,"RESERVADO nn=20. NO ES UN TIRADOR: la caja esta sobre el ARBITRO, hombre de traje oscuro con barba, sin careta ni uniforme"
+InsecurePettyCreature,0,B,B,arma,alta,"RESERVADO nn=07. 2a pasada: linea fina saliendo de B hacia arriba-derecha en k=77 y k=150, y B del lado del rival en 6 de 6. Sube de media a alta"
+InsecurePettyCreature,1,A,A,arma,alta,"RESERVADO nn=08. 2a pasada: objeto oscuro pequenio en la cruz de A en k=13, 26 y 92, y linea fina bajando de A en k=52 y k=245. Sube de media a alta"
+MediumShoddyAmphiuma,0,A,A,accion,media,RESERVADO nn=18. 2a pasada: A totalmente extendida hacia el rival en 4 de 6; sin arma visible sobre la mesa verde del fondo. Sigue media
+MediumShoddyAmphiuma,1,A,A,hoja,alta,RESERVADO nn=03. linea fina clara bajando de A en k=287 y k=294
+NervousHospitableChick,0,A,A,arma,alta,RESERVADO nn=02. 2a pasada: A es la mano del lado del rival en 4 de 6 y en k=267 y k=275 hay una linea fina oscura bajando de A: arma en reposo. Sube de media a alta
+NervousHospitableChick,1,A,A,accion,media,"RESERVADO nn=04. 2a pasada: A extendida hacia el rival en 6 de 6, pero sin arma visible en ninguno; sigue media"
+NextImmaterialGoldfish,0,A,A,hoja,alta,RESERVADO nn=09. linea fina oscura saliendo de A hacia la derecha en k=99 y k=208
+NextImmaterialGoldfish,1,A,A,arma,alta,RESERVADO nn=11. mancha oscura pegada a A en los tres cuadros
+WholeTallAlpineroadguidetigerbeetle,0,A,A,arma,alta,"RESERVADO nn=16. 2a pasada: en k=80 se ve la hoja oscura saliendo de A hacia arriba-derecha, y mancha oscura de cazoleta en A en k=235 y k=336. Sube de media a alta"
+WholeTallAlpineroadguidetigerbeetle,1,A,A,hoja,alta,RESERVADO nn=01. hoja fina saliendo de A hacia abajo-izquierda en k=289 y k=295

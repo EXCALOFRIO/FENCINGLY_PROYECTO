@@ -1,0 +1,50 @@
+# FENCINGLY_PROYECTO: en git va el CODIGO, la DOCUMENTACION y los datos pequenos que no se
+# pueden regenerar (catalogo, etiquetas, tablas de scouting). Lo que NO va, y donde vive:
+#   - resultados de la extraccion (01_extraccion/pruebas): respaldo en HF privado
+#     (EXCALORIO/fencingly-extraccion, `respalda.py`); son GB y crecen con el corpus
+#   - videos: emision de television con atletas identificables, ya estan en el CDN de origen
+#   - pesos de modelos: se bajan (YOLO de ultralytics, Sapiens 2 de HF)
+
+__pycache__/
+*.pyc
+.env
+*.part
+
+# resultados y temporales de la extraccion
+01_extraccion/pruebas/
+01_extraccion/TRABAJO/
+**/logs/
+*.log
+
+# pesos
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# media pesada generada por figuras y revisiones (se regenera con su script); los CSV, MD y JSON
+# pequenos de 02_validacion SI van: ahi estan las anotaciones a mano (conteo_ojo_pasos,
+# INDICE_y_tus_veredictos, anotacion.csv), que no se pueden regenerar
+*.mp4
+*.avi
+*.mov
+*.gif
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.npz
+*.npy
+*.pkl
+*.tar.gz
+*.zip
+*.previo
+02_validacion/herramienta/_publico/
+
+# salidas POR CLIP de la etapa 7 (van en el respaldo de HF con el resto de la extraccion)
+02_validacion/pista/eventos_*.csv
+02_validacion/pista/serie_eventos_*.csv
+02_validacion/pista/posicion_clip_*.csv
+
+# archivo historico: zips y copias viejas (estan en disco y en el respaldo)
+99_historico/

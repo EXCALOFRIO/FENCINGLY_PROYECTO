@@ -1,0 +1,112 @@
+=== 1 y 2 · ACIERTO POR CUADRO en las ventanas anotadas ===
+clip                                   cuadros  detec   base trivial
+AliveIgnorantBarebirdbat                    66    56%     0%    56%
+BlissfulTiredAiredale                       66    92%   100%   100%
+ElasticVerifiableAmericancreamdraft         44    50%    50%    50%
+FirsthandSoreGnat                           66    53%     0%    53%
+ForcefulAntiqueAlbacoretuna                 22    68%     0%   100%
+GentleQuerulousElephantseal                 44    77%    48%    52%
+KindEnchantingKid                           44    45%     0%    75%
+PotablePossibleIcterinewarbler              22   100%     0%   100%
+TestyWatchfulBarebirdbat                    44    84%    16%    84%
+UnfortunateColossalLamb                     44    89%   100%   100%
+TOTAL                                      462  69.7%  34.6%  73.8%
+
+"trivial" es responder SIEMPRE «ninguna». Es la linea base mas tonta posible y hay que
+batirla tambien, porque 12 de las 21 ventanas anotadas son «ninguna» de principio a fin.
+
+=== 2b · EL MISMO ACIERTO PARTIDO EN DOS, que es lo que de verdad informa ===
+El numero agrupado esta dominado por las ventanas sin accion: 12 de 21 son «ninguna» de
+principio a fin, o sea el 73,8 % de los cuadros. Un detector que no dispare nunca saca ese
+73,8 % sin saber nada, y uno que dispare paga en esas ventanas. Partido:
+  ventanas CON dueno anotado: 121 cuadros, acierto detector 25.6 %, base 41.3 %, trivial 0 %
+  ventanas SIN dueno anotado: 341 cuadros, acierto detector 85.3 %, base 32.3 %, trivial 100 %
+  y cuando LOS DOS nombran dueno (36 cuadros), el LADO coincide en 86.1 %
+  falsa alarma: cuadros sin dueno anotado donde el detector inventa uno: 14.7 %
+
+=== 2c · CUANTO CUESTA LA CONDICION DE ORDEN DE t.83.2.a ===
+Es la condicion mas dudosa del detector, porque `pies` no separa el a fondo de la marcha.
+Apagarla no es la solucion —seria dejar de aplicar la regla— pero SI localiza el problema.
+  con la condicion (como esta)   acierto global 69.7 %   en ventanas CON dueno 25.6 %
+  sin la condicion               acierto global 69.7 %   en ventanas CON dueno 28.1 %
+
+=== 3 · EL INSTANTE DEL CAMBIO, tolerancia +-3 cuadros ===
+  FALLA    AliveIgnorantBarebirdbat           esperado c73->1  detectado nada
+  FALLA    AliveIgnorantBarebirdbat           esperado c280->1  detectado nada
+  FALLA    AliveIgnorantBarebirdbat           esperado c286->1  detectado nada
+  FALLA    FirsthandSoreGnat                  esperado c304->0  detectado nada
+  ACIERTA  GentleQuerulousElephantseal        esperado c277->0  detectado c278
+  FALLA    GentleQuerulousElephantseal        esperado c281->0  detectado [(278, 0)]
+  FALLA    GentleQuerulousElephantseal        esperado c291->-1  detectado [(300, -1)]
+  ACIERTA  KindEnchantingKid                  esperado c226->1  detectado c224
+  FALLA    KindEnchantingKid                  esperado c231->1  detectado [(224, 1)]
+  FALLA    TestyWatchfulBarebirdbat           esperado c299->0  detectado nada
+  cambios anotados 10, acertados 2 (20 %), cambios detectados de mas 8
+
+=== 4 · CAMBIOS POR SEGUNDO, con y sin intervalo de gracia ===
+clip                                        con      sin segundos
+AliveIgnorantBarebirdbat                   0.00     0.00     13.9
+BlissfulTiredAiredale                      0.35     0.35     11.4
+ElasticVerifiableAmericancreamdraft        1.32     1.32      7.6
+FirsthandSoreGnat                          0.79     0.79     12.7
+ForcefulAntiqueAlbacoretuna                0.33     0.33     12.3
+GentleQuerulousElephantseal                0.58     0.58     10.3
+KindEnchantingKid                          0.20     0.20     10.0
+PotablePossibleIcterinewarbler             0.69     0.69      8.7
+TestyWatchfulBarebirdbat                   0.41     0.41      9.7
+UnfortunateColossalLamb                    1.02     1.02     13.7
+TOTAL                                      0.55     0.55    110.1
+  ANOTADO A MANO: 10 cambios en 15.4 s = 0.65 cambios por segundo
+
+=== 4b · QUE APORTA CADA MECANISMO CONTRA LA OSCILACION, apagandolos uno a uno ===
+Sin esta tabla, `PERMANENCIA` y la histeresis serian dos numeros inventados.
+variante                            cambios/s  x lo real
+completo                                 0.55        0.8
+sin intervalo de gracia                  0.55        0.8
+sin histeresis (un solo umbral)          0.38        0.6
+sin filtro de amplitud/altura            0.84        1.3
+sin fusion de mesetas                    0.51        0.8
+sin nada de lo anterior                  0.89        1.4
+
+=== 5 · PARADAS: candidatos del criterio de t.86 ===
+  BlissfulTiredAiredale              c337  para el 0, atacaba el 1, manos 1.90 (umbral 3.45)
+  ElasticVerifiableAmericancreamdraf c155  para el 0, atacaba el 1, manos 2.83 (umbral 3.06)
+  ElasticVerifiableAmericancreamdraf c202  para el 1, atacaba el 0, manos 1.44 (umbral 3.06)
+  ForcefulAntiqueAlbacoretuna        c352  para el 0, atacaba el 1, manos 1.67 (umbral 2.50)
+  GentleQuerulousElephantseal        c237  para el 1, atacaba el 0, manos 3.10 (umbral 4.18)
+  KindEnchantingKid                  c245  para el 0, atacaba el 1, manos 2.35 (umbral 6.66)
+  TestyWatchfulBarebirdbat           c320  para el 1, atacaba el 0, manos 2.50 (umbral 5.68)
+  UnfortunateColossalLamb            c349  para el 0, atacaba el 1, manos 2.85 (umbral 4.72)
+  candidatos: 8 en 10 clips
+  PARADAS ANOTADAS A MANO EN LAS 21 VENTANAS: 0
+
+=== 6 · DONDE FALLA: cuadros mal clasificados, agrupados por regla ===
+    31 cuadros  t.89.4.a contraataque: no quita la prioridad al atacante
+        ejemplo: GentleQuerulousElephantseal c291 verdad -1 detector 0 conf 0.48
+    26 cuadros  t.89.5.d el ataque se acorta o se detiene
+        ejemplo: ElasticVerifiableAmericancream c196 verdad 1 detector -1 conf 1.00
+    21 cuadros  t.89.2 accion simultanea, no hay prioridad
+        ejemplo: AliveIgnorantBarebirdbat c280 verdad 1 detector -1 conf 1.00
+    20 cuadros  ninguna: nadie ha iniciado un ataque correcto
+        ejemplo: AliveIgnorantBarebirdbat c73 verdad 1 detector -1 conf 1.00
+    19 cuadros  t.84.3 ataque sobre la preparacion del adversario
+        ejemplo: BlissfulTiredAiredale c317 verdad -1 detector 1 conf 1.00
+    18 cuadros  t.83.2.a ataque MAL iniciado: el fondo precede a la extension
+        ejemplo: AliveIgnorantBarebirdbat c293 verdad 1 detector -1 conf 0.40
+     5 cuadros  t.83.2.a extension del brazo, sin fondo todavia
+        ejemplo: ElasticVerifiableAmericancream c200 verdad 1 detector 0 conf 1.00
+
+=== 7 · LA CONFIANZA, ¿separa acierto de fallo? ===
+  conf mediana en aciertos 1.000, en fallos 1.000
+  criterio declarado: separa si la mediana de aciertos es >= 1,2x la de fallos
+  veredicto: NO SEPARA, y se dice
+
+=== 8 · LOTE DE CONTROL: clips que NO se miraron al arreglar el detector ===
+Es la unica defensa contra haberme ajustado a las 21 ventanas. Los arreglos de definicion
+se encontraron mirando la senal en 5 de esas ventanas, asi que su acierto esta inflado.
+Estas ventanas se anotaron DESPUES de congelar el codigo y sobre clips sin tocar.
+  WhisperedTenderDeinonychus     c268-c289  cambios anotados []  detectados []
+  UglyNiceAplomadofalcon         c145-c166  cambios anotados [('154', 'ninguna'), ('158', 'izquierda')]  detectados []
+  ventanas de control: 44 cuadros, acierto global 9.1 %, en cuadros CON dueno 0.0 %
+
+tabla por cuadro -> C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\prioridad\p2_por_cuadro.csv

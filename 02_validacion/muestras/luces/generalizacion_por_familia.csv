@@ -1,0 +1,6 @@
+conjunto,familia,sedes,mio_exacto,mio_color,viejo_exacto,viejo_color,mio_fp,mio_fn,viejo_fp,viejo_fn,cuadro_ok_mio
+ajuste,A_FIE,16,14,15,15,15,2,0,1,1,15
+prueba,B_banner_ruso,2,2,2,2,2,0,0,0,0,1
+prueba,C_tokio2022,1,1,1,1,1,0,0,0,0,1
+prueba,D_obs_olimpico,1,1,1,1,1,0,0,0,0,1
+prueba,E_paris2022,1,1,1,0,0,0,0,1,0,1

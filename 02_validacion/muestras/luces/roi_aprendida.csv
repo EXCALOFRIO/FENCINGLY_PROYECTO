@@ -1,0 +1,9 @@
+grupo,tipo,n,enciende,pct,p50,perdidos_sede
+tokyofoil2022,control_ok,20,18,90.0,131.1,527
+tokyofoil2022,no_lights,20,2,10.0,4.0,527
+stpetersburgfoil2019,control_ok,20,16,80.0,155.2,120
+stpetersburgfoil2019,no_lights,20,6,30.0,3.6,120
+parisfoil2022,control_ok,20,17,85.0,195.8,49
+parisfoil2022,no_lights,20,4,20.0,5.1,49
+CONTROL_familia_A,control_ok,20,17,85.0,163.0,1189
+CONTROL_familia_A,no_lights,20,8,40.0,16.6,1189

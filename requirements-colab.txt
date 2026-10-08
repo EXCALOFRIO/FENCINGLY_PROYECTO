@@ -1,0 +1,35 @@
+# FENCINGLY - lo que hace falta para EXTRAER en Colab. No habia ningun requirements en el arbol.
+#
+# UN SOLO ENTORNO, y ahi esta la gracia. En Windows `ultralytics` y `transformers` no coexisten y
+# por eso hay dos venv; en Colab se instala todo junto y las diez etapas corren en un proceso. Eso
+# es posible desde que `pipeline.capacidades()` pregunta "que puedo importar" en vez de "que
+# interprete soy": la pregunta vieja devolvia UNA etiqueta, acertaba "ultralytics" en cuanto ese
+# import funcionaba, y dejaba las etapas 4, 5, 7, 8 y 9 en SKIP para siempre.
+#
+# opencv-python-HEADLESS y no opencv-python: Colab no tiene pantalla, y el paquete normal arrastra
+# GTK por `imshow`. `cv2.VideoWriter` y `VideoCapture` funcionan igual en el headless, que es lo
+# unico que este codigo usa.
+#
+# LAS VERSIONES NO SE CLAVAN, Y ES DELIBERADO. `preflight.VERSIONES` clava torch 2.14.0+cu126,
+# numpy 2.5.2, pandas 3.0.5, scipy 1.18.1 y python 3.14.2 porque la HUELLA DE DETERMINISMO del
+# entrenamiento depende de ellas: un parche de numpy cambia el hash del productor e invalida 23.091
+# artefactos. **La extraccion no depende de esa huella**, y Colab no da python 3.14.2. Asi que aqui
+# se pone el minimo, se llama a `preflight.entorno(exigir=False)`, y **se apuntan las versiones
+# observadas en el manifiesto de cada lote**. Un candado de version que no aplica solo consigue que
+# nadie pueda correr nada.
+#
+# Lo instalado en esta maquina el 2026-09-22, para que se vea contra que se midio todo:
+#   ultralytics 8.4.142   torch 2.14.0+cu126 / +cu130   transformers 5.16.1
+#   numpy 2.5.2 (venv de extraccion) / 2.5.3 (venv de HF)   pandas 3.0.5   scipy 1.18.1
+#   opencv 5.0.0.93   matplotlib 3.11.1   huggingface_hub 1.30.0
+
+ultralytics>=8.4
+transformers>=5.16
+torch>=2.6
+numpy>=2.0
+pandas>=2.2
+scipy>=1.13
+matplotlib>=3.8
+opencv-python-headless>=4.10
+huggingface_hub>=0.30
+tqdm

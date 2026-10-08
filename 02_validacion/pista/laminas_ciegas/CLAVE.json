@@ -1,0 +1,42 @@
+{
+ "0": {
+  "clip": "WillingIncompatibleFrog",
+  "zona": "fotr_half"
+ },
+ "1": {
+  "clip": "BossyLiveDassie",
+  "zona": "fotr_warning_box"
+ },
+ "2": {
+  "clip": "GleamingFaintArizonaalligatorlizard",
+  "zona": "middle"
+ },
+ "3": {
+  "clip": "WhimsicalWigglyDromedary",
+  "zona": "fotr_half"
+ },
+ "4": {
+  "clip": "GracefulFortunateBeardeddragon",
+  "zona": "fotl_warning_box"
+ },
+ "5": {
+  "clip": "FearfulUnluckyBettong",
+  "zona": "fotl_warning_box"
+ },
+ "6": {
+  "clip": "HeavyUnderstatedInchworm",
+  "zona": "middle"
+ },
+ "7": {
+  "clip": "IndolentSmoggyAngwantibo",
+  "zona": "fotl_half"
+ },
+ "8": {
+  "clip": "BiodegradableOblongHochstettersfrog",
+  "zona": "fotl_half"
+ },
+ "9": {
+  "clip": "HonorableDigitalBass",
+  "zona": "fotr_warning_box"
+ }
+}

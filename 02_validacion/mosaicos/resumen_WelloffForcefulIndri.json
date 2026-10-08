@@ -1,0 +1,78 @@
+{
+ "clip": "WelloffForcefulIndri",
+ "W": 1920,
+ "H": 1080,
+ "T": 300,
+ "paso": 10,
+ "tiempos": {
+  "pose": {
+   "llamadas": 30,
+   "llamadas_por_cuadro": 1.0,
+   "ms_por_llamada": 343.7418166666248,
+   "ms_por_cuadro": 343.7418166666248,
+   "ms_por_cuadro_primera_pasada": 343.7418166666248,
+   "ms_por_cuadro_del_florete": 0.0
+  },
+  "matting": {
+   "llamadas": 113,
+   "llamadas_por_cuadro": 3.7666666666666666,
+   "ms_por_llamada": 801.962639822994,
+   "ms_por_cuadro": 3020.7259433332774,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 1415.0043999999361
+  },
+  "seg": {
+   "llamadas": 113,
+   "llamadas_por_cuadro": 3.7666666666666666,
+   "ms_por_llamada": 267.81021946898306,
+   "ms_por_cuadro": 1008.7518266665029,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 473.367976666547
+  },
+  "normal": {
+   "llamadas": 60,
+   "llamadas_por_cuadro": 2.0,
+   "ms_por_llamada": 333.64409666669417,
+   "ms_por_cuadro": 667.2881933333883,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 0.0
+  },
+  "pointmap": {
+   "llamadas": 30,
+   "llamadas_por_cuadro": 1.0,
+   "ms_por_llamada": 531.5694466665263,
+   "ms_por_cuadro": 531.5694466665263,
+   "ms_por_cuadro_primera_pasada": 0.0,
+   "ms_por_cuadro_del_florete": 0.0
+  },
+  "TODAS": {
+   "ms_por_cuadro": 5572.07722666632
+  }
+ },
+ "utilizables": 300,
+ "muestreados": 30,
+ "procesados": 30,
+ "descartados_pintados": 0,
+ "rec_kp": 0.9918312007866648,
+ "rec_desp": 0.08603678364571093,
+ "fuga_arb": 0.0,
+ "fuga_fondo": 0.009451990845669441,
+ "resto_arb_frac": 0.00250447680839978,
+ "residuo": 0.23688652565277407,
+ "fuga_solape": 0.08821580703027665,
+ "ret_oscuro_propio": 0.37435575292916,
+ "cobertura_cuadro": 0.039562853652263384,
+ "no_validos": 0,
+ "lados": 60,
+ "florete_lados_con_eje": 55,
+ "florete_lados_con_recta": 6,
+ "florete_cuadros_con_recta": 6,
+ "florete_dif_eje_mediana": 13.73565446217031,
+ "florete_dentro_0": 0.05319148936170213,
+ "florete_dentro_90": 0.08928571428571429,
+ "florete_contaminados": 0,
+ "mano": {
+  "0": "B",
+  "1": "A"
+ }
+}

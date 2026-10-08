@@ -1,0 +1,33 @@
+{
+ "clip": "AromaticShockedGermanspitz",
+ "W": 1920,
+ "H": 1080,
+ "T": 300,
+ "paso": 5,
+ "utilizables": 300,
+ "muestreados": 60,
+ "procesados": 60,
+ "descartados_pintados": 0,
+ "rec_kp": 0.9773171079357259,
+ "rec_desp": 0.06289860638154182,
+ "fuga_arb": 0.0,
+ "fuga_fondo": 0.00427317504515101,
+ "resto_arb_frac": 0.009160762507517472,
+ "residuo": 0.2395240766517114,
+ "fuga_solape": 0.09445248358694358,
+ "ret_oscuro_propio": 0.5125515214216828,
+ "cobertura_cuadro": 0.048363779578189305,
+ "no_validos": 3,
+ "lados": 120,
+ "florete_lados_con_eje": 117,
+ "florete_lados_con_recta": 17,
+ "florete_cuadros_con_recta": 17,
+ "florete_dif_eje_mediana": 8.996802342540718,
+ "florete_dentro_0": 0.10566615620214395,
+ "florete_dentro_90": 0.0,
+ "florete_contaminados": 2,
+ "mano": {
+  "0": "A",
+  "1": "A"
+ }
+}

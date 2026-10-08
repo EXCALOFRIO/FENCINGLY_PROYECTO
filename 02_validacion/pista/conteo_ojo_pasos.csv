@@ -1,0 +1,4 @@
+clip,lado,cuadro_inicio,cuadro_fin,s_utiles,umbral_px,n_zancadas,n_pasos_convenio,n_marchas_convenio,n_romper_convenio,n_medios_pasos,n_fondos_det,n_detectados,n_zancadas_cubiertas,recall_zancadas
+UglyNiceAplomadofalcon,0,0,269,9.0,28.1,11,5,2,3,1,1,8,11,1.0
+GentleQuerulousElephantseal,0,33,342,10.3,48.4,15,5,5,0,5,3,7,12,0.8
+AliveIgnorantBarebirdbat,1,14,419,13.5,54.5,23,10,5,5,3,3,11,21,0.913

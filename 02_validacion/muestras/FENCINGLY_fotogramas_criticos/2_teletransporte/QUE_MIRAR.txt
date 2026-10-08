@@ -1,0 +1,1 @@
+El torso se mueve mas rapido de lo humanamente posible entre dos cuadros: la caja salta a OTRA persona. Medido: 0,25 % de los CUADROS, no de los clips.

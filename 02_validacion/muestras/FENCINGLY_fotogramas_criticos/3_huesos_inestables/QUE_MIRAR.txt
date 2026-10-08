@@ -1,0 +1,1 @@
+La distancia hombro-cadera cambia dentro del clip, o sea que el esqueleto salta entre cuerpos distintos. Medido: 0,52 %.

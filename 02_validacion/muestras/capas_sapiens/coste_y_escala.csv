@@ -1,0 +1,29 @@
+capa,alto,ancho,mediana_ms,min_ms,max_ms,vram_pico_MiB
+seg,1024,768,254.9,247.1,272.5,1087
+seg,384,288,82.3,66.6,93.4,828
+normal,1024,768,326.6,313.5,344.6,1464
+normal,384,288,89.5,72.9,132.8,960
+pointmap,1024,768,502.8,480.9,536.4,2193
+matting,1024,768,757.8,747.6,831.9,3538
+matting,384,288,125.2,115.1,135.1,3038
+
+C4 pointmap: cambio de z mediana al ampliar el recorte (mascara de persona)
+clip,lado,relleno,z_recorte_ajustado,z_recorte_ampliado,cambio_pct
+SentimentalLargeBedlingtonterrier,0,0.15,0.9937,0.9985,0.49
+SentimentalLargeBedlingtonterrier,0,0.3,0.9937,1.0771,8.4
+SentimentalLargeBedlingtonterrier,1,0.15,0.9922,1.249,25.89
+SentimentalLargeBedlingtonterrier,1,0.3,0.9922,1.3818,39.27
+AdorableFittingAsiansmallclawedotter,0,0.15,2.9434,3.2031,8.83
+AdorableFittingAsiansmallclawedotter,0,0.3,2.9434,3.5508,20.64
+AdorableFittingAsiansmallclawedotter,1,0.15,2.9824,3.3613,12.7
+AdorableFittingAsiansmallclawedotter,1,0.3,2.9824,3.3438,12.12
+SoreEasygoingEmperorshrimp,0,0.15,0.7505,1.7119,128.11
+SoreEasygoingEmperorshrimp,0,0.3,0.7505,5.9609,694.27
+SoreEasygoingEmperorshrimp,1,0.15,1.0,4.7383,373.83
+SoreEasygoingEmperorshrimp,1,0.3,1.0,3.2754,227.54
+
+C5 pointmap cuadro completo
+clip,altura3d_cuerpo_u,error_vs_1.75m,separacion_en_alturas,dist3d_u
+SentimentalLargeBedlingtonterrier,0.0729,24.0,2.28,0.1664
+AdorableFittingAsiansmallclawedotter,0.6126,2.9,1.69,1.0327
+SoreEasygoingEmperorshrimp,0.1757,10.0,2.23,0.3917

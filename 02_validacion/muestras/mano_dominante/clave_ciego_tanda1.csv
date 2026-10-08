@@ -1,0 +1,16 @@
+# CLAVE de la anotacion ciega. NO se mira hasta que la anotacion esta
+# escrita. Orden barajado con random.Random(20260911) sobre los clips en el orden
+# en que se pasaron. Generada el 2026-09-11.
+nn,clip,lado
+01,WastefulYawningAmericanquarterhorse,1
+02,HairyCourteousEarwig,0
+03,SeparateHoarseFeline,0
+04,HairyCourteousEarwig,1
+05,IlliterateDisloyalFulmar,0
+06,VibrantJoyousAsiaticgreaterfreshwaterclam,0
+07,WastefulYawningAmericanquarterhorse,0
+08,AdorableVeneratedDuiker,1
+09,SeparateHoarseFeline,1
+10,AdorableVeneratedDuiker,0
+11,IlliterateDisloyalFulmar,1
+12,VibrantJoyousAsiaticgreaterfreshwaterclam,1

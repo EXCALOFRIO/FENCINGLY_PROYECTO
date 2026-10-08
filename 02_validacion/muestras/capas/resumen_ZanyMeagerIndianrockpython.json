@@ -1,0 +1,17 @@
+{
+ "clip": "ZanyMeagerIndianrockpython",
+ "n_cuadros": 40,
+ "rec_kp": 0.9961282009006741,
+ "rec_desp": 0.07581484803539293,
+ "fuga_arb": 0.0,
+ "fuga_fondo": 0.03088324984516478,
+ "residuo": 0.2677484693319087,
+ "fuga_solape": 0.9417779965884471,
+ "ret_oscuro_propio": 0.8738480350454713,
+ "resto_arb_frac": 0.040981897862495884,
+ "cobertura_cuadro": 0.019011962890625,
+ "n_marcados_no_validos": 0,
+ "n_lados": 80,
+ "rec_kp_validos": 0.9961282009006741,
+ "rec_kp_marcados": null
+}
