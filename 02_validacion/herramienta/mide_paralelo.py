@@ -44,7 +44,7 @@ def una(n, ids, minutos, lote):
     """QUE HACE: lanza n trabajadores sobre trozos disjuntos, mide `minutos` y los mata."""
     trozo = (len(ids) + n - 1) // n
     procs = []
-    banderas = (subprocess.CREATE_NEW_PROCESS_GROUP | 0x00000008) if sys.platform == "win32" \
+    banderas = (subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW) if sys.platform == "win32" \
         else 0
     logs = RU.TRABAJO / "logs_medida"
     logs.mkdir(parents=True, exist_ok=True)

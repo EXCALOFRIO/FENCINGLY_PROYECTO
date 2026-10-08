@@ -142,7 +142,7 @@ def lanza(n_gpu, n_cpu, conjunto="disco", lote=20, etapas_gpu="1,4", descarga=Fa
           exigir=True, respaldo=120):
     """QUE HACE: lanza los trabajadores DESATENDIDOS y devuelve el control.
 
-    `CREATE_NEW_PROCESS_GROUP` + `DETACHED_PROCESS` para que sigan vivos cuando se cierre la
+    `CREATE_NEW_PROCESS_GROUP` + `CREATE_NO_WINDOW` para que sigan vivos, sin ventana, cuando se cierre la
     consola que los lanzo. Si murieran con la consola, "dejarlo toda la noche" seria una promesa
     que el codigo no cumple.
     """
@@ -162,7 +162,12 @@ def lanza(n_gpu, n_cpu, conjunto="disco", lote=20, etapas_gpu="1,4", descarga=Fa
     pids = []
     banderas = 0
     if os.name == "nt":
-        banderas = subprocess.CREATE_NEW_PROCESS_GROUP | 0x00000008  # DETACHED_PROCESS
+        banderas = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+        """SIN VENTANA, y no `DETACHED_PROCESS` (2026-10-08, lo pidio el usuario). Un proceso
+        DESACOPLADO no tiene consola, asi que cada programa de consola que lanza (el `python.exe`
+        del venv es un lanzador que arranca otro) le abre a Windows una ventana NUEVA en pantalla.
+        `CREATE_NO_WINDOW` le da una consola oculta que heredan los hijos: ninguna ventana, y siguen
+        vivos al cerrar la terminal que los lanzo. Todo lo que dicen va a `logs_noche/*.log`."""
     for i in range(n_gpu):
         desde = i * trozo
         log = LOGS / ("gpu%d.log" % i)

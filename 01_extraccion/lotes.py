@@ -298,6 +298,7 @@ def _lanza(py, codigo, clips, etiqueta):
            "CLIPS = json.loads(%r)\n"
            % (str(RU.CODIGO), str(RU.HERRAMIENTA), json.dumps(clips)))
     r = subprocess.run([py, "-c", pre + codigo], capture_output=True, text=True,
+                       creationflags=(subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0),
                        encoding="utf-8", errors="replace")
     d = time.perf_counter() - t
     if r.returncode != 0:
