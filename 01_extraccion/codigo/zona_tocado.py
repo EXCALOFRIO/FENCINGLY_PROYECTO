@@ -49,13 +49,14 @@ CFG_PISTA = {"length_m": 14.0, "width_m": 1.5, "lines_m": [-7.0, -5.0, -2.0, 0.0
 VENTANA_S = 0.5
 BANDA_ROTULO = 0.78
 """Fraccion de la altura a partir de la cual esta el rotulo del marcador: se excluye de las rayas."""
-CIFRA = ("x del tocado: correlacion con la zona humana 0,387 (n=220; la x de la etapa 7 da -0,003). "
-         "Zona: acierto 0,520 contra 0,448 de `middle`, +0,073 con IC95 [-0,005, +0,150]: NO pasa el "
-         "criterio declarado por poco, asi que la columna `zona` NO esta adoptada. Cobertura 0,380 "
-         "(sin luz 0,40, sin homografia en el tocado 0,22). Medido el 2026-10-08 en 582 clips anotados.")
-"""LA CIFRA, con el criterio que se declaro antes de medir. Lo que SI se adopta es `x_tocado_m` como
-DATO MEDIDO (la senial de posicion mas fuerte del proyecto, y la unica distinta de cero); lo que NO
-se adopta es la ZONA como respuesta. El paso siguiente declarado: pasar `x_tocado_m` al etiquetador
+CIFRA = ("Zona ADOPTADA (2026-10-08, 1.313 clips anotados con respuesta): acierto 0,476 contra 0,353 "
+         "de `middle`, +0,123 IC95 [+0,090, +0,155]; contra la etapa 7 en los mismos 694 clips 0,484 "
+         "contra 0,343, +0,141 IC95 [+0,094, +0,187]. Correlacion x-zona 0,292 (etapa 7: -0,034). "
+         "Cobertura 0,549. Por `via` de la luz: roi_sede +0,158, general_tras_roi +0,114, general "
+         "+0,091, las tres con IC95 por encima de cero. Con rayas vistas (`metodo_h=lines`) 0,520.")
+"""LA CIFRA, con el criterio que se declaro antes de medir. HISTORIA: con 582 clips (220 con respuesta)
+la zona se quedo en +0,073 IC95 [-0,005, +0,150] y NO se adopto; el criterio no se toco, y con
+1.313 clips pasa sus dos mitades con holgura. `x_tocado_m` es dato medido desde el primer dia. El paso siguiente declarado: pasar `x_tocado_m` al etiquetador
 en lugar de la x de la etapa 7 y medir su cabeza `strip_location` (hoy 0,463 contra 0,397)."""
 
 COLUMNAS = ["clip", "motivo", "cuadro_tocado", "via_luz", "cuadro_usado", "x_izq_m", "x_der_m",

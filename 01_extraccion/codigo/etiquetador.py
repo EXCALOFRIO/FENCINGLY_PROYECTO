@@ -273,11 +273,39 @@ def _eventos_por_lado(clip, T):
     return E, True
 
 
+X_ZONA = os.environ.get("FENCINGLY_X_ZONA", "0") == "1"
+"""DE DONDE SALE LA x EN METROS DEL BLOQUE ABSOLUTO. `0`: la de la etapa 7 (`x_inicio_m` de cada
+evento), que contra la zona humana correlaciona -0,034. `1`: la de la etapa 11 (`zona_<clip>.csv`,
+rayas pintadas + camara en el cuadro de la luz), que correlaciona 0,292 en 1.313 clips."""
+
+
+def _x_metros_zona(clip, T, X):
+    """QUE DEVUELVE: X con `x_izq_m`/`x_der_m` de la etapa 11 en +-0,5 s del cuadro usado, NaN fuera.
+    La ventana es la misma en la que la etapa 11 acepta una homografia: fuera de ella no hay medida."""
+    p = RU.TRABAJO / ("zona_%s.csv" % clip)
+    if not p.is_file():
+        return X, False
+    with open(p, encoding="utf-8") as fh:
+        f = next(csv.DictReader(fh), None)
+    try:
+        k = int(float(f["cuadro_usado"]))
+        xi, xd = float(f["x_izq_m"]), float(f["x_der_m"])
+    except (TypeError, ValueError, KeyError):
+        return X, False
+    if not (math.isfinite(xi) and math.isfinite(xd)):
+        return X, False
+    a, b = max(0, k - 15), min(T, k + 16)
+    X[a:b, 0], X[a:b, 1] = xi, xd
+    return X, b > a
+
+
 def _x_metros(clip, T):
     """QUE DEVUELVE: (T, 2) con la x en metros de cada tirador, o NaN si el clip no tiene
     homografia. **NaN y no cero**: 6 de cada 10 clips no tienen homografia, y un cero ahi los haria
     indistinguibles de un tirador en el centro de la pista."""
     X = np.full((T, 2), np.nan, dtype="float32")
+    if X_ZONA:
+        return _x_metros_zona(clip, T, X)
     p = RU.PISTA / ("serie_eventos_%s.csv" % clip)
     if not p.is_file():
         return X, False

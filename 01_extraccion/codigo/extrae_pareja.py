@@ -59,6 +59,8 @@ caja (0 medido, 1 interpolado, 2 sostenido, 3 redetectado) y NO se debe perder a
 """
 from __future__ import annotations
 
+import os
+
 import numpy as np
 
 import a3_selector as SEL
@@ -91,6 +93,21 @@ Se deja el interruptor y el codigo para que quede la medida, no para usarlo."""
 CONF_YOLO = 0.10
 IMGSZ_YOLO = 960
 
+YOLO_HALF = os.environ.get("FENCINGLY_YOLO_HALF", "1") == "1"
+YOLO_LOTE = int(os.environ.get("FENCINGLY_YOLO_LOTE", "8"))
+"""YOLO EN fp16 Y EN LOTES DE 8 CUADROS, adoptado el 2026-10-08 con dos puertas.
+
+Puerta 1, cajas crudas (8 clips, 2.487 cuadros): el 99,92 % de las cajas con IoU >= 0,9 y
+desplazamiento p50 0,26 px, pero el MISMO NUMERO de cajas solo en el 98,9 % de los cuadros contra el
+99 % declarado: **no paso**. La diferencia son cajas en el umbral `CONF_YOLO = 0,10` que aparecen o no.
+
+Puerta 2, la que importa y declarada antes de medirla: la PAREJA que elige `procesa` (20 clips,
+12.069 cajas): **99,94 %** con IoU >= 0,95 por lado (criterio 99,5 %) y presencia igual en el
+99,99 %. Las cajas de umbral no llegan a la pareja. Velocidad de la deteccion, intercalada con la
+GPU compartida: **1,53x** (fp16 solo: 1,19x; el lote es lo que paga).
+
+`FENCINGLY_YOLO_HALF=0 FENCINGLY_YOLO_LOTE=1` devuelve el camino anterior, cuadro a cuadro en fp32."""
+
 
 def detecta_clip(yolo, cap, cv2) -> tuple:
     """QUE HACE: pasa el detector por todos los cuadros y devuelve cajas, cuadros y los fotogramas.
@@ -102,18 +119,27 @@ def detecta_clip(yolo, cap, cv2) -> tuple:
     H = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     frames, cajas, cuadros = [], [], []
     k = 0
-    while True:
-        ok, im = cap.read()
-        if not ok:
+    fin = False
+    while not fin:
+        trozo = []
+        while len(trozo) < YOLO_LOTE:
+            ok, im = cap.read()
+            if not ok:
+                fin = True
+                break
+            trozo.append(im)
+        if not trozo:
             break
-        frames.append(im)
-        r = yolo.predict(im, imgsz=IMGSZ_YOLO, conf=CONF_YOLO, verbose=False, device=0)[0]
-        if r.boxes is not None and len(r.boxes):
-            b = r.boxes.xyxy.cpu().numpy()
-            for i in range(len(b)):
-                cajas.append(b[i])
-                cuadros.append(k)
-        k += 1
+        frames.extend(trozo)
+        rs = yolo.predict(trozo, imgsz=IMGSZ_YOLO, conf=CONF_YOLO, verbose=False, device=0,
+                          half=YOLO_HALF)
+        for r in rs:
+            if r.boxes is not None and len(r.boxes):
+                b = r.boxes.xyxy.cpu().numpy()
+                for i in range(len(b)):
+                    cajas.append(b[i])
+                    cuadros.append(k)
+            k += 1
     return (np.asarray(cajas, "float32"), np.asarray(cuadros, "int32"), W, H, k, frames)
 
 

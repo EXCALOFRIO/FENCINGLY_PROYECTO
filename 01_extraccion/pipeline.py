@@ -246,7 +246,7 @@ ETAPAS = [
           "no GPU: eats the series, not the video. `origen_etiqueta = modelo`, never merged"),
     Etapa(11, "where the touch was: painted lines + camera motion, at the light",
           ("cv2",), ("poses_%s.npz",), "zona_<clip>.csv", _zona,
-          "x vs human zone: r 0.387 (stage 7: -0.003). Zone answer NOT adopted: +0.073, CI95 crosses 0"),
+          "zone ADOPTED: 0.476 vs middle 0.353 (+0.123, CI95 [+0.090, +0.155], n=1313); vs stage 7 +0.141 CI95 [+0.094, +0.187]"),
 ]
 
 NOTA_8 = """STAGE 8 HAS NO `corre` ON PURPOSE, AND ITS NUMBER WAS THE WRONG ONE.

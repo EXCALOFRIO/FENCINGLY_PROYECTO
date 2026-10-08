@@ -116,7 +116,7 @@ Una fila por clip. Medido contra `strip_location` en 582 clips anotados (`ESTADO
 | `cuadro_usado` | `columna` | cuadro con homografia confiable mas cercano al tocado, en +-0,5 s | cuadro | SI | - |
 | `x_izq_m / x_der_m` | `columna` | posicion de cada tirador a lo largo de la pista | m desde la linea central | PARCIAL | convenio: x crece hacia la derecha de la imagen |
 | `x_tocado_m` | `columna` | la media de las dos | m | **SI, contra verdad humana** | correlacion con la zona **0,387** (n=220); la x de la etapa 7 da **-0,003** |
-| `zona` | `columna` | la zona de `x_tocado_m` con +-2 / +-5 m | categoria | **NO ADOPTADA** | 0,520 contra 0,448 de `middle`, IC95 de la diferencia [-0,005, +0,150]: no pasa el criterio declarado |
+| `zona` | `columna` | la zona de `x_tocado_m` con +-2 / +-5 m | categoria | **ADOPTADA** (2026-10-08) | 1.313 clips: 0,476 contra 0,353 de `middle`, +0,123 IC95 [+0,090, +0,155]; contra la etapa 7 en 694 clips +0,141 IC95 [+0,094, +0,187]. Con 582 clips no pasaba (IC95 [-0,005, +0,150]) |
 | `conf_h / metodo_h` | `columna` | confianza de la homografia y si viene de rayas o propagada con la camara | 0-1 / texto | SI | rayas 0,538 contra propagada 0,508 de acierto |
 | `frac_cuadros_con_h` | `columna` | fraccion de cuadros del clip con homografia confiable | 0-1 | SI | - |
 
