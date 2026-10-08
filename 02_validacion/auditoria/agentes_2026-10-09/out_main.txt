@@ -1,0 +1,215 @@
+TRABAJO= C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\01_extraccion\pruebas existe True
+PISTA= C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\pista existe True
+manifiesto: 362950 clips
+clips con poses_: 5568
+
+=== 6. duplicados ===
+clip_id duplicado en manifiesto: 0
+urls duplicadas entre los 5568 clips extraidos: 0
+mismo fichero de video fisico bajo >1 clip_id: 0
+
+resoluciones (W,H) en los clips extraidos:
+   1280x720 : 4232
+   1920x1080 : 1051
+   854x480 : 255
+   640x360 : 17
+   1920x1078 : 12
+   1920x1008 : 1
+
+=== 3. cuadro_tocado vs T (fin del clip) ===
+clips con zona_ csv no vacio: 5104; con motivo=='ok' y cuadro_tocado: 2798
+   p1   frac=0.000
+   p5   frac=0.160
+   p10  frac=0.460
+   p25  frac=0.676
+   p50  frac=0.776
+   p75  frac=0.844
+   p90  frac=0.896
+   p95  frac=0.920
+   p99  frac=0.953
+   media 0.7152401176319071 n 2798
+   frac<0.2 (tocado en la primera quinta parte del clip): 156 (0.0558)
+   frac<0.5: 305 (0.1090)
+   frac>1.0 (tocado fuera del clip, deberia ser imposible): 0
+peores ejemplos (frac mas bajo o >1):
+   AcceptableImprobableGiraffe              cuadro_tocado=     0  T=  250  frac=0.000
+   AgonizingFaroffHerring                   cuadro_tocado=     0  T=  250  frac=0.000
+   AppropriateDependentIsabellineshrike     cuadro_tocado=     0  T=  300  frac=0.000
+   AptSelfishCottonmouth                    cuadro_tocado=     0  T=   90  frac=0.000
+   AstonishingAgreeableCanadagoose          cuadro_tocado=     0  T=  500  frac=0.000
+   BlackandwhiteShadyHerring                cuadro_tocado=     0  T=  300  frac=0.000
+   BlankAgileArthropods                     cuadro_tocado=     0  T=  300  frac=0.000
+   BrilliantWideeyedBarasingha              cuadro_tocado=     0  T=  300  frac=0.000
+   BruisedFaithfulBlackpanther              cuadro_tocado=     0  T=  300  frac=0.000
+   ClosePessimisticFishingcat               cuadro_tocado=     0  T=  250  frac=0.000
+   ClosedIdealisticAmurratsnake             cuadro_tocado=     0  T=  300  frac=0.000
+   ConstantInfiniteBluetickcoonhound        cuadro_tocado=     0  T=  250  frac=0.000
+   DependentGenerousEarwig                  cuadro_tocado=     0  T=  300  frac=0.000
+   DeterminedHandsomeIberianmole            cuadro_tocado=     0  T=  250  frac=0.000
+   DifferentFirstJay                        cuadro_tocado=     0  T=  250  frac=0.000
+
+=== 2. lights (lado L/R) vs manifiesto['touch'] ===
+clips comparables (luz on-target + touch left/right/double en manifiesto): 4328
+acierto global: 0.6719 (n=4328)
+matriz pred x touch:
+touch   double  left  right
+pred                       
+double      63   183    202
+left       148  1345    311
+right      136   440   1500
+
+acierto por via:
+                      mean  count
+via                              
+general           0.738377   1269
+general_tras_roi  0.696113   1698
+roi_sede          0.579721   1361
+
+acierto por torneo (torneos con >=15 clips comparables):
+                                mean  count
+torneo                                     
+serbiafoil2022              0.400000     15
+katowicefoil2019            0.515625    256
+seoulsabre2019              0.522727     44
+moscowwch2015               0.523810     21
+tauberbischofsheimfoil2022  0.529412     34
+algierssabre2022            0.529412     85
+stpetersburgfoil2019        0.545741    317
+kazanfoil2020               0.554090    379
+parisfoil2022               0.591346    208
+budapest2020                0.611111     18
+tokyoolympics2020           0.619217    281
+madridsabre2022             0.631579     19
+budapestsabre2021           0.647059     17
+montrealsabre2020           0.647059     17
+cairosabre2019              0.655172     29
+qatarfoil2021               0.657216    388
+eurochamps2022              0.698113     53
+cali2018                    0.703704     27
+budapestsabre2019           0.714286     21
+cancunsabre2017             0.714286     42
+bonnfoil2022                0.722222     18
+anaheimfoil2018             0.732014    556
+turinfoil2020               0.738889    180
+budapest2019                0.750000     32
+worldchamps2022             0.757576     99
+heidenheim2018              0.760000     25
+incheonfoil2022             0.779661     59
+anaheimfoil2019             0.798942    189
+wuxi2018                    0.806452     62
+budapestepee2022            0.809524     21
+dubai2018                   0.826087     23
+cali2019                    0.833333     42
+cairoepee2022               0.842105     19
+doha2019                    0.850000     40
+doha2017                    0.863636     22
+dubai2019                   0.900000     20
+barcelona2019               0.904762     21
+heidenheim2019              0.904762     21
+budapestwch2019             0.913043     46
+barcelona2016               0.916667     24
+barcelona2018               0.925926     27
+tallinn2019                 0.952381     21
+bern2018                    0.958333     24
+qatar2020                   0.961538     26
+
+=== 1. lado 0/1 vs 'initiated' (fotl/fotr) usando el primer evento de ataque ===
+clips comparables: 4222
+acierto global (predicho por orden de eventos vs 'initiated' humano): 0.5168 (n=4222)
+(referencia: techo humano publicado para 'initiated' = 0.688; acierto~0.5 es azar)
+
+acierto por torneo (torneos con >=15 clips comparables):
+                                mean  count
+torneo                                     
+qatar2020                   0.307692     26
+budapestepee2022            0.312500     16
+barcelona2018               0.370370     27
+cali2018                    0.370370     27
+budapestsabre2019           0.375000     16
+doha2017                    0.411765     17
+cancunsabre2017             0.432432     37
+cali2019                    0.436364     55
+tallinn2019                 0.444444     18
+wuxi2018                    0.454545     55
+cairosabre2019              0.454545     22
+heidenheim2018              0.466667     15
+parisfoil2022               0.487013    154
+tokyoolympics2020           0.494774    287
+katowicefoil2019            0.500000    244
+budapestwch2019             0.500000     44
+bern2018                    0.500000     20
+heidenheimepee2022          0.500000     16
+anaheimfoil2018             0.506087    575
+algierssabre2022            0.506494     77
+kazanfoil2020               0.513433    335
+tauberbischofsheimfoil2022  0.514286     35
+anaheimfoil2019             0.519553    179
+barcelona2016               0.523810     21
+stpetersburgfoil2019        0.527869    305
+doha2019                    0.529412     34
+turinfoil2020               0.532258    186
+montrealsabre2020           0.533333     15
+qatarfoil2021               0.538293    457
+dubai2019                   0.550000     20
+kazanwch2014                0.562500     16
+seoulsabre2019              0.565217     46
+worldchamps2022             0.567797    118
+heidenheim2019              0.588235     17
+budapest2019                0.590909     22
+eurochamps2022              0.592593     54
+bonnfoil2022                0.640000     25
+incheonfoil2022             0.641026     78
+dubai2018                   0.647059     17
+serbiafoil2022              0.687500     16
+barcelona2019               0.750000     20
+cairoepee2022               0.750000     20
+
+=== 7. valores imposibles en serie_eventos (duracion<0, v>8 m/s, |x|>8 m) ===
+ficheros serie_eventos leidos: 5501, filas totales: 117997
+duracion_s < 0: 0
+velocidad_m_s > 8: 2815
+    ('PertinentThatBrontosaurus', 'doha2017', 'fondo', 91535.59)
+    ('jitteryCassowaryRedPaperWasp', 'parisolympicsepee2024', 'fondo', 46986.217)
+    ('GrayThoseGerbil', 'stpetersburgfoil2019', 'fondo', 21842.212)
+    ('DeadRegularAngelwingmussel', 'stpetersburgfoil2019', 'fondo', 21357.49)
+    ('DeadRegularAngelwingmussel', 'stpetersburgfoil2019', 'fondo', 19812.995)
+    ('BarrenHopefulEel', 'parisfoil2022', 'fondo', 18465.507)
+    ('ArtisticIdolizedAmericanindianhorse', 'cali2019', 'fondo', 17704.682)
+    ('ArtisticIdolizedAmericanindianhorse', 'cali2019', 'fondo', 17110.243)
+    ('HeavyIdioticHawk', 'parisfoil2022', 'fondo', 15386.901)
+    ('MajorDecentBrahmanbull', 'stpetersburgfoil2019', 'fondo', 14691.564)
+|x_inicio_m| o |x_fin_m| > 8: 18002
+    ('ZigzagObeseFlyinglemur', 'anaheimfoil2018', 'fondo', 'x_fin_m', -514354.485)
+    ('HarshAcademicBlackwidowspider', 'anaheimfoil2018', 'fondo', 'x_fin_m', 149955.059)
+    ('AggressiveFlimsyAegeancat', 'stpetersburgfoil2019', 'fondo', 'x_fin_m', -53957.596)
+    ('UnknownHoarseDwarfmongoose', 'katowicefoil2019', 'fondo', 'x_fin_m', 39940.15)
+    ('FlatFearfulCaecilian', 'anaheimfoil2018', 'fondo', 'x_fin_m', -25475.142)
+    ('AggressiveFlimsyAegeancat', 'stpetersburgfoil2019', 'fondo', 'x_inicio_m', -18521.072)
+    ('BarrenHopefulEel', 'parisfoil2022', 'fondo', 'x_fin_m', -15399.255)
+    ('AggressiveFlimsyAegeancat', 'stpetersburgfoil2019', 'romper', 'x_fin_m', -12407.238)
+    ('SpiritedFlashyKid', 'parisfoil2022', 'fondo', 'x_fin_m', -10635.178)
+    ('AggressiveFlimsyAegeancat', 'stpetersburgfoil2019', 'romper', 'x_fin_m', -9505.788)
+
+por torneo (duracion<0 + vel>8 + x>8 juntos), torneos con >=2 incidencias:
+   anaheimfoil2018              incidencias=2619 clips_de_ese_torneo=747
+   stpetersburgfoil2019         incidencias=2112 clips_de_ese_torneo=432
+   katowicefoil2019             incidencias=1833 clips_de_ese_torneo=333
+   tokyoolympics2020            incidencias=1733 clips_de_ese_torneo=374
+   qatarfoil2021                incidencias=1685 clips_de_ese_torneo=576
+   turinfoil2020                incidencias=1205 clips_de_ese_torneo=254
+   parisfoil2022                incidencias=1169 clips_de_ese_torneo=255
+   kazanfoil2020                incidencias=821  clips_de_ese_torneo=419
+   anaheimfoil2019              incidencias=520  clips_de_ese_torneo=230
+   eurochamps2022               incidencias=470  clips_de_ese_torneo=80
+   cali2019                     incidencias=374  clips_de_ese_torneo=65
+   vancouverepee2022            incidencias=283  clips_de_ese_torneo=15
+   heidenheim2019               incidencias=270  clips_de_ese_torneo=32
+   wuxi2018                     incidencias=260  clips_de_ese_torneo=67
+   worldchamps2022              incidencias=256  clips_de_ese_torneo=148
+   incheonfoil2022              incidencias=255  clips_de_ese_torneo=92
+   serbiafoil2022               incidencias=249  clips_de_ese_torneo=25
+   dubai2018                    incidencias=190  clips_de_ese_torneo=24
+   tauberbischofsheimfoil2022   incidencias=180  clips_de_ese_torneo=40
+   parisolympicsepee2024        incidencias=174  clips_de_ese_torneo=7
+
+FIN chk_main.py

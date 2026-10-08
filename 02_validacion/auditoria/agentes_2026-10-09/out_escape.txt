@@ -1,0 +1,48 @@
+filas imposibles (v>8 o |x|>8) en total: 10496
+de esas, SIN marcar no-fiable (publicable=='True' o vacio, sin_homografia no 'True'): 287
+
+por torneo:
+  anaheimfoil2018              61
+  katowicefoil2019             36
+  parisfoil2022                29
+  eurosepee2023                26
+  bonnfoil2022                 23
+  algierssabre2022             17
+  belgradefoil2022             12
+  heidenheimepee2025           11
+  stpetersburgfoil2019         10
+  turinfoil2020                8
+  cairoepee2022                8
+  incheonfoil2022              6
+  kazanwch2014                 6
+  qatarfoil2021                5
+  worldchamps2022              4
+  qatar2020                    4
+  eurochamps2022               4
+  budapestepee2022             3
+  moscowwch2015                3
+  caliepee2024                 2
+  cali2019                     2
+  cairosabre2019               1
+  doha2019                     1
+  orleanssabre2022             1
+  plovdivsabre2025             1
+
+peores 15 por magnitud:
+('HugeAmusingCornsnake', 'anaheimfoil2018', 'fondo', 2324.72, [-16.227, 538.444], 'True', None, 2324.72)
+('PlainDefinitiveDamselfly', 'belgradefoil2022', 'romper', 2138.017, [1362.068, 407.31], 'True', None, 2138.017)
+('PlainDefinitiveDamselfly', 'belgradefoil2022', 'fondo', 2137.02, [4.379, 580.201], 'True', None, 2137.02)
+('PlainDefinitiveDamselfly', 'belgradefoil2022', 'romper', 748.785, [1540.969, 1155.433], 'True', None, 1540.969)
+('terribleBeardedFirewormPuggle', 'heidenheimepee2025', 'brazo', None, [-1393.136, -46.949], 'True', None, 1393.136)
+('terribleBeardedFirewormPuggle', 'heidenheimepee2025', 'fondo', -2931.411, [396.214, -1189.657], 'True', None, 1189.657)
+('PopularElaborateChrysomelid', 'anaheimfoil2018', 'fondo', 101.628, [-256.788, -703.395], 'True', None, 703.395)
+('HugeAmusingCornsnake', 'anaheimfoil2018', 'brazo', None, [-26.741, 453.86], 'True', None, 453.86)
+('ShamefulWelltodoAustraliankestrel', 'eurochamps2022', 'fondo', 409.842, [15.613, -64.369], 'True', None, 409.842)
+('terribleBeardedFirewormPuggle', 'heidenheimepee2025', 'fondo', 365.365, [19.289, 77.873], 'True', None, 365.365)
+('QuarterlyIgnorantFowl', 'moscowwch2015', 'fondo', 155.609, [47.577, 351.311], 'True', None, 351.311)
+('PlainDefinitiveDamselfly', 'belgradefoil2022', 'brazo', None, [27.284, 351.215], 'True', None, 351.215)
+('terribleBeardedFirewormPuggle', 'heidenheimepee2025', 'fondo', -36.396, [-36.625, 338.603], 'True', None, 338.603)
+('HugeAmusingCornsnake', 'anaheimfoil2018', 'marcha', 295.085, [-23.418, 0.196], 'True', None, 295.085)
+('PlainDefinitiveDamselfly', 'belgradefoil2022', 'fondo', 272.86, [4.935, 50.4], 'True', None, 272.86)
+
+clips distintos afectados: 49

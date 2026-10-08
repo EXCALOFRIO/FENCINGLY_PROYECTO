@@ -1,0 +1,63 @@
+clips a procesar: 5572
+  ... 1000 clips procesados
+  ... 2000 clips procesados
+  ... 3000 clips procesados
+  ... 4000 clips procesados
+  ... 5000 clips procesados
+errores de lectura: 0
+
+=== 5. confianza de keypoints por resolucion (solo poses MEDIDAS) ===
+       clips_lado  sc_media  frac_bajo_umbral_media  sc_media_p10
+res                                                              
+360p           33  0.440747                0.176945      0.318722
+480p          500  0.459459                0.147812      0.308304
+720p         8425  0.488264                0.092478      0.424106
+1080p        2128  0.499463                0.081027      0.444215
+
+=== 4. tasa de swap izq/der ANATOMICO del tobillo, frame a frame (solo medidas) ===
+lado-clips evaluados (>=10 transiciones validas): 10822
+transiciones validas totales: 2814417, swaps detectados: 5407, tasa global: 0.00192
+
+distribucion de la tasa por lado-clip:
+count    10822.000000
+mean         0.002146
+std          0.006472
+min          0.000000
+25%          0.000000
+50%          0.000000
+75%          0.000000
+max          0.173913
+Name: tasa, dtype: float64
+
+peores 20 lado-clip (mayor tasa, con >=30 transiciones):
+                             clip  lado  n_trans  n_swap     tasa
+      NiceTimelyBedlingtonterrier     1       36       5 0.138889
+          GentleParchedArcherfish     1      197      21 0.106599
+     DistortedLinearEthiopianwolf     1       89       8 0.089888
+RespectfulInexperiencedFlycatcher     0      114      10 0.087719
+EverlastingBitterHochstettersfrog     0      184      16 0.086957
+        MiniatureDisguisedKarakul     0       89       7 0.078652
+             AfraidFrayedInchworm     1      249      19 0.076305
+                    GeneralIllElk     0       54       4 0.074074
+            GrippingDiligentJunco     0       55       4 0.072727
+             CoarsePoshBlackmamba     1      153      11 0.071895
+             OffensiveFormalBaiji     1       56       4 0.071429
+           SnappyTautKentrosaurus     0       30       2 0.066667
+             HarshUnfitFlycatcher     0       61       4 0.065574
+      ApprehensiveKindlyApatosaur     0       31       2 0.064516
+      UnconsciousRemarkableGerbil     1      269      16 0.059480
+        ScarceCompassionateGodwit     1       85       5 0.058824
+    ParallelFoolishAmericanmarten     0      292      17 0.058219
+          PerfectDownrightDolphin     0      299      17 0.056856
+QueasyRespectfulInexpectatumpleco     0      147       8 0.054422
+               RigidSmugDragonfly     1       74       4 0.054054
+
+tasa de swap por resolucion:
+          n  tasa_media    trans  swaps
+res                                    
+1080p  2058    0.001038   616557    562
+360p     30    0.026458     4058    104
+480p    467    0.000699   115699     88
+720p   8267    0.002415  2078103   4653
+
+FIN chk_poses.py

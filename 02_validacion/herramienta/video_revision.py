@@ -206,6 +206,16 @@ def _fuera_de_caja(kp, sc, caja_xywh):
     return np.where(dentro, sc, 0.0)
 
 
+PREPROC_GPU = os.environ.get("FENCINGLY_PREPROC_GPU", "0") == "1"
+"""EL PREPROCESO DE SAPIENS (recorte con `grid_sample`, redimension, normalizado) EN LA GPU. El
+procesador de HF es torch puro y sigue el `device` de la entrada; sin `device=` lo hace en CPU,
+~13,7 ms por recorte medido en CPU (2026-10-08), y luego pasa el resultado a la GPU.
+
+**MEDIDO Y RECHAZADO (2026-10-08)**, con la puerta de siempre (p50 < 0,02 px, max < 0,5 px), en 2
+clips y 367.524 puntos usables: p50 0,009 px pero **max 166,5 px**, y velocidad **1,03x** (GPU
+compartida con la corrida). Es el mismo fallo que el lote: un cambio minimo de aritmetica en un
+punto ambiguo lo manda a otro sitio. Se queda apagado; el interruptor queda para la medida."""
+
 LOTE_POSE = int(os.environ.get("FENCINGLY_LOTE_POSE", "1"))
 """CUANTOS RECORTES POR PASADA DEL MODELO DE POSE. **Vale 1: el knob se midio y se RECHAZO.**
 
@@ -268,7 +278,8 @@ def poses_del_clip(proc, mod, torch, video, B, pres, mask, W, H, T, lote=None,
         if not pend_img:
             return
         with torch.inference_mode():
-            e = proc(images=pend_img, boxes=pend_caja, return_tensors="pt")
+            e = (proc(images=pend_img, boxes=pend_caja, return_tensors="pt", device="cuda")
+                 if PREPROC_GPU else proc(images=pend_img, boxes=pend_caja, return_tensors="pt"))
             e = {q: (v.to("cuda").half() if v.is_floating_point() else v.to("cuda"))
                  for q, v in e.items()}
             o = mod(**e)
