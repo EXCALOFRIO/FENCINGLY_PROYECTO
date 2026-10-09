@@ -1,0 +1,46 @@
+SONDA V-JEPA 2: EL BLANCO TOCADO (pregunta 3 de VJEPA2_VARIANTES_2026-10-09), 5 semilla(s)
+================================================================================
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+   con etiqueta de body_location: 1671
+filas con body_location 1671; con embedding 1670
+reservado: 25 torneos, 436 clips; entrenamiento 1234
+tokens cargados: 3.5 GB en 186 s
+   interna B  epocas  20  wd 1e-03  acierto 0.453  nll 1.7749  (44 s)
+   interna B  epocas  20  wd 1e-02  acierto 0.456  nll 1.7745  (41 s)
+   interna B  epocas  20  wd 5e-02  acierto 0.459  nll 1.7732  (42 s)
+   interna B  epocas  40  wd 1e-03  acierto 0.443  nll 3.0726  (82 s)
+   interna B  epocas  40  wd 1e-02  acierto 0.431  nll 3.0678  (82 s)
+   interna B  epocas  40  wd 5e-02  acierto 0.447  nll 3.0084  (83 s)
+   interna B  epocas  80  wd 1e-03  acierto 0.393  nll 5.0072  (166 s)
+   interna B  epocas  80  wd 1e-02  acierto 0.384  nll 5.2106  (166 s)
+   interna B  epocas  80  wd 5e-02  acierto 0.431  nll 4.8336  (168 s)
+   interna (n=318): B elegida epocas 20 wd 5e-02; con 5 semillas A 0.484  B 0.465  C 0.597 (C ajustada en estos mismos clips: optimista)
+
+RESERVADO: 436 clips, 25 torneos
+                                              acierto   contra A (IC95 por torneo)
+--------------------------------------------------------------------------------
+clase mayoritaria del entrenamiento (torso)     0.523   +0.044 [-0.002, +0.091]
+A (etiquetador, cabeza cuerpo)                  0.479   (linea base que decide)
+B                                               0.443   -0.037  [-0.110, +0.036]
+C                                               0.532   +0.053  [+0.007, +0.099]
+techo humano (n=108)                            0.481
+B contra la mayoritaria (informativo): -0.080 [-0.134, -0.031]
+
+control del espejo (prediccion identica)  B 1.0000  C 1.0000
+
+por arma (informativo):
+   epee   n= 289   mayoritaria 0.516   A 0.439   B 0.453   C 0.526
+   foil   n=  47   mayoritaria 0.851   A 0.745   B 0.596   C 0.830
+   sabre  n= 100   mayoritaria 0.390   A 0.470   B 0.340   C 0.410
+
+matriz de confusion de C (filas = humano, columnas = C), clases ['torso', 'front_arm', 'back_arm', 'hand', 'head', 'front_leg', 'back_leg', 'foot']
+   torso       220    0    0    3    0    1    0    4
+   front_arm   102    1    0    7    0    0    0    3
+   back_arm      3    0    0    0    0    0    0    0
+   hand         38    1    0    7    1    0    0    0
+   head         16    0    0    1    0    0    0    0
+   front_leg    12    0    0    0    0    0    0    5
+   back_leg      0    0    0    0    0    0    0    0
+   foot          7    0    0    0    0    0    0    4
+
+CRITERIO: C - A = +0.053 >= +0,02, IC95 [+0.007, +0.099] sin cruzar cero, espejo 1.0000  ->  PASA

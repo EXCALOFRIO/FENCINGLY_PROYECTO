@@ -157,3 +157,35 @@ lee por indices igual.
 ## Resultados
 
 (pendiente)
+
+### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
+
+Salida: `02_validacion/auditoria/vjepa_ojos_2026-10-09/sonda_cuerpo_5semillas.txt`. El reservado son
+436 clips de 25 torneos; el entrenamiento, 1.234.
+
+| | acierto | contra A (IC95 por torneo) |
+|---|---:|---|
+| clase mayoritaria (torso) | 0,523 | +0,044 [-0,002, +0,091] |
+| A (cabeza `cuerpo` del etiquetador) | 0,479 | linea base que decide |
+| B (sonda V-JEPA) | 0,443 | -0,037 [-0,110, +0,036] |
+| **C (A + B)** | **0,532** | **+0,053 [+0,007, +0,099]** |
+| techo humano (n=108) | 0,481 | |
+
+El espejo da 1,0000 en B y en C.
+
+**El criterio declarado PASA, pero la lectura honesta es que V-JEPA no sabe donde fue el tocado.**
+
+- **La linea base estaba mal elegida.** La que se declaro (A) queda POR DEBAJO de contestar siempre
+  torso (0,479 contra 0,523).
+- **C apenas se separa de la mayoritaria**: 0,532 contra 0,523, +0,009. La matriz de confusion
+  dice por que: C contesta torso en 398 de los 436 clips. Lo que mejora frente a A es decir torso
+  mas a menudo, no ver el blanco.
+- **B sola queda por debajo de la mayoritaria**: -0,080 [-0,134, -0,031].
+
+El fallo es mio, al declarar el protocolo: la linea base que decide tenia que haber sido la mejor de
+las dos (A y la mayoritaria). Con ella, C - max(A, mayoritaria) = +0,009, que no llega a +0,02.
+**Veredicto: no aporta.** No hay nada de produccion que adoptar.
+
+Con 1.234 clips de 8 clases desbalanceadas y un techo humano de 0,481, esta etiqueta no da para mas
+de lo que da contestar torso. Si se quisiera de verdad, habria que limitarla a lo que el arbitraje
+usa: en florete, valido (torso) o no valido. Eso ya lo da la luz blanca de la etapa 9.
