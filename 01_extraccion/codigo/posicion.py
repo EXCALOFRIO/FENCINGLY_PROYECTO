@@ -110,6 +110,7 @@ la pose inventada no esta ni medido (seccion 21.4 de `04_documentacion/BITACORA_
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 
@@ -674,9 +675,10 @@ def eventos(ap, r, fps, poses=None, paso=4, eje_brazo="hombro", res=None) -> lis
                       guardia=guardia[lado])
         ev += _pasos(P1, P2, C, lado, haciarival, ks, fps, version=paso)
         ev += _altos(C, lado, ks, fps)
-    ev += _acciones(C, ks, fps)
+    acc = _acciones(C, ks, fps)
+    ev += acc
     if poses is not None:
-        ev += _brazos(poses, r, C, ks, eje=eje_brazo)
+        ev += _brazos(poses, r, C, ks, eje=eje_brazo, acciones=acc)
         ev += _botes(poses, r, C, ks, res, fps)
     """EL ARBITRAJE, y despues el ASERTO de exclusividad. Ver `arbitra` para como decide."""
     fuera = []
@@ -935,7 +937,8 @@ def eventos_sin_homografia(res, fps, poses=None) -> list:
         i = fin + 1
     if poses is not None:
         Cv = np.full((T, 2, 2), np.nan)
-        out += _brazos(poses, r, Cv, ks, eje="hombro")
+        out += _brazos(poses, r, Cv, ks, eje="hombro",
+                       acciones=[e for e in out if e["tipo"] == "accion"])
     out.sort(key=lambda e: (e["cuadro"], e.get("lado", -1)))
     return out
 
@@ -1560,7 +1563,29 @@ def _acciones(C, ks, fps):
     return out
 
 
-def _brazos(poses, r, C, ks, eje="hombro"):
+MANO_ACCION = os.environ.get("FENCINGLY_MANO_ACCION", "0") == "1"
+"""LA CASCADA COMPLETA DE LA MANO ARMADA (2026-10-09), ver `ETAPA7_PUERTAS_2026-10-09.md` §2.
+
+`0`: `mano_armada(KP, SC, B, W, H, lado)` a secas, que es lo que corria. `1`: con `org`, `mask` y la
+mascara de los eventos `accion` de la propia etapa 7, que es como se midieron las cifras de la
+cascada (1,000 en 19 reservados, 0,949 en 59); con `1` la fila de `brazo` lleva tambien
+`mano_por` (que peldano decidio) y `mano_dudosa`."""
+
+
+def _mascara_acciones(acciones, T):
+    """(T,) bool con los cuadros dentro de algun evento `accion`, o **None** si no hay ninguno: None
+    es «no medido» y `mano_armada` no aplica la puerta; ceros seria «ninguna accion», que es otra
+    afirmacion. Lo mismo que `mano_guante.mascara_accion`, sin leer `eventos.csv`."""
+    tramos = [(int(e["inicio"]), int(e["fin"])) for e in (acciones or []) if e.get("tipo") == "accion"]
+    if not tramos:
+        return None
+    m = np.zeros(int(T), bool)
+    for a, b in tramos:
+        m[max(0, a):min(int(T), b + 1)] = True
+    return m
+
+
+def _brazos(poses, r, C, ks, eje="hombro", acciones=None):
     """CRITERIO DE EXTENSION DE BRAZO, declarado: el largo del eje `hombro -> raiz de la mano` en
     fraccion del largo del torso pasa de `BRAZO_UMBRAL` veces su mediana del clip y esta subiendo.
 
@@ -1602,14 +1627,26 @@ def _brazos(poses, r, C, ks, eje="hombro"):
     (`pie_firme -> encarado_accion -> mayoria_3`), asi que **no se pueden atribuir a lo que esta
     linea calcula**. Pasar `accion` moveria las cifras de la pista, o sea que es un cambio
     declarado y medido, no un arreglo de paso: queda identificado y NO hecho.
+
+    MEDIDO EL 2026-10-09 contra la ficha FIE (`verifica_mano_accion.py`, 9.751 decisiones, 958
+    tiradores; `ETAPA7_PUERTAS_2026-10-09.md` §4): con `org`, `mask` y `accion`
+    (`FENCINGLY_MANO_ACCION=1`) el acierto* por clip pasa de 0,878 a 0,892, pero el criterio
+    declarado era POR TIRADOR y ahi da 9 contra 6, p = 0,61. **No pasa: va APAGADO por defecto.**
     """
     import cono_lib as CL
     KP, SC = poses["KP"], poses["SC"]
     T = min(KP.shape[0], r["T"])
     out = []
+    kw = {}
+    if MANO_ACCION:
+        org = poses.get("origen")
+        kw = {"org": org[:T] if org is not None else None,
+              "mask": np.asarray(r["mask"][:T], bool),
+              "accion": _mascara_acciones(acciones, T)}
     for lado in (0, 1):
+        _d = {}
         try:
-            mano, _d = CL.mano_armada(KP[:T], SC[:T], r["B"][:T], r["W"], r["H"], lado)
+            mano, _d = CL.mano_armada(KP[:T], SC[:T], r["B"][:T], r["W"], r["H"], lado, **kw)
         except Exception:
             mano = None
         if mano is None:
@@ -1669,6 +1706,9 @@ def _brazos(poses, r, C, ks, eje="hombro"):
                                              and pico >= BRAZO_COMPLETA * p98
                                              and pico >= BRAZO_COMPLETA_MEDIANA * base),
                             "mano": mano, "eje": "%s -> raiz de la mano" % eje})
+                if MANO_ACCION:
+                    out[-1]["mano_por"] = _d.get("por")
+                    out[-1]["mano_dudosa"] = _d.get("dudosa")
             i = j + 1
     return out
 
@@ -1863,6 +1903,67 @@ UNIDAD = {"fondo": "m a lo largo de la pista", "marcha": "m a lo largo de la pis
           "brazo": "fraccion de torso, crecimiento sobre la mediana"}
 
 
+PUERTA_EVENTO = os.environ.get("FENCINGLY_PUERTA_EVENTO", "1") == "1"
+"""LA PUERTA FISICA POR EVENTO (2026-10-09), ver `04_documentacion/informes/ETAPA7_PUERTAS_2026-10-09.md`.
+
+`publicable` era solo del CLIP: la escala pasa el control y TODAS sus filas heredan el `True`. La
+auditoria del 09/10 encontro 287 filas en 49 clips con `publicable=True` y x de hasta 538 m o
+velocidades de 2.324 m/s: en algunos cuadros la homografia propagada revienta. Con la puerta, cada
+fila lleva `fisica_evento` y `motivo_no_publicable`, y `publicable = publicable_clip AND fisica_evento
+is not False`. El evento NO se borra.
+
+ADOPTADA con su criterio declarado antes de medir, sobre las 5.566 series anotadas: (a) filas
+`publicable=True` que violan la fisica 156 -> 0; (b) rebaja 156 de 16.202 publicables = 0,0096
+(criterio <= 0,05), en 44 clips; (c) recalculada de punta a punta en 53 clips, las columnas que lee
+el etiquetador salen identicas. `0` la apaga y la serie sale como antes, sin las columnas nuevas.
+Para series ya escritas no hace falta recalcular la etapa 7: `01_extraccion/aplica_puerta_evento.py`."""
+
+V_MAX_EVENTO_MS = 8.0
+"""Velocidad media maxima de un evento. Un fondo o una flecha no pasan de ~5-6 m/s de media."""
+X_MAX_REL_M = 16.0
+"""La x va relativa al anclaje (mediana del punto medio de los dos, que esta sobre la pista): 14 m de
+pista mas 2 m de zona de retroceso es la maxima distancia posible a el."""
+
+
+def fisica_evento(f, fps):
+    """QUE DEVUELVE: (True/False/None, motivo o None) para una fila de la serie.
+
+    Solo mira magnitudes en METROS con umbrales fisicos declarados antes de medir. None si la fila no
+    trae ninguna (p. ej. un clip sin homografia): no medido no es lo mismo que aprobado."""
+    def num(k):
+        v = f.get(k)
+        try:
+            v = float(v)
+        except (TypeError, ValueError):
+            return None
+        return v if np.isfinite(v) else None
+    v, x0, x1, dur = num("velocidad_m_s"), num("x_inicio_m"), num("x_fin_m"), num("duracion_s")
+    if v is None and x0 is None and x1 is None:
+        return None, None
+    mal = []
+    if v is not None and abs(v) > V_MAX_EVENTO_MS:
+        mal.append("velocidad")
+    if x0 is not None and x1 is not None:
+        t = max(dur if dur is not None else 0.0, 1.0 / max(float(fps), 1.0))
+        if abs(x1 - x0) / t > V_MAX_EVENTO_MS:
+            mal.append("desplazamiento")
+    if any(x is not None and abs(x) > X_MAX_REL_M for x in (x0, x1)):
+        mal.append("fuera_de_pista")
+    return (not mal), ("+".join(mal) if mal else None)
+
+
+def aplica_puerta_evento(f, fps):
+    """QUE HACE: anade a la fila `publicable_clip`, `fisica_evento` y `motivo_no_publicable`, y
+    rebaja `publicable` si la fila falla. Se llama DESPUES de copiar el `publicable` del clip."""
+    ok, motivo = fisica_evento(f, fps)
+    f["publicable_clip"] = f.get("publicable")
+    f["fisica_evento"] = ok
+    f["motivo_no_publicable"] = motivo
+    if ok is False:
+        f["publicable"] = False
+    return f
+
+
 def serie(ev, ap, clip, fps, poses=None, extra=None) -> list:
     """QUE HACE: la SERIE TEMPORAL CONSULTABLE de eventos, una fila por evento y no por cuadro.
 
@@ -1931,6 +2032,9 @@ def serie(ev, ap, clip, fps, poses=None, extra=None) -> list:
              "sep_pies_m": _r(e.get("sep_pies_m", float("nan"))),
              "umbral_quieto_m": e.get("umbral_quieto_m"),
              "mano": e.get("mano"), "eje": e.get("eje")}
+        if MANO_ACCION:
+            f["mano_por"] = e.get("mano_por")
+            f["mano_dudosa"] = e.get("mano_dudosa")
         if lado >= 0 and org is not None and k1 < len(org):
             o = org[k0:k1 + 1, lado]
             h = hue[k0:k1 + 1, lado] if hue is not None and k1 < len(hue) else None
@@ -1944,6 +2048,8 @@ def serie(ev, ap, clip, fps, poses=None, extra=None) -> list:
                       "hueco_sin_medir": None})
         if extra:
             f.update(extra)
+        if PUERTA_EVENTO:
+            aplica_puerta_evento(f, fps)
         filas.append(f)
     filas.sort(key=lambda z: (z["cuadro_inicio"], z["lado"], z["tipo"]))
     return filas

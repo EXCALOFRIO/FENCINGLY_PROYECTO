@@ -149,7 +149,10 @@ def marca_primer_plano(cajas, cuadros, W, H, T) -> dict:
     QUE DEVUELVE: `sospecha` (el alto de la caja mayor, informativo), `sola` (cuadros sin ninguna
     pareja posible), `tramos` y la `mask` de cuadros utilizables.
     """
-    c = np.asarray(cajas, dtype="float64")
+    c = np.asarray(cajas, dtype="float64").reshape(-1, 4)
+    """`reshape(-1, 4)`: un clip SIN UNA SOLA deteccion da `cajas == []`, que numpy convierte en un
+    array 1-D, y `c[:, 3]` cascaba con IndexError (2026-10-09, 2 clips de anotados con video
+    legible). Con la forma impuesta el clip no tiene ningun cuadro con pareja y no se usa."""
     ks = np.asarray(cuadros, dtype="int64")
     alto = (c[:, 3] - c[:, 1]) / H
     pie = c[:, 3] / H

@@ -1,0 +1,50 @@
+== AJUSTE R1
+   1 A1 florete >= +0.05, IC>0          PASA  +0.094 [+0.053,+0.135]
+   2 ACx no baja                        PASA  +0.084 [+0.042,+0.124]
+   3 torneos buenos sin perder >0.02    NO PASA  [('kazanfoil2020', np.float64(0.921), 76, np.float64(0.971), 70, np.float64(-0.082), np.False_), ('worldchamps2022', np.float64(0.943), 35, np.float64(0.977), 44, np.float64(0.183), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.951), 143, np.float64(0.958), 165, np.True_), ('sabre', np.float64(0.861), 36, np.float64(0.974), 38, np.True_)]
+== AJUSTE R2
+   1 A1 florete >= +0.05, IC>0          PASA  +0.069 [+0.031,+0.106]
+   2 ACx no baja                        PASA  +0.110 [+0.072,+0.148]
+   3 torneos buenos sin perder >0.02    PASA  [('kazanfoil2020', np.float64(0.921), 76, np.float64(0.921), 76, np.float64(0.0), np.True_), ('worldchamps2022', np.float64(0.943), 35, np.float64(0.935), 46, np.float64(0.217), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.951), 143, np.float64(0.958), 166, np.True_), ('sabre', np.float64(0.861), 36, np.float64(0.95), 40, np.True_)]
+== AJUSTE R4
+   1 A1 florete >= +0.05, IC>0          PASA  +0.070 [+0.032,+0.108]
+   2 ACx no baja                        PASA  +0.106 [+0.068,+0.145]
+   3 torneos buenos sin perder >0.02    NO PASA  [('kazanfoil2020', np.float64(0.921), 76, np.float64(0.933), 75, np.float64(-0.021), np.False_), ('worldchamps2022', np.float64(0.943), 35, np.float64(0.935), 46, np.float64(0.217), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.951), 143, np.float64(0.958), 166, np.True_), ('sabre', np.float64(0.861), 36, np.float64(0.95), 40, np.True_)]
+== AJUSTE R5
+   1 A1 florete >= +0.05, IC>0          NO PASA  +0.048 [+0.027,+0.071]
+   2 ACx no baja                        PASA  +0.089 [+0.060,+0.119]
+   3 torneos buenos sin perder >0.02    PASA  [('kazanfoil2020', np.float64(0.921), 76, np.float64(0.921), 76, np.float64(0.0), np.True_), ('worldchamps2022', np.float64(0.943), 35, np.float64(0.956), 45, np.float64(0.2), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.951), 143, np.float64(0.958), 167, np.True_), ('sabre', np.float64(0.861), 36, np.float64(0.923), 39, np.True_)]
+== AJUSTE R6
+   1 A1 florete >= +0.05, IC>0          PASA  +0.060 [+0.035,+0.088]
+   2 ACx no baja                        PASA  +0.095 [+0.063,+0.126]
+   3 torneos buenos sin perder >0.02    NO PASA  [('kazanfoil2020', np.float64(0.921), 76, np.float64(0.933), 75, np.float64(-0.021), np.False_), ('worldchamps2022', np.float64(0.943), 35, np.float64(0.956), 45, np.float64(0.2), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.951), 143, np.float64(0.958), 166, np.True_), ('sabre', np.float64(0.861), 36, np.float64(0.923), 39, np.True_)]
+== PRUEBA R1
+   1 A1 florete >= +0.05, IC>0          PASA  +0.170 [+0.138,+0.205]
+   2 ACx no baja                        PASA  +0.170 [+0.135,+0.208]
+   3 torneos buenos sin perder >0.02    PASA  [('anaheimfoil2018', np.float64(0.857), 182, np.float64(0.971), 206, np.float64(0.134), np.True_), ('anaheimfoil2019', np.float64(0.862), 65, np.float64(1.0), 63, np.float64(0.023), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.902), 112, np.float64(0.958), 120, np.True_), ('sabre', np.float64(0.864), 44, np.float64(0.976), 41, np.True_)]
+== PRUEBA R2
+   1 A1 florete >= +0.05, IC>0          PASA  +0.146 [+0.115,+0.176]
+   2 ACx no baja                        PASA  +0.193 [+0.158,+0.230]
+   3 torneos buenos sin perder >0.02    PASA  [('anaheimfoil2018', np.float64(0.857), 182, np.float64(0.958), 213, np.float64(0.159), np.True_), ('anaheimfoil2019', np.float64(0.862), 65, np.float64(0.97), 66, np.float64(0.057), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.902), 112, np.float64(0.944), 124, np.True_), ('sabre', np.float64(0.864), 44, np.float64(0.93), 43, np.True_)]
+== PRUEBA R4
+   1 A1 florete >= +0.05, IC>0          PASA  +0.148 [+0.117,+0.180]
+   2 ACx no baja                        PASA  +0.188 [+0.154,+0.226]
+   3 torneos buenos sin perder >0.02    PASA  [('anaheimfoil2018', np.float64(0.857), 182, np.float64(0.967), 210, np.float64(0.148), np.True_), ('anaheimfoil2019', np.float64(0.862), 65, np.float64(0.985), 65, np.float64(0.045), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.902), 112, np.float64(0.951), 123, np.True_), ('sabre', np.float64(0.864), 44, np.float64(0.93), 43, np.True_)]
+== PRUEBA R5
+   1 A1 florete >= +0.05, IC>0          PASA  +0.117 [+0.090,+0.146]
+   2 ACx no baja                        PASA  +0.179 [+0.145,+0.211]
+   3 torneos buenos sin perder >0.02    PASA  [('anaheimfoil2018', np.float64(0.857), 182, np.float64(0.941), 220, np.float64(0.159), np.True_), ('anaheimfoil2019', np.float64(0.862), 65, np.float64(0.97), 66, np.float64(0.057), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.902), 112, np.float64(0.911), 124, np.True_), ('sabre', np.float64(0.864), 44, np.float64(0.909), 44, np.True_)]
+== PRUEBA R6
+   1 A1 florete >= +0.05, IC>0          PASA  +0.122 [+0.094,+0.153]
+   2 ACx no baja                        PASA  +0.179 [+0.146,+0.213]
+   3 torneos buenos sin perder >0.02    PASA  [('anaheimfoil2018', np.float64(0.857), 182, np.float64(0.949), 217, np.float64(0.148), np.True_), ('anaheimfoil2019', np.float64(0.862), 65, np.float64(0.985), 65, np.float64(0.045), np.True_)]
+   4 espada/sable A1 no baja >0.02      PASA  [('epee', np.float64(0.902), 112, np.float64(0.927), 123, np.True_), ('sabre', np.float64(0.864), 44, np.float64(0.909), 44, np.True_)]

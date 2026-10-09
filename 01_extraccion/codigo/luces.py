@@ -131,9 +131,27 @@ las dos cumplen el criterio, salen las dos y se separan por posicion.
 """
 from __future__ import annotations
 
+import os
+
 import numpy as np
 
 import cv2
+
+ESCALON_VISTO = os.environ.get("FENCINGLY_LUZ_ESCALON_VISTO", "0") == "1"
+"""EL CUADRO DEL TOCADO = 0, primer arreglo (regla R3 de `LUCES_POR_FUENTE_2026-10-09.md`): por PIXEL.
+Una racha que ya esta encendida en la PRIMERA muestra del clip se aceptaba como escalon (`ini <= 0`),
+y es la luz del tocado ANTERIOR que sigue encendida al empezar el clip -- o una bandera del rotulo --:
+salia `cuadro_tocado = 0` en el 8 % de los clips de florete en disco. Con esto encendido solo vale un
+encendido VISTO. MEDIDO Y APAGADO: en 600 clips al azar C0 baja de 0,068 a 0 y en los 48 que cambian
+A1 sube de 0,500 a 0,818, pero NO pasa la puerta 3 declarada: cambia tambien 10 de los 521 clips cuyo
+encendido no era 0 (quitar pixeles mueve la fuerza maxima y el ancla del grupo). Lo sustituye
+`SIN_CUADRO0`, que solo actua donde el cuadro sale 0."""
+
+SIN_CUADRO0 = os.environ.get("FENCINGLY_LUZ_SIN_CUADRO0", "0") == "1"
+"""EL CUADRO DEL TOCADO = 0, segundo arreglo (regla R3b), por LUZ y solo donde hace falta: si el grupo
+del tocado empieza en el cuadro 0, se rehace el grupo SIN las luces que ya estaban encendidas al
+empezar el clip. Un clip cuyo grupo no empieza en 0 sale identico por construccion. La puerta y la
+cifra estan en el informe; el defecto lo pone esa puerta."""
 
 ANCHO_RED = 480
 PASO = 2
@@ -300,7 +318,10 @@ def detecta(ruta: str, paso: int = PASO, banda=BANDA_Y,
         u_apagado = base + FRAC_APAGADO * salto
         k_prev = np.clip(ini - 1, 0, T - 1)
         antes = np.take_along_axis(s, k_prev[None], axis=0)[0]
-        escalon = (ini <= 0) | (antes <= u_apagado)
+        if ESCALON_VISTO:
+            escalon = (ini > 0) & (antes <= u_apagado)
+        else:
+            escalon = (ini <= 0) | (antes <= u_apagado)
         valido = cand & escalon & (largo >= dur_min) & (largo <= dur_max)
         if not valido.any():
             continue
@@ -464,3 +485,91 @@ def resumen_clip(grupo: list[dict]) -> list[dict]:
     for j, d in enumerate(fuera):
         d["orden"] = j
     return fuera
+
+
+# ---------------------------------------------------------------------------------------------
+# LA ETAPA 9 ENTERA: que detector se usa y en que orden
+# ---------------------------------------------------------------------------------------------
+
+USA_V2 = os.environ.get("FENCINGLY_LUCES_V2", "1") == "1"
+"""EL DETECTOR VIEJO PRIMERO (`luces_v2`, regla R2 de `LUCES_POR_FUENTE_2026-10-09.md`), y este
+modulo solo si aquel no da tocado. ADOPTADO (2026-10-09): pasa las cuatro puertas declaradas en la
+mitad de AJUSTE (la unica de las seis reglas que las pasa todas) y se confirma en la de PRUEBA, 2.016
+clips recalculados con los dos detectores. Florete, PRUEBA, 868 clips:
+
+    acuerdo de una luz con `touch` (A1)   0,801 (554) -> 0,947 (641)   +0,146 IC95 [+0,115, +0,176]
+    ACIERTO* (sobre todos los left/right)  0,525 -> 0,718             +0,193 IC95 [+0,158, +0,230]
+    cobertura                              0,795 -> 0,969
+    cuadro del tocado = 0                  0,094 -> 0,014
+
+Espada 0,902 -> 0,944 y sable 0,864 -> 0,930 en A1 (PRUEBA). Y es mas barato: el viejo tarda menos
+que este y este solo corre en el 8 % de clips en que el viejo no da tocado. `=0` vuelve a la etapa 9
+de antes, byte a byte."""
+
+_V2_CANAL = {"red_L": ("roja", "L"), "green_R": ("verde", "R"),
+             "white_L": ("blanca", "L"), "white_R": ("blanca", "R")}
+
+
+def lee_v2(video: str) -> tuple[list[dict], str, float | None]:
+    """QUE DEVUELVE: (filas con el esquema de `resumen_clip`, via, fps) con el detector viejo.
+
+    Las columnas que el viejo no mide (area, salto, confianza...) van `None`, no cero: el viejo no da
+    confianza y escribir 1,0 seria inventarla. El cuadro sale de `touch_lights` (segundos con tres
+    decimales) por `round(t * fps)`, que devuelve el cuadro exacto (el error del redondeo es <0,03
+    cuadros a 60 fps)."""
+    from luces_v2 import lights_generic as LG
+    r = LG.analyze_any(video, clock=True)
+    fps = r.get("fps")
+    via = "v2_%s" % (r.get("source") or "none")
+    if r.get("f_touch") is None or not fps:
+        return [], via, fps
+    filas = []
+    for k, t in (r.get("touch_lights") or {}).items():
+        if t is None or k not in _V2_CANAL:
+            continue
+        canal, lado = _V2_CANAL[k]
+        filas.append(dict(canal=canal, lado=lado, cuadro_encendido=int(round(t * fps)),
+                          t_encendido_s=t, confianza=None, discordante=False,
+                          cajas_v2=r.get("box_method"),
+                          avisos_v2="|".join(r.get("quality_flags") or [])))
+    filas.sort(key=lambda d: d["cuadro_encendido"])
+    for j, d in enumerate(filas):
+        d["orden"] = j
+    return filas, via, fps
+
+
+def lee_vigente(video: str, roi=None) -> tuple[list[dict], str, float]:
+    """La etapa 9 de antes del 2026-10-09, sin cambiar nada: ROI de sede si la hay, y el detector
+    general si la ROI no da nada (`general_tras_roi`)."""
+    det = detecta(video, banda=roi["banda"]) if roi else detecta(video)
+    via = "roi_sede" if roi else "general"
+    fps = det.get("fps") or 25.0
+    gr, via = _grupo(det["luces"], fps, via)
+    if roi and not gr:
+        det2 = detecta(video)
+        gr, via = _grupo(det2["luces"], fps, "general_tras_roi")
+    return resumen_clip(gr) or [], via, fps
+
+
+def _grupo(luces: list[dict], fps: float, via: str) -> tuple[list[dict], str]:
+    """El grupo del tocado y, con `SIN_CUADRO0`, el arreglo del cuadro 0: SOLO si el grupo empieza en
+    el cuadro 0 se rehace sin las luces que ya estaban encendidas al empezar el clip, y la via lleva
+    `+sin0` para que se pueda separar. Un clip cuyo grupo no empieza en 0 no se toca."""
+    gr = grupo_del_tocado(agrupa(luces, fps), fps)
+    if SIN_CUADRO0 and gr and min(d["cuadro_encendido"] for d in gr) == 0:
+        gr = grupo_del_tocado(agrupa([d for d in luces if d["cuadro_encendido"] > 0], fps), fps)
+        via += "+sin0"
+    return gr, via
+
+
+def lee_clip(video: str, roi=None) -> tuple[list[dict], str, float]:
+    """QUE DEVUELVE: (filas del grupo del tocado, via, fps). Lo llaman la etapa 9 y la 11, para que
+    las dos lean las luces de la MISMA manera. Con `USA_V2`, el viejo primero; si no da tocado, el
+    vigente, con `via = tras_v2_<via del vigente>` para que se pueda separar."""
+    if USA_V2:
+        filas, via, fps = lee_v2(video)
+        if filas:
+            return filas, via, fps
+        filas, via, fps2 = lee_vigente(video, roi)
+        return filas, "tras_v2_" + via, fps2
+    return lee_vigente(video, roi)

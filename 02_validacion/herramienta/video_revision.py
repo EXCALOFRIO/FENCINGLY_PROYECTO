@@ -101,57 +101,77 @@ def fase1(clips, videos=None):
     videos = videos or {}
     PRUEBAS.mkdir(parents=True, exist_ok=True)
     for cid in clips:
-        ruta = videos.get(cid) or RU.video(cid)
-        if not ruta:
-            print("%-40s SIN VIDEO, no se procesa" % cid[:40])
-            continue
-        ca = PRUEBAS / ("det_%s.pkl" % cid)
-        cap = cv2.VideoCapture(ruta)
-        fps_clip = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
-        """LA CADENCIA SE GUARDA EN EL NPZ, y no se vuelve a deducir mas tarde.
+        try:
+            _fase1_uno(cid, yolo, EP, videos)
+        except Exception as ex:
+            """UN CLIP QUE CASCA NO SE LLEVA EL LOTE (2026-10-09). Antes la excepcion salia
+            del bucle y los clips que quedaban del lote no se procesaban NUNCA: en cada vuelta
+            volvia a cascar el mismo. Medido en la noche de anotados: 3 clips sin una sola
+            deteccion (`planos.marca_primer_plano` con un array 1-D) dejaron **9 clips buenos**
+            sin etapa 1, y el trabajador se paro creyendo que ya no habia nada que hacer."""
+            print("%-40s ETAPA 1 FALLA %s: %s" % (cid[:40], type(ex).__name__, str(ex)[:120]),
+                  flush=True)
 
-        Antes el unico sitio donde quedaba escrita era `posicion_clip_<clip>.csv`, que lo escribe
-        la etapa 7. Quien leyera el NPZ sin haber corrido la etapa 7 se quedaba con un 25 por
-        defecto, y **una cadencia equivocada escala TODAS las velocidades**: con un clip de 30 fps
-        leido como 25, cada velocidad sale multiplicada por 1,2. Lo cazo el control del espejo del
-        etiquetador, donde el clip espejo no tenia CSV y sus velocidades salian exactamente 1,2
-        veces las del original. En Colab el mp4 se borra tras procesar, asi que si la cadencia no
-        viaja en el NPZ no hay de donde recuperarla."""
-        if ca.exists():
-            with open(ca, "rb") as fh:
-                cajas, cuadros, W, H, T = pickle.load(fh)
-            frames = []
-            while True:
-                ok, im = cap.read()
-                if not ok:
-                    break
-                frames.append(im)
-        else:
-            ex = {}
-            cajas, cuadros, W, H, T, frames = EP.detecta_clip(yolo, cap, cv2, extra=ex)
-            with open(ca, "wb") as fh:
-                pickle.dump((cajas, cuadros, W, H, T), fh)
-            np.savez_compressed(
-                PRUEBAS / ("detx_%s.npz" % cid),
-                conf=(np.concatenate(ex["conf"]) if ex.get("conf") else np.zeros(0)).astype("float16"),
-                kp=(np.concatenate(ex["kp"]) if ex.get("kp") else np.zeros((0, 17, 3))).astype("float16"))
-            """LO QUE YOLO VE Y ANTES SE TIRABA (2026-10-08): la confianza y los 17 puntos de CADA
-            persona detectada, arbitro y publico incluidos, en el orden de `cajas`. Con esto la
-            pareja se puede volver a elegir sin GPU con algo mas que cajas; sin esto, cambiar la
-            seleccion obligaba a repetir la etapa 1. ~50 KB por clip."""
-        cap.release()
-        gris = [cv2.cvtColor(cv2.resize(f, (160, 90)), cv2.COLOR_BGR2GRAY).astype("float32")
-                for f in frames]
-        r = EP.procesa(cajas, cuadros, W, H, T, yolo=yolo, frames=frames, gris=gris)
-        np.savez_compressed(PRUEBAS / ("revision_%s.npz" % cid),
-                            B=r["B"], Be=r["Be"], pres=r["pres"], tipo=r["tipo"], mask=r["mask"],
-                            W=W, H=H, T=T, motivo=r["motivo"], video=ruta,
-                            tramos=np.array(r["tramos"], dtype="int32").reshape(-1, 2),
-                            ambos=r["ambos"], fps=np.float64(fps_clip))
-        print("%-40s ambos %5.1f %%  redet %3d  planos fuera %3d  fundidos %s  recortados %3d" % (
-            cid[:40], 100 * r["ambos"], r["nredetectados"], r["fuera"],
-            ("c%d-c%d" % (r["fundidos"][0][0], r["fundidos"][0][1])) if r["fundidos"] else "-",
-            r["recortados"]))
+
+def _fase1_uno(cid, yolo, EP, videos):
+    ruta = videos.get(cid) or RU.video(cid)
+    if not ruta:
+        print("%-40s SIN VIDEO, no se procesa" % cid[:40])
+        return
+    ca = PRUEBAS / ("det_%s.pkl" % cid)
+    cap = cv2.VideoCapture(ruta)
+    fps_clip = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
+    """LA CADENCIA SE GUARDA EN EL NPZ, y no se vuelve a deducir mas tarde.
+
+    Antes el unico sitio donde quedaba escrita era `posicion_clip_<clip>.csv`, que lo escribe
+    la etapa 7. Quien leyera el NPZ sin haber corrido la etapa 7 se quedaba con un 25 por
+    defecto, y **una cadencia equivocada escala TODAS las velocidades**: con un clip de 30 fps
+    leido como 25, cada velocidad sale multiplicada por 1,2. Lo cazo el control del espejo del
+    etiquetador, donde el clip espejo no tenia CSV y sus velocidades salian exactamente 1,2
+    veces las del original. En Colab el mp4 se borra tras procesar, asi que si la cadencia no
+    viaja en el NPZ no hay de donde recuperarla."""
+    if ca.exists():
+        with open(ca, "rb") as fh:
+            cajas, cuadros, W, H, T = pickle.load(fh)
+        frames = []
+        while True:
+            ok, im = cap.read()
+            if not ok:
+                break
+            frames.append(im)
+    else:
+        ex = {}
+        cajas, cuadros, W, H, T, frames = EP.detecta_clip(yolo, cap, cv2, extra=ex)
+        if not T:
+            """UN VIDEO DE 0 CUADROS ES UN VIDEO ROTO, no un clip vacio (2026-10-09). Escribir su
+            `revision_` lo daba por hecho y nadie lo volvia a bajar. Sin `det_` ni `revision_`,
+            la vuelta siguiente lo ve pendiente y `lotes.legible` lo manda bajar otra vez."""
+            cap.release()
+            print("%-40s VIDEO ILEGIBLE (0 cuadros): no se escribe nada" % cid[:40], flush=True)
+            return
+        with open(ca, "wb") as fh:
+            pickle.dump((cajas, cuadros, W, H, T), fh)
+        np.savez_compressed(
+            PRUEBAS / ("detx_%s.npz" % cid),
+            conf=(np.concatenate(ex["conf"]) if ex.get("conf") else np.zeros(0)).astype("float16"),
+            kp=(np.concatenate(ex["kp"]) if ex.get("kp") else np.zeros((0, 17, 3))).astype("float16"))
+        """LO QUE YOLO VE Y ANTES SE TIRABA (2026-10-08): la confianza y los 17 puntos de CADA
+        persona detectada, arbitro y publico incluidos, en el orden de `cajas`. Con esto la
+        pareja se puede volver a elegir sin GPU con algo mas que cajas; sin esto, cambiar la
+        seleccion obligaba a repetir la etapa 1. ~50 KB por clip."""
+    cap.release()
+    gris = [cv2.cvtColor(cv2.resize(f, (160, 90)), cv2.COLOR_BGR2GRAY).astype("float32")
+            for f in frames]
+    r = EP.procesa(cajas, cuadros, W, H, T, yolo=yolo, frames=frames, gris=gris)
+    np.savez_compressed(PRUEBAS / ("revision_%s.npz" % cid),
+                        B=r["B"], Be=r["Be"], pres=r["pres"], tipo=r["tipo"], mask=r["mask"],
+                        W=W, H=H, T=T, motivo=r["motivo"], video=ruta,
+                        tramos=np.array(r["tramos"], dtype="int32").reshape(-1, 2),
+                        ambos=r["ambos"], fps=np.float64(fps_clip))
+    print("%-40s ambos %5.1f %%  redet %3d  planos fuera %3d  fundidos %s  recortados %3d" % (
+        cid[:40], 100 * r["ambos"], r["nredetectados"], r["fuera"],
+        ("c%d-c%d" % (r["fundidos"][0][0], r["fundidos"][0][1])) if r["fundidos"] else "-",
+        r["recortados"]))
 
 
 def _pinta(im, kp, sc, col):
@@ -504,86 +524,99 @@ def fase2(clips, video=True):
     mod = Sapiens2ForPoseEstimation.from_pretrained(str(snap), dtype=torch.float16).to("cuda").eval()
     SALIDA.mkdir(parents=True, exist_ok=True)
     for cid in clips:
-        z = np.load(PRUEBAS / ("revision_%s.npz" % cid), allow_pickle=True)
-        B, pres, tipo, mask = z["B"], z["pres"], z["tipo"], z["mask"]
-        Be = z["Be"] if "Be" in z.files else B
-        W, H, T = int(z["W"]), int(z["H"]), int(z["T"])
-        fps_clip = float(z["fps"]) if "fps" in z.files else 0.0
-        motivo, ruta_video = str(z["motivo"]), str(z["video"])
-        KP, SC, frames = poses_del_clip(proc, mod, torch, ruta_video, B, pres, mask, W, H, T,
-                                        guarda_frames=video)
-        nvac = tira_poses_vacias(KP, SC, pres, mask, T)
-        mask, nrec2 = recorta_por_poses(pres, mask)
-        val = valida_inventadas(KP, SC, pres, mask, T)
-        KP, SC, origen, hueco = inventa_poses(KP, SC, pres, mask, T)
-        ninv = int(((origen == 1) | (origen == 2)).sum())
-        dobles = int(((origen[mask] >= 0).sum(axis=1) == 2).sum())
-        util = int(mask.sum())
-        """`filtro_vacias` dice que ESTE fichero se escribio con el filtro de poses vacias puesto, y
-        cuantas se tiraron. Sin esa marca no se puede juzgar un NPZ: los escritos antes de que el
-        filtro existiera tienen poses medidas de 0 a 8 puntos utiles dentro, y un check que no
-        distinga los dos casos acusa a la tuberia de un fallo que ya no comete. Es el mismo principio
-        que `origen` y `tipo`: el dato lleva escrito como se obtuvo."""
-        np.savez_compressed(PRUEBAS / ("poses_%s.npz" % cid),
-                            KP=KP, SC=SC, origen=origen, hueco=hueco,
-                            B=B, Be=Be, pres=pres, mask=mask,
-                            W=W, H=H, T=T, motivo=motivo, video=ruta_video,
-                            filtro_vacias=np.array(nvac, dtype="int32"),
-                            puntos_min=np.array(PUNTOS_MIN, dtype="int32"),
-                            fps=np.float64(fps_clip), ambos=z["ambos"] if "ambos" in z.files
-                            else np.float64(float("nan")))
-        print("%-34s con LAS DOS poses %4d de %4d utilizables (%.1f %%), inventadas %d, "
-              "poses vacias tiradas %d, recortados por pose %d" % (
-                  cid[:34], dobles, util, 100.0 * dobles / max(util, 1), ninv, nvac, nrec2))
-        if val:
-            print("   error de inventar, escondiendo poses conocidas: mediana %.2f px "
-                  "(%.1f %% del torso), p90 %.2f px, n=%d" % (
-                      val["px_p50"], 100 * val["rel_p50"], val["px_p90"], val["n"]))
+        try:
+            _fase2_uno(cid, proc, mod, torch, video)
+        except Exception as ex:
+            """UN CLIP QUE CASCA NO SE LLEVA EL LOTE (2026-10-09). Antes la excepcion salia
+            del bucle y los clips que quedaban del lote no se procesaban NUNCA: en cada vuelta
+            volvia a cascar el mismo. Medido en la noche de anotados: 3 clips sin una sola
+            deteccion (`planos.marca_primer_plano` con un array 1-D) dejaron **9 clips buenos**
+            sin etapa 4, y el trabajador se paro creyendo que ya no habia nada que hacer."""
+            print("%-40s ETAPA 4 FALLA %s: %s" % (cid[:40], type(ex).__name__, str(ex)[:120]),
+                  flush=True)
 
-        if not video:
-            continue
-        cap = cv2.VideoCapture(ruta_video)
-        fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
-        cap.release()
-        out = cv2.VideoWriter(str(SALIDA / ("%s.mp4" % cid)),
-                              cv2.VideoWriter_fourcc(*"mp4v"), fps, (W, H))
-        for k in range(min(T, len(frames))):
-            vis = frames[k].copy()
-            if mask[k]:
-                for lado in (0, 1):
-                    if origen[k, lado] < 0:
-                        continue
-                    col = COL_LADO[lado]
-                    inv = origen[k, lado] > 0
-                    if inv:
-                        """Las inventadas van en violeta y con la etiqueta puesta, para que nadie
-                        las confunda con dato medido al mirar el video."""
-                        col = VIOLETA
-                    _pinta(vis, KP[k, lado], SC[k, lado], col)
-                    b = Be[k, lado] if inv else B[k, lado]
-                    if np.isfinite(b).all():
-                        cv2.rectangle(vis, (int(b[0] * W), int(b[1] * H)),
-                                      (int(b[2] * W), int(b[3] * H)), col, 1 if inv else 2)
-                    et = ["IZQUIERDA", "DERECHA"][lado]
-                    if origen[k, lado] == 1:
-                        et += " INVENTADA interpolada"
-                    elif origen[k, lado] == 2:
-                        et += " INVENTADA sostenida"
-                    elif tipo[k, lado] == 3:
-                        et += " redetectada"
-                    if np.isfinite(b).all():
-                        cv2.putText(vis, et, (int(b[0] * W), max(14, int(b[1] * H) - 6)),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, col, 2)
-            else:
-                cv2.rectangle(vis, (0, 36), (W, 72), (0, 0, 160), -1)
-                cv2.putText(vis, "FUERA: primer plano o repeticion, este cuadro no se usa",
-                            (10, 62), cv2.FONT_HERSHEY_SIMPLEX, 0.62, (255, 255, 255), 2)
-            cv2.rectangle(vis, (0, 0), (W, 34), (12, 12, 18), -1)
-            cv2.putText(vis, "%s c%d/%d  %s" % (cid[:24], k, T - 1, motivo[:70]),
-                        (8, 23), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (240, 240, 240), 1)
-            out.write(vis)
-        out.release()
-        print("   video -> %s" % (SALIDA / ("%s.mp4" % cid)))
+
+def _fase2_uno(cid, proc, mod, torch, video):
+    z = np.load(PRUEBAS / ("revision_%s.npz" % cid), allow_pickle=True)
+    B, pres, tipo, mask = z["B"], z["pres"], z["tipo"], z["mask"]
+    Be = z["Be"] if "Be" in z.files else B
+    W, H, T = int(z["W"]), int(z["H"]), int(z["T"])
+    fps_clip = float(z["fps"]) if "fps" in z.files else 0.0
+    motivo, ruta_video = str(z["motivo"]), str(z["video"])
+    KP, SC, frames = poses_del_clip(proc, mod, torch, ruta_video, B, pres, mask, W, H, T,
+                                    guarda_frames=video)
+    nvac = tira_poses_vacias(KP, SC, pres, mask, T)
+    mask, nrec2 = recorta_por_poses(pres, mask)
+    val = valida_inventadas(KP, SC, pres, mask, T)
+    KP, SC, origen, hueco = inventa_poses(KP, SC, pres, mask, T)
+    ninv = int(((origen == 1) | (origen == 2)).sum())
+    dobles = int(((origen[mask] >= 0).sum(axis=1) == 2).sum())
+    util = int(mask.sum())
+    """`filtro_vacias` dice que ESTE fichero se escribio con el filtro de poses vacias puesto, y
+    cuantas se tiraron. Sin esa marca no se puede juzgar un NPZ: los escritos antes de que el
+    filtro existiera tienen poses medidas de 0 a 8 puntos utiles dentro, y un check que no
+    distinga los dos casos acusa a la tuberia de un fallo que ya no comete. Es el mismo principio
+    que `origen` y `tipo`: el dato lleva escrito como se obtuvo."""
+    np.savez_compressed(PRUEBAS / ("poses_%s.npz" % cid),
+                        KP=KP, SC=SC, origen=origen, hueco=hueco,
+                        B=B, Be=Be, pres=pres, mask=mask,
+                        W=W, H=H, T=T, motivo=motivo, video=ruta_video,
+                        filtro_vacias=np.array(nvac, dtype="int32"),
+                        puntos_min=np.array(PUNTOS_MIN, dtype="int32"),
+                        fps=np.float64(fps_clip), ambos=z["ambos"] if "ambos" in z.files
+                        else np.float64(float("nan")))
+    print("%-34s con LAS DOS poses %4d de %4d utilizables (%.1f %%), inventadas %d, "
+          "poses vacias tiradas %d, recortados por pose %d" % (
+              cid[:34], dobles, util, 100.0 * dobles / max(util, 1), ninv, nvac, nrec2))
+    if val:
+        print("   error de inventar, escondiendo poses conocidas: mediana %.2f px "
+              "(%.1f %% del torso), p90 %.2f px, n=%d" % (
+                  val["px_p50"], 100 * val["rel_p50"], val["px_p90"], val["n"]))
+
+    if not video:
+        return
+    cap = cv2.VideoCapture(ruta_video)
+    fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
+    cap.release()
+    out = cv2.VideoWriter(str(SALIDA / ("%s.mp4" % cid)),
+                          cv2.VideoWriter_fourcc(*"mp4v"), fps, (W, H))
+    for k in range(min(T, len(frames))):
+        vis = frames[k].copy()
+        if mask[k]:
+            for lado in (0, 1):
+                if origen[k, lado] < 0:
+                    continue
+                col = COL_LADO[lado]
+                inv = origen[k, lado] > 0
+                if inv:
+                    """Las inventadas van en violeta y con la etiqueta puesta, para que nadie
+                    las confunda con dato medido al mirar el video."""
+                    col = VIOLETA
+                _pinta(vis, KP[k, lado], SC[k, lado], col)
+                b = Be[k, lado] if inv else B[k, lado]
+                if np.isfinite(b).all():
+                    cv2.rectangle(vis, (int(b[0] * W), int(b[1] * H)),
+                                  (int(b[2] * W), int(b[3] * H)), col, 1 if inv else 2)
+                et = ["IZQUIERDA", "DERECHA"][lado]
+                if origen[k, lado] == 1:
+                    et += " INVENTADA interpolada"
+                elif origen[k, lado] == 2:
+                    et += " INVENTADA sostenida"
+                elif tipo[k, lado] == 3:
+                    et += " redetectada"
+                if np.isfinite(b).all():
+                    cv2.putText(vis, et, (int(b[0] * W), max(14, int(b[1] * H) - 6)),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, col, 2)
+        else:
+            cv2.rectangle(vis, (0, 36), (W, 72), (0, 0, 160), -1)
+            cv2.putText(vis, "FUERA: primer plano o repeticion, este cuadro no se usa",
+                        (10, 62), cv2.FONT_HERSHEY_SIMPLEX, 0.62, (255, 255, 255), 2)
+        cv2.rectangle(vis, (0, 0), (W, 34), (12, 12, 18), -1)
+        cv2.putText(vis, "%s c%d/%d  %s" % (cid[:24], k, T - 1, motivo[:70]),
+                    (8, 23), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (240, 240, 240), 1)
+        out.write(vis)
+    out.release()
+    print("   video -> %s" % (SALIDA / ("%s.mp4" % cid)))
 
 
 if __name__ == "__main__":

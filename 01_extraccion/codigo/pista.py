@@ -264,15 +264,19 @@ def indice_videos() -> dict:
     return RU.indice_videos()
 
 
-def pareja(clip: str):
+def pareja(clip: str, frames=None):
     """QUE HACE: los dos tiradores desde el pickle de detecciones ya cacheado, sin volver a pasar
-    YOLO."""
+    YOLO.
+
+    `frames` hace falta para que la eleccion sea la MISMA que la de la etapa 1 cuando la puerta de
+    piernas esta encendida (`pareja_v2.PIERNA_K`), porque esa puerta mira pixeles. Sin ellos, aqui
+    saldria la pareja de antes de la puerta y las poses de la etapa 4 serian de otra gente."""
     pk = SCRATCH_VIEJO / ("det_%s.pkl" % clip)
     if not pk.exists():
         return None
     with open(pk, "rb") as fh:
         cajas, cuadros, W, H, T = pickle.load(fh)
-    r = EP.procesa(cajas, cuadros, W, H, T)
+    r = EP.procesa(cajas, cuadros, W, H, T, frames=frames)
     r["cajas"], r["cuadros"], r["W"], r["H"], r["T"] = cajas, cuadros, W, H, T
     return r
 
@@ -2078,6 +2082,13 @@ def analiza(clip: str, video: str = None, frames: list = None,
         if video is None:
             return {"clip": clip, "ok": False, "motivo": "sin video en disco"}
         frames = lee(video, T)
+    import pareja_v2 as _PAR
+    if _PAR.PIERNA_K > 0:
+        """La pareja otra vez, ahora con los fotogramas, para que coincida con la de la etapa 1
+        (puerta de piernas, PAREJA_2026-10-09). Con la puerta apagada no se rehace nada."""
+        r = pareja(clip, frames=frames)
+        if not r["mask"].any():
+            return {"clip": clip, "ok": False, "motivo": "sin tramo utilizable"}
     ks = [int(v) for v in np.nonzero(r["mask"])[0] if v < len(frames)]
     if len(ks) < 12:
         return {"clip": clip, "ok": False, "motivo": "menos de 12 cuadros utilizables leidos"}

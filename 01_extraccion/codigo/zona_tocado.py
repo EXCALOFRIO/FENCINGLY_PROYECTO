@@ -126,18 +126,12 @@ def cuadro_tocado(clip, video, torneo):
             return int(min(int(float(f["cuadro_encendido"])) for f in filas)), filas[0].get("via")
         return None, "lights csv sin luces"
     import luces as LU
-    roi = RU.roi_sede(torneo)
-    det = LU.detecta(video, banda=roi["banda"]) if roi else LU.detecta(video)
-    fps = det.get("fps") or 30.0
-    gr = LU.grupo_del_tocado(LU.agrupa(det["luces"], fps), fps)
-    via = "roi_sede" if roi else "general"
-    if roi and not gr:
-        det = LU.detecta(video)
-        gr = LU.grupo_del_tocado(LU.agrupa(det["luces"], fps), fps)
-        via = "general_tras_roi"
-    if not gr:
+    filas, via, _fps = LU.lee_clip(video, RU.roi_sede(torneo))
+    """La MISMA lectura que la etapa 9 (`luces.lee_clip`): antes esto era una copia de su codigo, y
+    dos copias de una regla acaban siendo dos reglas."""
+    if not filas:
         return None, via
-    return int(min(g["cuadro_encendido"] for g in gr)), via
+    return int(min(g["cuadro_encendido"] for g in filas)), via
 
 
 def analiza(clip, video, torneo=None):

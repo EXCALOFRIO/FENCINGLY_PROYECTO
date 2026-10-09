@@ -267,16 +267,36 @@ def descarga(clip, torneo, destino):
         return str(p), "ya_estaba"
     url = CA.url(clip, torneo)
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    tmp = p.with_name(p.name + ".part")
     try:
-        with urllib.request.urlopen(req, timeout=120) as r, open(p, "wb") as fh:
+        with urllib.request.urlopen(req, timeout=120) as r, open(tmp, "wb") as fh:
             fh.write(r.read())
     except Exception as ex:
+        tmp.unlink(missing_ok=True)
         return None, "%s: %s" % (type(ex).__name__, str(ex)[:60])
-    if p.stat().st_size <= 10240:
-        n = p.stat().st_size
-        p.unlink()
+    """A UN `.part` Y LUEGO `os.replace` (2026-10-09). Escribiendo directamente en el `.mp4`, una
+    descarga cortada a medias dejaba un fichero de mas de 10 KB que la vuelta siguiente daba por
+    bueno ("ya_estaba") y la etapa 1 leia como 0 cuadros: `CavernousBoldBunny` (moov atom not
+    found) se quedo asi para siempre en anotados."""
+    if tmp.stat().st_size <= 10240:
+        n = tmp.stat().st_size
+        tmp.unlink()
         return None, "cuerpo de %d B, no es un video" % n
+    os.replace(tmp, p)
     return str(p), "bajado"
+
+
+def legible(ruta):
+    """QUE DEVUELVE: True si OpenCV abre el mp4 y le ve al menos un cuadro.
+
+    Cuesta ~10 ms. Existe porque un mp4 truncado (sin `moov`) pesa megas y pasa cualquier
+    comprobacion de tamano, y la etapa 1 lo procesaria como un clip de 0 cuadros."""
+    import cv2
+    cap = cv2.VideoCapture(str(ruta))
+    try:
+        return bool(cap.isOpened()) and int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0) > 0
+    finally:
+        cap.release()
 
 
 def _lanza(py, codigo, clips, etiqueta):
@@ -382,14 +402,30 @@ def corre(clips, etapas, descargar=False, borrar=False, lote=25, verboso=True,
         pend = {n: [c for c in trozo if n not in hechas(c, [n], remoto)]
                 for n in etapas}
         corridos = set()
+        vivos = []
         if descargar:
-            vivos = []
             for c in trozo:
                 if not any(c in pend[n] for n in etapas):
                     continue
-                if RU.video(c):
+                v = RU.video(c)
+                if v and legible(v):
                     vivos.append(c)
                     continue
+                if v:
+                    """ILEGIBLE: se vuelve a bajar a DESCARGAS, que `RU.video` mira ANTES que el
+                    indice del arbol, asi que la copia buena tapa a la rota sin borrar nada. Si la
+                    rota estaba en DESCARGAS se aparta con otro nombre, no se borra."""
+                    pv = pathlib.Path(v)
+                    rota = pv.with_name(pv.name + ".ilegible")
+                    if pv.parent == RU.DESCARGAS:
+                        if rota.exists():
+                            """BAJADO DOS VECES Y LAS DOS ILEGIBLE: esta roto EN EL ORIGEN. Medido:
+                            el CDN sirve `CavernousBoldBunny` truncado, byte a byte igual que la
+                            copia rota de septiembre. Sin este tope se bajaria en cada vuelta."""
+                            apunta({"clip": c, "estado": "video roto en el origen"})
+                            continue
+                        os.replace(pv, rota)
+                    apunta({"clip": c, "estado": "video ilegible, se vuelve a bajar", "ruta": v})
                 tor = df.loc[c, "torneo"] if c in df.index else None
                 if tor is None:
                     apunta({"clip": c, "estado": "sin torneo en el manifiesto"})
@@ -404,7 +440,10 @@ def corre(clips, etapas, descargar=False, borrar=False, lote=25, verboso=True,
         for n in etapas:
             cs = [c for c in pend[n]
                   if (RU.video(c) or n not in NECESITAN_VIDEO)
+                  and not (descargar and n in NECESITAN_VIDEO and c not in vivos)
                   and hechas(c, DEPENDE[n], remoto) == set(DEPENDE[n])]
+            """Con `--descarga`, un clip cuyo video se sabe roto (ilegible y sin copia buena) no se
+            le pasa a la etapa: antes se le corria la etapa 1 en cada vuelta para no sacar nada."""
             saltados = len(pend[n]) - len(cs)
             if saltados and verboso:
                 print("   etapa %-2d  %3d clips saltados: les falta %s"

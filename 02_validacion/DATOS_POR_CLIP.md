@@ -83,7 +83,10 @@ Una fila por EVENTO, no por cuadro. Es la serie temporal de bajo nivel que pedia
 | `pose_fiable` | `columna` | si las poses del evento son todas medidas | bool | SI | es el resumen de `origen_max` y `hueco_sin_medir` |
 | `hueco_max` | `columna` | el hueco mas largo de las poses que usa el evento | cuadros | SI | por encima de 24 el error de la pose **no esta medido** |
 | `hueco_sin_medir` | `columna` | si el evento usa una pose de hueco mayor de 24 cuadros | bool | SI | marca el dato cuyo error no es verificable |
-| `publicable` | `columna` | si la escala metrica del clip pasa el control fisico | bool | SI | **2,6 %** de los clips por tirador |
+| `publicable` | `columna` | si la escala metrica del clip pasa el control fisico **y** el evento pasa la puerta fisica por evento | bool | SI | **2,6 %** de los clips por tirador; la puerta por evento rebaja **156 de 16.202** filas publicables (0,0096) que tenian x o v imposibles (2026-10-09) |
+| `publicable_clip` | `columna` | el `publicable` del clip, antes de la puerta por evento | bool | SI | es el que habia hasta el 2026-10-09 |
+| `fisica_evento` | `columna` | si el evento pasa la puerta fisica: v media <= 8 m/s, desplazamiento/duracion <= 8 m/s, abs(x) <= 16 m | bool o None | SI | **None** si la fila no trae magnitudes en metros (sin homografia): no medido no es aprobado |
+| `motivo_no_publicable` | `columna` | que comprobaciones fallan (`velocidad`, `desplazamiento`, `fuera_de_pista`, unidas por `+`) | texto o None | SI | `ETAPA7_PUERTAS_2026-10-09.md` |
 | `puerta_dos_lados` | `columna` | si los DOS tiradores del clip pasan el control fisico | bool | SI | la puerta vieja comparaba la mediana **agrupada** y daba 12,8 %; por tirador es **2,6 %** |
 | `ancla_deriva_m` | `columna` | cuanto deriva el origen del mapa a lo largo del clip | m | SI | utilizable (< 1,00 m) en **2 de 11 clips**; el resto lleva el aviso |
 | `ancla_fiable` | `columna` | si el origen del mapa se puede creer | bool | SI | 2 de 11 |

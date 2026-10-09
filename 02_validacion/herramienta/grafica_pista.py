@@ -557,6 +557,10 @@ def fila_posicion(d, c):
     f.update({k: round(v, 4) if isinstance(v, float) else v for k, v in d["ruido"].items()})
     for t in MARCA_EV:
         f["n_" + t] = sum(1 for e in d["ev"] if e["tipo"] == t)
+    if PO.PUERTA_EVENTO:
+        """Cuantas filas de la serie no pasan la puerta fisica POR EVENTO (`posicion.fisica_evento`).
+        `publicable` de esta fila sigue siendo el del CLIP: esto dice cuanto hay que creerselo."""
+        f["n_eventos_fisica_mal"] = sum(1 for s in d["serie"] if s.get("fisica_evento") is False)
     for t in ("fondo", "marcha", "romper", "alto"):
         m = [e["magnitud_m"] for e in d["ev"]
              if e["tipo"] == t and np.isfinite(e.get("magnitud_m", np.nan))]

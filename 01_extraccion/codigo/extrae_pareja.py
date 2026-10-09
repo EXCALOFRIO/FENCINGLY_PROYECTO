@@ -135,7 +135,10 @@ def detecta_clip(yolo, cap, cv2, extra=None) -> tuple:
             break
         frames.extend(trozo)
         rs = yolo.predict(trozo, imgsz=IMGSZ_YOLO, conf=CONF_YOLO, verbose=False, device=0,
-                          half=YOLO_HALF)
+                          quantize=16 if YOLO_HALF else 32)
+        """`quantize` y no `half` (2026-10-09): ultralytics 8.4 da `half` por obsoleto y escribe
+        un WARNING por cada llamada, ~40 por clip, millones de lineas en `gpu*.log` en el florete.
+        Medido en 64 cuadros: cajas y puntos IDENTICOS bit a bit a `half=True`."""
         for r in rs:
             if r.boxes is not None and len(r.boxes):
                 b = r.boxes.xyxy.cpu().numpy()
@@ -394,7 +397,9 @@ def procesa(cajas, cuadros, W, H, T, yolo=None, frames=None, gris=None, cron=Non
     cj, ck = cajas[keep], cuadros[keep]
     tr = SEL.construye_trayectorias(cj, ck, W, H, T)
     t = marca("trayectorias", t)
-    res = PAR.elige_pareja(tr, W, H, T)
+    res = PAR.elige_pareja(tr, W, H, T, frames=frames)
+    """Con `frames` la pareja puede mirar los pixeles (puerta de piernas, `pareja_v2.PIERNA_K`);
+    en `fase1` ya estan en memoria, asi que no cuesta decodificar nada."""
     B, pres = SEL.a_matrices(res["elegidas"], cj, T, W, H)
     t = marca("pareja", t)
     ndup = _quita_duplicados(B, pres, W, H, T)

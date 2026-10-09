@@ -162,24 +162,17 @@ def _luces(clip, ctx):
     import csv
     import luces as LU
     roi = RU.roi_sede(ctx.get("torneo"))
-    det = LU.detecta(ctx["video"], banda=roi["banda"]) if roi else LU.detecta(ctx["video"])
-    via = "roi_sede" if roi else "general"
-    fps = det.get("fps") or ctx.get("fps") or 25.0
-    """`detecta` devuelve un dict con `luces` dentro, no la lista; y trae el `fps` leido del propio
-    video, que es mejor fuente que cualquier valor por defecto que le pase el llamante."""
-    gr = LU.grupo_del_tocado(LU.agrupa(det["luces"], fps), fps)
-    if roi and not gr:
-        det2 = LU.detecta(ctx["video"])
-        gr = LU.grupo_del_tocado(LU.agrupa(det2["luces"], fps), fps)
-        via = "general_tras_roi"
-        """EL RESPALDO, medido el 2026-10-08. La ROI de sede no encontraba NINGUNA luz en el 40 % de
-        582 clips anotados (anaheimfoil2018, qatarfoil2021 y katowicefoil2019 sobre todo), con la
-        barra roja bien visible en el video: el detector general la ve con confianza 1,0. Como
-        respaldo recupera **63 de 80** de esos clips. Y su cuadro es MENOS fiable que el de la ROI:
-        donde contestan los dos, coinciden a +-3 cuadros en el **64 %** de 70 clips. Por eso no
-        sustituye a la ROI, solo entra cuando la ROI no da nada, y lleva `via = general_tras_roi`
-        para que se pueda separar."""
-    filas = LU.resumen_clip(gr) or []
+    filas, via, _fps = LU.lee_clip(ctx["video"], roi)
+    """QUE DETECTOR, EN QUE ORDEN: `luces.lee_clip`, el mismo que usa la etapa 11 cuando no hay CSV.
+    Con `FENCINGLY_LUCES_V2` primero el detector viejo (`luces_v2`, `via = v2_fie | v2_generic`) y,
+    si no da tocado, el de abajo con `via = tras_v2_<via>` (`LUCES_POR_FUENTE_2026-10-09.md`).
+
+    EL RESPALDO DE LA ROI, medido el 2026-10-08. La ROI de sede no encontraba NINGUNA luz en el 40 %
+    de 582 clips anotados (anaheimfoil2018, qatarfoil2021 y katowicefoil2019 sobre todo), con la
+    barra roja bien visible en el video: el detector general la ve con confianza 1,0. Como respaldo
+    recupera **63 de 80** de esos clips. Y su cuadro es MENOS fiable que el de la ROI: donde
+    contestan los dos, coinciden a +-3 cuadros en el **64 %** de 70 clips. Por eso no sustituye a la
+    ROI, solo entra cuando la ROI no da nada, y lleva `via = general_tras_roi`."""
     for f in filas:
         f["clip"], f["via"] = clip, via
     p = PRUEBAS / ("lights_%s.csv" % clip)
@@ -189,7 +182,7 @@ def _luces(clip, ctx):
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas or [{"clip": clip, "via": via}])
-    return "%d lights, via=%s (90.5 %% with the venue ROI, 71.4 %% without; fallback 64 %% frame agreement)" % (len(filas), via)
+    return "%d lights, via=%s (see LUCES_POR_FUENTE_2026-10-09.md for the rate by via)" % (len(filas), via)
 
 
 def _zona(clip, ctx):
@@ -240,7 +233,8 @@ ETAPAS = [
           "(the `mano` column of serie_eventos_<clip>.csv)", None,
           "runs INSIDE stage 7, without the `encarado_accion` rung: see the note below"),
     Etapa(9, "scoring lights", ("cv2",), (), "lights_<clip>.csv", _luces,
-          "90.5 % with the per-venue ROI (21 venues), 71.4 % without. Reported by `via`"),
+          "old fencingly_v2 detector first (LUCES_POR_FUENTE_2026-10-09): one-light agreement with "
+          "`touch` in foil 0.801 -> 0.947 (held-out half, n=641), frame 0 0.094 -> 0.014. By `via`"),
     Etapa(10, "the three labels, predicted", ("torch",),
           ("poses_%s.npz",), "etiquetas_<clip>.csv", _etiqueta,
           "no GPU: eats the series, not the video. `origen_etiqueta = modelo`, never merged"),
@@ -266,7 +260,12 @@ from two different owners glued together. The correct attribution:
 And what stage 7 actually runs is **none of the three**: `posicion.py` calls `mano_armada` without
 `accion=`, so the `encarado_accion` rung cannot fire and the chain is
 `pie_firme -> hombro_firme -> nariz_dir_dudosa -> geometria_a`. Passing `accion` would move the
-piste numbers, so it is identified and NOT done here."""
+piste numbers, so it is identified and NOT done here.
+
+MEASURED 2026-10-09 (`ETAPA7_PUERTAS_2026-10-09.md` §4), behind `FENCINGLY_MANO_ACCION`: against
+the FIE licence hand, 9,751 decisions / 958 fencers, the full cascade lifts per-clip accuracy* from
+0.878 to 0.892, but the declared criterion was PER FENCER and there it is 9 wins vs 6 losses,
+p = 0.61. It did not pass, so it ships OFF (`0`)."""
 
 
 def capacidades():

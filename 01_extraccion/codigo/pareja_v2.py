@@ -284,11 +284,122 @@ cuadro en un plano ancho: **verificado a ojo como CORRECTO**. De los 60 clips so
 es justo el roto. Bajar el umbral se llevaria casos buenos."""
 
 
-def elige_pareja(trayectorias, W, H, T, min_frac=0.02, fusionar=True) -> dict:
+PIERNA_K = float(os.environ.get("FENCINGLY_PIERNA_K", "0.5"))
+"""PUERTA DE PIERNAS, ADOPTADA el 2026-10-09 (PAREJA_2026-10-09). `FENCINGLY_PIERNA_K=0` la apaga.
+
+Validada con criterio declarado antes de mirar (empeora <= 1 y mejora >= 15 de 30), sobre 30 clips
+al azar fuera del desarrollo en los que cambia la pareja: **23 mejoran, 0 empeoran**, 5 mal y mal,
+1 bien y bien, 1 a medias. Cambia la pareja en 233 de 5.717 anotados (4,1 %). En la muestra al azar
+de 60 arregla 2 de los 3 fallos (arbitro y publico sentado).
+
+Fuera las parejas cuya pierna MAS OSCURA brilla menos que `PIERNA_K` veces la de la pareja mas
+clara de las que pasan las puertas geometricas. El pantalon y las medias del tirador son blancos por
+reglamento en las tres armas y el lame no llega a las piernas (el lame es lo que hundio la blancura
+del TORSO, bitacora seccion 18); el arbitro de traje y el publico sentado, no. Es RELATIVA al clip
+porque la blancura absoluta ya se midio inservible: dos tiradores reales en un pabellon oscuro
+daban 0,069 y 0,000. Una pareja cuyo brillo no se puede medir (sin cuadros) NO se juzga: None no es
+cero. Solo actua si el que llama pasa los fotogramas (`frames`); sin ellos el camino es el de antes.
+
+OJO, CONSECUENCIA: la pareja ya no se puede rehacer solo desde `det_<clip>.pkl`, hace falta el
+video. `pista.pareja` (etapa 7) la rehace con los fotogramas por eso. Y un clip cuya etapa 1 corrio
+ANTES de esta puerta y en el que la puerta cambia la pareja tiene que rehacer las etapas 1, 4, 7 y
+11: si no, la etapa 7 elegiria la pareja nueva mientras `poses_` lleva la vieja."""
+PIERNA_BANDA = (0.60, 0.92)
+"""Franja vertical de la caja, en fraccion del alto desde arriba: de medio muslo al tobillo. Deja
+fuera las zapatillas, que son de color, y el suelo de debajo."""
+PIERNA_ANCHO = (0.25, 0.75)
+"""Franja horizontal centrada: los bordes de la caja son fondo con frecuencia."""
+PIERNA_MUESTRAS = 12
+PIERNA_COMPARTE_MIN = 0.30
+"""La pareja que SUSTITUYE a la de arriba tiene que compartir al menos esta fraccion de cuadros.
+
+POR QUE, medido en el desarrollo (737 clips, PAREJA_2026-10-09 §2): sin esto la puerta empeoraba 3
+clips, y los tres eran retransmisiones de primeros planos con fondo negro (Eurosport, Tokio 2020) en
+las que la franja de las piernas de un tirador en guardia o en fondo cae ENTRE las piernas, sobre el
+fondo oscuro. La sustituta salia de otro plano del clip: comparte 0,02, 0,11 y 0,20. Las 26 mejoras
+del desarrollo tienen sustituta con comparte >= 0,39."""
+
+
+def brillo_pierna(t, frames):
+    """QUE DEVUELVE: la mediana, sobre <= `PIERNA_MUESTRAS` cuadros repartidos por la trayectoria, de
+    la mediana de V (HSV) en la franja de las piernas. None si ningun cuadro se pudo leer.
+
+    `frames` es cualquier cosa indexable por cuadro (la lista de `fase1` o un dict con solo los
+    cuadros pedidos); un cuadro que falte se salta."""
+    import cv2
+    ks = list(t["cuadros"])
+    if not ks:
+        return None
+    sel = sorted({ks[int(j)] for j in np.linspace(0, len(ks) - 1, min(PIERNA_MUESTRAS, len(ks)))})
+    pos = {k: q for q, k in enumerate(ks)}
+    vals = []
+    for k in sel:
+        try:
+            im = frames[k]
+        except (KeyError, IndexError):
+            continue
+        if im is None:
+            continue
+        Hi, Wi = im.shape[:2]
+        x1, y1, x2, y2 = [float(v) for v in t["cajas"][pos[k]]]
+        w, h = x2 - x1, y2 - y1
+        xa, xb = int(max(0, x1 + PIERNA_ANCHO[0] * w)), int(min(Wi, x1 + PIERNA_ANCHO[1] * w))
+        ya, yb = int(max(0, y1 + PIERNA_BANDA[0] * h)), int(min(Hi, y1 + PIERNA_BANDA[1] * h))
+        if xb - xa < 2 or yb - ya < 2:
+            continue
+        hsv = cv2.cvtColor(im[ya:yb, xa:xb], cv2.COLOR_BGR2HSV)
+        vals.append(float(np.median(hsv[..., 2])))
+    return float(np.median(vals)) if vals else None
+
+
+def cuadros_pierna(t):
+    """Los cuadros que `brillo_pierna` va a mirar de esta trayectoria. Para decodificar solo esos."""
+    ks = list(t["cuadros"])
+    if not ks:
+        return []
+    return sorted({ks[int(j)] for j in np.linspace(0, len(ks) - 1, min(PIERNA_MUESTRAS, len(ks)))})
+
+
+def _puerta_pierna(parejas, frames, K):
+    """QUE DEVUELVE: (parejas que quedan, informe o None). Nunca deja la lista vacia."""
+    brillo = {}
+
+    def b(r):
+        if id(r) not in brillo:
+            brillo[id(r)] = brillo_pierna(r["t"], frames)
+        return brillo[id(r)]
+
+    bp = []
+    for x in parejas:
+        va, vb = b(x["a"]), b(x["b"])
+        bp.append(None if va is None or vb is None else min(va, vb))
+    for x, v in zip(parejas, bp):
+        x["pierna"] = v
+    medidos = [v for v in bp if v is not None]
+    if not medidos:
+        return parejas, None
+    bmax = max(medidos)
+    if bp[0] is None or bp[0] >= K * bmax:
+        return parejas, {"bmax": bmax, "fuera": 0, "antes": bp[0], "cambia": False}
+    sust = [x for x, v in zip(parejas, bp)
+            if (v is None or v >= K * bmax) and x["comparte"] >= PIERNA_COMPARTE_MIN]
+    if not sust:
+        """La de arriba tiene piernas oscuras pero no hay con que sustituirla: se queda, como
+        antes de la puerta. Lo peor que pasa es no arreglar, nunca cambiar a ciegas."""
+        return parejas, {"bmax": bmax, "fuera": 0, "antes": bp[0], "cambia": False,
+                         "sin_sustituta": True}
+    nueva = [sust[0]] + [x for x in parejas if x is not sust[0]]
+    return nueva, {"bmax": bmax, "fuera": parejas.index(sust[0]), "antes": bp[0],
+                   "cambia": True}
+
+
+def elige_pareja(trayectorias, W, H, T, min_frac=0.02, fusionar=True, frames=None) -> dict:
     """QUE HACE: fusiona los trozos y elige la pareja FILMADA, no la mejor puntuada suelta.
 
     QUE DEVUELVE: `elegidas` en orden izquierda-derecha por su cx RELATIVO, `parejas` con las cinco
     mejores y sus terminos para poder contradecir la eleccion, `candidatos`, y `motivo`.
+
+    `frames` (opcional, indexable por cuadro) activa la puerta de piernas si `PIERNA_K > 0`.
     """
     tr = fusiona(trayectorias, W, H) if fusionar else [_ordena(t) for t in trayectorias]
     cand = [rasgos(t, W, H, T) for t in tr]
@@ -347,11 +458,20 @@ def elige_pareja(trayectorias, W, H, T, min_frac=0.02, fusionar=True) -> dict:
                 "borde_descartadas": len(nunca_entera),
                 "motivo": "AVISO: ninguna pareja pasa las puertas de geometria"}
     parejas.sort(key=lambda x: -x["p"])
+    pierna = None
+    if PIERNA_K > 0 and frames is not None:
+        parejas, pierna = _puerta_pierna(parejas, frames, PIERNA_K)
     mej = parejas[0]
     izq, der = ((mej["a"], mej["b"]) if mej["cx_a"] <= mej["cx_b"] else (mej["b"], mej["a"]))
+    motivo = ("pareja: comparte %.0f%% sep %.2f alturas dpie %.3f (rel %.2f) cruza %.2f "
+              "frente %.3f") % (
+        100 * mej["comparte"], mej["sepalt"], mej["dpie"], mej["dpie_rel"], mej["cruza"],
+        mej["frente"])
+    if pierna and pierna["cambia"]:
+        """La procedencia queda escrita en `revision_<clip>.npz`: se sabe que clips decidio esta
+        puerta y con que numeros, sin rehacer nada."""
+        motivo += " | PIERNA: fuera %d (la de antes %s < %.2f x %.0f)" % (
+            pierna["fuera"], "None" if pierna["antes"] is None else "%.0f" % pierna["antes"],
+            PIERNA_K, pierna["bmax"])
     return {"elegidas": [izq, der], "parejas": parejas[:5], "candidatos": cand, "nfus": len(tr),
-            "borde_descartadas": len(nunca_entera),
-            "motivo": ("pareja: comparte %.0f%% sep %.2f alturas dpie %.3f (rel %.2f) cruza %.2f "
-                       "frente %.3f") % (
-                100 * mej["comparte"], mej["sepalt"], mej["dpie"], mej["dpie_rel"], mej["cruza"],
-                mej["frente"])}
+            "borde_descartadas": len(nunca_entera), "pierna": pierna, "motivo": motivo}
