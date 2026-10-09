@@ -92,6 +92,68 @@ cuenta: 106.432 clips x 19 MB son ~2 TB, y en D: hay 1,7 TB libres.
   espejo 1,0000. Se dan por arma (en florete casi todo es torso) y B contra la mayoritaria.
 - **La ventana incluye el tocado**: acaba 0,5 s despues, asi que el contacto esta dentro.
 
+## Cambio 1 (2026-10-09 22:05, ANTES de extraer nada salvo pruebas de humo de 3-8 clips sin cifras de acierto)
+
+**Por que.** El usuario propone los "tres ojos" (macro, meso, micro) y pide usar el modelo GRANDE en
+vez del pequenio. Esto sustituye a las variantes V1-V4 de arriba, que no se extraen. Ninguna de las
+dos cosas se habia medido contra etiquetas.
+
+**El modelo.** ViT-g de V-JEPA 2: 1.000 M de parametros, Apache-2.0, sin acceso restringido.
+Coste medido en 3 clips, con los tres ojos x 2 vistas, por clip:
+
+| modelo | s de GPU/clip | anotados (5.836) | florete (106.432) |
+|---|---:|---:|---:|
+| ViT-L 256 (V0, 1 ojo) | 1,2 | 2 h | 1,5 dias |
+| ViT-g 256, 3 ojos | 10,4 | ~17 h | ~13 dias |
+| ViT-g 384, 3 ojos | 34,3 | ~55 h | ~42 dias |
+| ViT-g 384, solo meso | ~11,4 | ~18 h | ~14 dias |
+
+ViT-g 384 con los tres ojos no cabe en el mes de la corrida: 42 dias, ademas de las etapas 1 + 4.
+Por eso se extrae en dos tandas sobre los anotados:
+
+- **Tanda G256**: ViT-g 256, los tres ojos.
+- **Tanda G384**: ViT-g 384, solo el ojo meso. Dice si la resolucion compensa su coste.
+
+**Los tres ojos** (`vjepa_variantes.py`):
+
+| ojo | clave | tiempo | espacio | tokens |
+|---|---|---|---|---:|
+| macro | `mac4` | el clip ENTERO, 64 cuadros repartidos (~6/s) | la imagen entera, 16:9 estirada | 512 |
+| meso | `rec8` | `[a - 4,0 s, a + 0,5 s]`, como V0 | el recorte de la pareja de V0 | 2.048 (8x8) |
+| micro | `mic8` | `[a - 1,5 s, a + 0,5 s]`, 64 cuadros (~32/s, casi los fps del video) | ZOOM movil que contiene las dos manos adelantadas (Sapiens) | 2.048 (8x8) |
+
+`rec4` y `mic4` salen exactos promediando 2x2.
+
+**El zoom del micro se fijo mirando 8 clips, antes de cualquier cifra**
+(`02_validacion/auditoria/vjepa_ojos_2026-10-09/`). La caja fija de las manos salia tan grande como
+el recorte de la pareja; la caja de lado fijo enseniaba el hueco entre los dos. La regla final:
+
+- **centro**: el punto medio de la mano adelantada de cada tirador;
+- **tamanio**: ancho = max(1,3 |dx|, 0,9 x el alto del tirador), alto lo mismo con |dy|, con razon
+  entre 1 y 2;
+- **suavizado**: mediana movil de 7.
+
+En los 8 clips, 7 tienen las dos manos en 58-64 de los 64 cuadros y 1 va por el respaldo.
+
+**Lo que se compara** (misma sonda, rejilla, 5 semillas, reparto y fusiones que arriba; decide
+`initiated` con el mismo umbral, por pares contra su referencia):
+
+| comparacion | que mide | referencia |
+|---|---|---|
+| G0 = G256 `rec4` | el modelo grande, mismo ojo y misma compresion | V0 |
+| G0b = G256 `rec8` | menos compresion | G0 |
+| G1 = `rec4 + mac4` | anadir el macro | G0 |
+| G2 = `rec4 + mic4` | anadir el micro | G0 |
+| G3 = `rec4 + mac4 + mic4` | los tres ojos | G0 y V0 |
+| G4 = G384 `rec4` | la resolucion | G0 |
+
+Informativo: `mic8` solo; la zona con la media de `mac` (sonda de `VJEPA_ZONA`); `prioridad` y
+`body_location` con lo que gane.
+
+**Como se entrenan las sondas.** Los tokens van a un `memmap` en el NVMe (C:, temporal; se borra al
+acabar). Con 1.536 tokens de 1.408 son ~48 GB, que no caben en 32 GB de RAM. La sonda es la misma y
+lee por indices igual.
+
 ## Resultados
 
 (pendiente)

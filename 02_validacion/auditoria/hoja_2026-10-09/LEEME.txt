@@ -1,0 +1,1 @@
+crops/ y crops_anot/ (38 MB de recortes de tiradores) no se suben: se regeneran con `hoja_720_candidatos.py recortes`. Estan en disco en esta carpeta.

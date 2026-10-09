@@ -11,13 +11,19 @@ QUE GUARDA, por clip, `vjv_<clip>.npz` en `DESTINO` (una clave por salida pedida
   rec8   (2, 32, 8, 8, D) fp16   el MISMO recorte y ventana que `vjepa.py`, promediado 8x8 (no 4x4)
   ent8   (2, 32, 8, 8, D) fp16   la imagen ENTERA (sin recortar, 16:9 -> 256x256), misma ventana
   pre4   (2, 32, 4, 4, D) fp16   el recorte de la ventana ANTERIOR, [a - 8,5 s, a - 4,0 s]
-  rec4   (2, 32, 4, 4, D) fp16   el recorte de `vjepa.py` a 4x4 (para el modelo grande)
+  rec4   (2, 32, 4, 4, D) fp16   el recorte de `vjepa.py` a 4x4
+  LOS TRES OJOS (cambio 1 del protocolo, con el modelo grande):
+  rec8   el ojo MESO (el de arriba)
+  mac4   (2, 32, 4, 4, D) fp16   ojo MACRO: la imagen ENTERA, 64 cuadros repartidos por TODO el clip
+  mic8   (2, 32, 8, 8, D) fp16   ojo MICRO: [a - 1,5 s, a + 0,5 s] (~los fps del video) con ZOOM
+                                 MOVIL que sigue y contiene las manos adelantadas (Sapiens);
+                                 `caja_mic` (64, 4) la caja de cada cuadro
   media_<salida> (2, D) fp32, y idx, idx_pre, caja, caja_pre, n_pre_reales, ancla, via_ancla, fps, T
   vista 0 = la imagen, vista 1 = su ESPEJO horizontal (la sonda impone la antisimetria con las dos)
 El 4x4 de `rec8` se saca exacto promediando 2x2, asi que `rec8` contiene a `tok` de `vjepa.py`.
 
     python vjepa_variantes.py --conjunto anotados                     rec8, ent8, pre4 (ViT-L)
-    python vjepa_variantes.py --modelo vjepa2-vitg-fpc64-384 --salidas rec4 --destino D:/...vitg
+    python vjepa_variantes.py --modelo vjepa2-vitg-fpc64-384 --salidas rec8,mac4,mic8 --destino D:/...
     python vjepa_variantes.py --comprueba 5      rec8 -> 4x4 contra vjepa_<clip>.npz de 5 clips
 """
 from __future__ import annotations
@@ -39,7 +45,13 @@ PRE_DESDE_S = 8.5
 """La ventana anterior acaba donde empieza la de `vjepa.py` (a - 4,0 s) y dura lo mismo (4,5 s), con
 la misma densidad (64 cuadros, ~14/s). Medido sobre los anotados: el tocado cae a una mediana de 7,4 s
 del inicio del clip, asi que la ventana de `vjepa.py` deja fuera ~3,4 s y esta los cubre."""
-SALIDAS = ("rec8", "ent8", "pre4", "rec4")
+SALIDAS = ("rec8", "ent8", "pre4", "rec4", "mac4", "mic8")
+MIC_ANTES_S, MIC_DESPUES_S = 1.5, 0.5
+"""El ojo micro: 2 s alrededor del tocado en 64 cuadros, ~32/s: a 30 fps casi todos los cuadros del
+video (60 de 64), a 25 fps alguno repetido, a 50 fps uno de cada ~1,6."""
+MIC_LADO_MIN = 160
+MANOS_KP = (21, 42)
+"""Las dos raices de mano de Sapiens 2 (`cono_lib.MANOS`)."""
 
 
 def ventana_pre(a, fps):
@@ -51,8 +63,96 @@ def ventana_pre(a, fps):
     return np.clip(idx, 0, None).astype("int32"), int((idx >= 0).sum())
 
 
+def ventana_mic(a, fps, T):
+    ini = max(0, a - int(round(MIC_ANTES_S * fps)))
+    fin = min(T - 1, a + int(round(MIC_DESPUES_S * fps)))
+    if fin <= ini:
+        ini, fin = 0, T - 1
+    return np.round(np.linspace(ini, fin, VJ.N_CUADROS)).astype("int32")
+
+
+def caja_manos(KP, SC, B, idx, W, H):
+    """El ZOOM del ojo micro: una caja por cuadro que SIGUE el cruce de las manos y lo contiene.
+
+    POR QUE ASI (medido en 6 clips antes de fijarlo, `vjepa_ojos_2026-10-09/`):
+    - una caja FIJA de las manos en los 2 s salia de 440-720 px, tan grande como el recorte de la
+      pareja, porque en 2 s las manos recorren metros: no era un zoom;
+    - una caja movil de lado fijo centrada entre las manos enseniaba el HUECO vacio entre los dos
+      cuando estan lejos (la distancia entre las manos adelantadas va de 750 px a 66 px).
+    Asi que la caja contiene las dos manos y se cierra sobre ellas cuando se acercan.
+
+    Por cuadro y tirador, de sus dos raices de mano (confianza >= 0,3, dentro de la imagen y de su caja
+    ampliada un 25 %), la de x mas cerca del centro del rival: el criterio (a) de `cono_lib.mano_armada`,
+    por cuadro y sin decidir cual es la armada, porque aqui solo hace falta saber DONDE esta el cruce.
+    Con las dos manos: centro = su punto medio; ancho = max(1,3 |dx|, 0,9 h), alto = max(1,3 |dy|,
+    0,9 h), con h el alto mediano del tirador en la ventana, y razon ancho/alto entre 1 y 2 como el
+    recorte de la pareja. Los cuadros sin las dos manos se interpolan; mediana movil de 7 en las cuatro
+    magnitudes; nunca mas grande que la imagen.
+    QUE DEVUELVE: (cajas (64, 4) en pixeles, cuadros con las dos manos, via `manos` / `respaldo`)."""
+    n = len(idx)
+    g = np.full((n, 4), np.nan)
+    altos = []
+    for i, t in enumerate(idx):
+        bt = B[t]
+        if not np.isfinite(bt).all():
+            continue
+        altos.extend(((bt[:, 3] - bt[:, 1]) * H).tolist())
+        ps = []
+        for j in (0, 1):
+            x1, y1, x2, y2 = bt[j] * [W, H, W, H]
+            ax, ay = 0.25 * (x2 - x1), 0.25 * (y2 - y1)
+            rx = 0.5 * (bt[1 - j][0] + bt[1 - j][2]) * W
+            mejor = None
+            for k in MANOS_KP:
+                x, y = KP[t, j, k]
+                if not (SC[t, j, k] >= 0.3 and 0 <= x < W and 0 <= y < H
+                        and x1 - ax <= x <= x2 + ax and y1 - ay <= y <= y2 + ay):
+                    continue
+                if mejor is None or abs(x - rx) < abs(mejor[0] - rx):
+                    mejor = (float(x), float(y))
+            if mejor:
+                ps.append(mejor)
+        if len(ps) == 2:
+            (xa, ya), (xb, yb) = ps
+            g[i] = [0.5 * (xa + xb), 0.5 * (ya + yb), abs(xa - xb), abs(ya - yb)]
+    h = float(np.median(altos)) if altos else float(MIC_LADO_MIN)
+    ok = np.isfinite(g[:, 0])
+    via = "manos"
+    if not ok.any():
+        b = B[idx].reshape(-1, 4)
+        b = b[np.isfinite(b).all(axis=1)]
+        if not len(b):
+            return np.tile(np.array([0, 0, W, H], dtype="float32"), (n, 1)), 0, "imagen"
+        x1, x2 = b[:, 0].min() * W, b[:, 2].max() * W
+        y1, y2 = b[:, 1].min() * H, b[:, 3].max() * H
+        g[:] = [0.5 * (x1 + x2), y1 + 0.35 * (y2 - y1), (x2 - x1) / 1.3, 0.0]
+        via = "respaldo"
+    else:
+        pos = np.arange(n)
+        for c in range(4):
+            g[:, c] = np.interp(pos, pos[ok], g[ok, c])
+    pad = np.pad(g, ((3, 3), (0, 0)), mode="edge")
+    g = np.stack([np.median(pad[i:i + 7], axis=0) for i in range(n)])
+    an = np.maximum(1.3 * g[:, 2], 0.9 * h)
+    al = np.maximum(1.3 * g[:, 3], 0.9 * h)
+    al = np.where(an / al > 2.0, an / 2.0, al)
+    an = np.where(an / al < 1.0, al, an)
+    an, al = np.minimum(an, W), np.minimum(al, H)
+    x1 = np.clip(g[:, 0] - an / 2, 0.0, W - an)
+    y1 = np.clip(g[:, 1] - al / 2, 0.0, H - al)
+    cajas = np.stack([x1, y1, x1 + an, y1 + al], axis=1).astype("float32")
+    return cajas, int(ok.sum()), via
+
+
+VISTA = {"rec8": ("rec", 8), "rec4": ("rec", 4), "ent8": ("ent", 8), "pre4": ("pre", 4),
+         "mac4": ("mac", 4), "mic8": ("mic", 8)}
+"""salida -> (vista, promedio k x k). Una vista se pasa UNA vez por el modelo aunque salgan dos
+salidas de ella (`rec8` y `rec4`)."""
+
+
 def prepara(clip, salidas, lado):
-    """CPU: como `vjepa.prepara`, pero decodifica UNA vez y saca todas las vistas pedidas."""
+    """CPU: como `vjepa.prepara`, pero decodifica UNA vez y saca todas las vistas pedidas. Cada vista
+    es (cuadros, caja); caja None = la imagen entera."""
     import cv2
     p = RU.TRABAJO / ("poses_%s.npz" % clip)
     if not p.is_file():
@@ -61,6 +161,8 @@ def prepara(clip, salidas, lado):
         B, mask = z["B"], z["mask"]
         W, H, T = int(z["W"]), int(z["H"]), int(z["T"])
         fps = float(z["fps"]) if "fps" in z.files else 0.0
+        KP = z["KP"] if "mic8" in salidas else None
+        SC = z["SC"] if "mic8" in salidas else None
     video = RU.video(clip)
     if not video:
         return None, "sin video"
@@ -73,54 +175,55 @@ def prepara(clip, salidas, lado):
     caja = VJ.caja_recorte(B, idx, W, H)
     idx_pre, n_pre = ventana_pre(a, fps)
     caja_pre = VJ.caja_recorte(B, np.clip(idx_pre, 0, T - 1), W, H)
-    quiere_rec = any(s.startswith("rec") for s in salidas)
-    quiere_ent = "ent8" in salidas
-    quiere_pre = "pre4" in salidas
-    q_main = set(int(i) for i in idx)
-    q_pre = set(int(i) for i in idx_pre) if quiere_pre else set()
-    tope = max(int(idx.max()), max(q_pre) if q_pre else 0)
+    idx_mac = np.round(np.linspace(0, T - 1, VJ.N_CUADROS)).astype("int32")
+    idx_mic = ventana_mic(a, fps, T)
+    caja_mic, n_manos, via_mic = (caja_manos(KP, SC, B, idx_mic, W, H) if KP is not None
+                                  else (None, 0, ""))
+    caja_de_mic = ({int(t): caja_mic[i] for i, t in reversed(list(enumerate(idx_mic)))}
+                   if caja_mic is not None else None)
+    """Cuadro -> su caja del ojo micro; si un cuadro sale dos veces (videos de 25 fps), la primera."""
+    defs = {"rec": (idx, caja), "ent": (idx, None), "pre": (idx_pre, caja_pre),
+            "mac": (idx_mac, None), "mic": (idx_mic, caja_de_mic)}
+    vistas = sorted({VISTA[s][0] for s in salidas})
+    quiero = {v: set(int(i) for i in defs[v][0]) for v in vistas}
+    tope = max(max(q) for q in quiero.values())
 
-    def corta(im, c):
-        x1, y1, x2, y2 = [int(round(v)) for v in c]
-        r = cv2.resize(im[y1:y2, x1:x2], (lado, lado), interpolation=cv2.INTER_AREA)
+    def corta(im, c, cubico=False):
+        if c is not None:
+            x1, y1, x2, y2 = [int(round(v)) for v in c]
+            im = im[y1:y2, x1:x2]
+        interp = cv2.INTER_CUBIC if (cubico and im.shape[0] < lado) else cv2.INTER_AREA
+        r = cv2.resize(im, (lado, lado), interpolation=interp)
         return cv2.cvtColor(r, cv2.COLOR_BGR2RGB)
 
-    rec, ent, pre = {}, {}, {}
+    """INTER_AREA en todo, como `vjepa.py`, para que `rec` sea exactamente su recorte. Solo el ZOOM del
+    ojo micro, que casi siempre AMPLIA, va con INTER_CUBIC: INTER_AREA al ampliar es casi el vecino mas
+    cercano."""
+    cuadros = {v: {} for v in vistas}
     k = 0
     while k <= tope:
         ok, im = cap.read()
         if not ok:
             break
-        if k in q_main:
-            if quiere_rec:
-                rec[k] = corta(im, caja)
-            if quiere_ent:
-                ent[k] = cv2.cvtColor(cv2.resize(im, (lado, lado), interpolation=cv2.INTER_AREA),
-                                      cv2.COLOR_BGR2RGB)
-        if k in q_pre:
-            pre[k] = corta(im, caja_pre)
+        for v in vistas:
+            if k in quiero[v]:
+                c = defs[v][1]
+                cuadros[v][k] = corta(im, c[k] if isinstance(c, dict) else c, cubico=(v == "mic"))
         k += 1
     cap.release()
-    principal = rec if quiere_rec else ent
-    if (quiere_rec or quiere_ent) and not principal:
+    if not any(cuadros.values()):
         return None, "video ilegible"
-
-    def pila(cuadros, ids):
-        if not cuadros:
-            return None
-        ultimo = cuadros[max(cuadros)]
-        return np.stack([cuadros.get(int(i), ultimo) for i in ids])
-
-    d = {"clip": clip, "idx": idx, "idx_pre": idx_pre, "caja": caja, "caja_pre": caja_pre,
-         "n_pre_reales": n_pre, "ancla": a, "via": via, "fps": fps, "T": T,
-         "n_faltan": int(sum(int(i) not in principal for i in idx)) if principal else None,
-         "s_lee": time.perf_counter() - t0, "pilas": {}}
-    if quiere_rec:
-        d["pilas"]["rec"] = pila(rec, idx)
-    if quiere_ent:
-        d["pilas"]["ent"] = pila(ent, idx)
-    if quiere_pre:
-        d["pilas"]["pre"] = pila(pre, idx_pre)
+    d = {"clip": clip, "idx": idx, "idx_pre": idx_pre, "idx_mic": idx_mic, "caja": caja,
+         "caja_pre": caja_pre, "caja_mic": caja_mic if caja_mic is not None else np.zeros((0, 4), "float32"),
+         "n_manos": n_manos, "via_mic": via_mic, "n_pre_reales": n_pre, "ancla": a, "via": via,
+         "fps": fps, "T": T, "s_lee": time.perf_counter() - t0, "pilas": {}, "faltan": {}}
+    for v in vistas:
+        c = cuadros[v]
+        if not c:
+            return None, "video ilegible (%s)" % v
+        ultimo = c[max(c)]
+        d["pilas"][v] = np.stack([c.get(int(i), ultimo) for i in defs[v][0]])
+        d["faltan"][v] = int(sum(int(i) not in c for i in defs[v][0]))
     return d, ""
 
 
@@ -146,19 +249,13 @@ def embebe_todo(mod, d, salidas, lado):
     import torch
     t0 = time.perf_counter()
     out = {}
-    if "rec" in d["pilas"]:
-        h = embebe(mod, d["pilas"]["rec"], lado)
-        out["media_rec"] = h.float().mean(dim=1)
-        if "rec8" in salidas:
-            out["rec8"] = _pool(h, lado, 8)
-        if "rec4" in salidas:
-            out["rec4"] = _pool(h, lado, 4)
-    if "ent" in d["pilas"]:
-        h = embebe(mod, d["pilas"]["ent"], lado)
-        out["ent8"], out["media_ent"] = _pool(h, lado, 8), h.float().mean(dim=1)
-    if "pre" in d["pilas"]:
-        h = embebe(mod, d["pilas"]["pre"], lado)
-        out["pre4"], out["media_pre"] = _pool(h, lado, 4), h.float().mean(dim=1)
+    for v, pila in d["pilas"].items():
+        h = embebe(mod, pila, lado)
+        out["media_" + v] = h.float().mean(dim=1)
+        for s in salidas:
+            if VISTA[s][0] == v:
+                out[s] = _pool(h, lado, VISTA[s][1])
+        del h
     torch.cuda.synchronize()
     res = {k: (v.cpu().numpy().astype("float32") if k.startswith("media")
                else v.half().cpu().numpy()) for k, v in out.items()}
@@ -169,11 +266,13 @@ def guarda(d, res, s_gpu, destino, modelo):
     destino.mkdir(parents=True, exist_ok=True)
     f = destino / ("vjv_%s.npz" % d["clip"])
     tmp = destino / ("vjv_%s.part.npz" % d["clip"])
-    np.savez(tmp, idx=d["idx"], idx_pre=d["idx_pre"], caja=d["caja"], caja_pre=d["caja_pre"],
-             n_pre_reales=np.int32(d["n_pre_reales"]), ancla=np.int32(d["ancla"]),
-             via_ancla=d["via"], fps=np.float64(d["fps"]), T=np.int32(d["T"]),
-             n_faltan=np.int32(-1 if d["n_faltan"] is None else d["n_faltan"]), modelo=modelo,
-             s_gpu=np.float64(s_gpu), s_lee=np.float64(d["s_lee"]), **res)
+    faltan = {"faltan_" + v: np.int32(n) for v, n in d["faltan"].items()}
+    np.savez(tmp, idx=d["idx"], idx_pre=d["idx_pre"], idx_mic=d["idx_mic"], caja=d["caja"],
+             caja_pre=d["caja_pre"], caja_mic=d["caja_mic"], n_manos=np.int32(d["n_manos"]),
+             via_mic=d["via_mic"], n_pre_reales=np.int32(d["n_pre_reales"]),
+             ancla=np.int32(d["ancla"]), via_ancla=d["via"], fps=np.float64(d["fps"]),
+             T=np.int32(d["T"]), modelo=modelo, s_gpu=np.float64(s_gpu),
+             s_lee=np.float64(d["s_lee"]), **faltan, **res)
     os.replace(tmp, f)
 
 

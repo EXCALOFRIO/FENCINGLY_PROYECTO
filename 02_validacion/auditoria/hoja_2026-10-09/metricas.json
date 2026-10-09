@@ -1,0 +1,38 @@
+{
+  "clasico": {
+    "n_visibles": 58,
+    "punta_<=15px": "2/58",
+    "frac_<=15px": 0.034482758620689655,
+    "punta_<=30px": "8/58",
+    "frac_<=30px": 0.13793103448275862,
+    "ang_mediana_gr": 29.192712542849705,
+    "ang_n": 58,
+    "n_no_visibles": 42,
+    "falsos_positivos": "42/42",
+    "frac_fp": 1.0
+  },
+  "owlv2": {
+    "n_visibles": 58,
+    "punta_<=15px": "0/58",
+    "frac_<=15px": 0.0,
+    "punta_<=30px": "4/58",
+    "frac_<=30px": 0.06896551724137931,
+    "ang_mediana_gr": 64.33114251840499,
+    "ang_n": 58,
+    "n_no_visibles": 42,
+    "falsos_positivos": "42/42",
+    "frac_fp": 1.0
+  },
+  "sam2": {
+    "n_visibles": 58,
+    "punta_<=15px": "9/58",
+    "frac_<=15px": 0.15517241379310345,
+    "punta_<=30px": "20/58",
+    "frac_<=30px": 0.3448275862068966,
+    "ang_mediana_gr": 11.74488275693983,
+    "ang_n": 58,
+    "n_no_visibles": 42,
+    "falsos_positivos": "42/42",
+    "frac_fp": 1.0
+  }
+}
