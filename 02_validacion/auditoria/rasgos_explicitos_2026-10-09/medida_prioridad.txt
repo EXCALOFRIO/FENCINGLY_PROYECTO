@@ -1,0 +1,69 @@
+RASGOS EXPLICITOS (protocolo RASGOS_EXPLICITOS_2026-10-09)
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+rasgos: 5791 en cache, 0 por calcular
+cobertura por rasgo (fraccion no NaN, sobre 5791 clips x 2 tiradores):
+   v_ult1s                0.959
+   v_1a2s                 0.948
+   v_2a3s                 0.935
+   frac_avanza_1s         0.959
+   frac_retrocede_1s      0.959
+   acel_final             0.936
+   avanza_en_tocado       0.935
+   t_inicio_avance        0.531
+   ext_tocado             0.904
+   ext_max_1s             0.952
+   t_ext80                0.952
+   vext_pico              0.960
+   t_vext_pico            0.960
+   t_inicio_pie           0.454
+   brazo_menos_pie        0.453
+   parte_cierre_1s        0.927
+   m_a_su_fondo           0.595
+   t_ult_marcha           0.450
+   t_ult_romper           0.402
+   t_ult_fondo            0.321
+   t_ult_brazo            0.861
+   n_marcha_2s            0.999
+   n_romper_2s            0.999
+   n_fondo_2s             0.999
+   n_brazo_2s             0.999
+   dist_menos1s           0.944
+   dist_menos05s          0.934
+   dist_tocado            0.929
+   t_ult_accion           0.980
+   via_ancla              1.000
+   fps                    1.000
+filas: initiated 5536, prioridad 1076 (florete 795, sable 281)
+
+================================================================================
+TAREA prioridad: 1076 filas con rasgos
+C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\01_extraccion\codigo\etiquetador.py:895: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:821.)
+  tot += float(p) * len(j)
+reparto por torneo: entrenamiento 735 clips / 40 torneos, reservado 341 / 17
+                                          acierto
+clase mayoritaria del entrenamiento         0.522
+gana el que inicio                          0.644  (cobertura 0.947; etiqueta HUMANA)
+GRU (etiquetador)                           0.642
+RASGOS explicitos (GBM)                     0.537   -0.106  IC95 por torneo [-0.153, -0.034]
+fusion GRU + rasgos                         0.604   -0.038  IC95 por torneo [-0.079, +0.000]  (informativo)
+control del espejo de los rasgos: 1.0000  (empates exactos izq = der: 5)
+CRITERIO: rasgos - GRU = -0.106 >= +0,02, IC95 [-0.153, -0.034] sin cruzar cero, espejo 1.0000  ->  NO PASA
+
+por arma (informativo):
+   foil   n= 229  GRU 0.651  rasgos 0.546  fusion 0.638
+   sabre  n= 112  GRU 0.625  rasgos 0.518  fusion 0.536
+
+palancas: caida de acierto al permutar cada rasgo (particion interna, n=245):
+   t_ext80                +0.0408
+   ext_max_1s             +0.0359
+   t_inicio_avance        +0.0196
+   brazo_menos_pie        +0.0139
+   v_1a2s                 +0.0082
+   t_ult_romper           +0.0073
+   frac_retrocede_1s      +0.0065
+   v_ult1s                +0.0057
+   parte_cierre_1s        +0.0057
+   t_ult_brazo            +0.0024
+   v_2a3s                 +0.0016
+   dist_menos1s           +0.0008
