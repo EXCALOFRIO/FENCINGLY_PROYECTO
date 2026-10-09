@@ -41,6 +41,13 @@ salta solo, porque el estado es el disco.
 - **Un cambio de código no entra en los trabajadores que corren** (ejecutan las etapas dentro del
   proceso y los módulos quedan en caché): `--para` y relanzar.
 - Trabajadores: `gpu*` etapas 1 y 4, `cpu*` etapas 7, 9 y 11, `resp` el respaldo a HF.
+- **AL TERMINAR la corrida, un paso que la noche NO hace sola** (2026-10-09): la zona final del
+  tocado necesita un modelo POR TORNEO (ángulo del borde lejano contra la homografía,
+  `ANGULO_FUSION_2026-10-09.md`), así que se corre cuando el torneo esté entero:
+  `python zona_fusion.py --conjunto foil --escribe`. Hasta entonces `zona_` lleva
+  `via_zona = pendiente_torneo` y `zona` (la de la homografía sola) sigue valiendo.
+- **El florete NO es la corrida final mientras se esté midiendo** (lo pidió el usuario el
+  2026-10-09): se prueba sobre los 5.837 anotados y el florete se lanza cuando se dé por cerrado.
 
 ## 3. Qué sale de cada clip
 
@@ -53,7 +60,7 @@ Tabla completa, con el error medido de cada campo, en
 | 4 | `poses_<clip>.npz` | 308 puntos por tirador y cuadro, medido vs. rellenado |
 | 7 | `serie_eventos_`, `posicion_clip_<clip>.csv` | marcha, romper, fondo, brazo, mano armada, pista |
 | 9 | `lights_<clip>.csv` | cuadro del tocado por las luces (`via` dice de dónde sale) |
-| 11 | `zona_<clip>.csv` | x del tocado en metros por las rayas de la pista |
+| 11 | `zona_<clip>.csv` | x del tocado en metros por las rayas de la pista; `zona_final` tras `zona_fusion.py` |
 | 10 | `etiquetas_<clip>.csv` | quién inicia y zona (apagada hasta guardar los pesos) |
 
 ## 4. Las reglas del proyecto
