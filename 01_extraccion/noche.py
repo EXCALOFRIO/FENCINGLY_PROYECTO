@@ -139,7 +139,7 @@ def prevuelo(etapas=(1, 4, 7)):
 
 
 def lanza(n_gpu, n_cpu, conjunto="disco", lote=20, etapas_gpu="1,4", descarga=False,
-          exigir=True, respaldo=120):
+          exigir=True, respaldo=120, respaldo_de=None):
     """QUE HACE: lanza los trabajadores DESATENDIDOS y devuelve el control.
 
     `CREATE_NEW_PROCESS_GROUP` + `CREATE_NO_WINDOW` para que sigan vivos, sin ventana, cuando se cierre la
@@ -204,7 +204,7 @@ def lanza(n_gpu, n_cpu, conjunto="disco", lote=20, etapas_gpu="1,4", descarga=Fa
         llamaba Colab y el remoto tenia 0 clips con ~5.000 extraidos. Ver `respalda.py`."""
         log = LOGS / "resp.log"
         cmd = [sys.executable, "-u", str(pathlib.Path(__file__).parent / "respalda.py"),
-               "--conjunto", conjunto, "--cada", str(respaldo)]
+               "--conjunto", respaldo_de or conjunto, "--cada", str(respaldo)]
         with open(log, "ab") as fh:
             p = subprocess.Popen(cmd, stdout=fh, stderr=subprocess.STDOUT,
                                  creationflags=banderas, close_fds=True)
@@ -268,11 +268,14 @@ def main():
     ap.add_argument("--lote", type=int, default=20)
     ap.add_argument("--etapas-gpu", default="1,4", dest="etgpu")
     ap.add_argument("--descarga", action="store_true",
-                    help="baja del CDN los clips que no esten en disco y borra el mp4 despues")
+                    help="baja del CDN los clips que no esten en disco, a RU.DESCARGAS, donde SE "
+                         "QUEDAN (`--borra-video` solo borra TRABAJO/videos, la ruta de Colab)")
     ap.add_argument("--sin-exigir", action="store_false", dest="exigir",
                     help="lanza aunque el prevuelo falle")
     ap.add_argument("--respaldo", type=float, default=120,
                     help="minutos entre subidas al HF privado; 0 lo apaga")
+    ap.add_argument("--respaldo-de", default=None, dest="respaldo_de",
+                    help="conjuntos que respalda, separados por coma (por defecto, --conjunto)")
     ap.add_argument("--prevuelo", action="store_true", dest="solo_prevuelo")
     ap.add_argument("--estado", action="store_true")
     ap.add_argument("--para", action="store_true")
@@ -289,7 +292,8 @@ def main():
         para()
     else:
         lanza(a.gpu, a.cpu, a.conjunto, a.lote, etapas_gpu=a.etgpu,
-              descarga=a.descarga, exigir=a.exigir, respaldo=a.respaldo)
+              descarga=a.descarga, exigir=a.exigir, respaldo=a.respaldo,
+              respaldo_de=a.respaldo_de)
     return 0
 
 

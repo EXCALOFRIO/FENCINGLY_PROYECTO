@@ -93,18 +93,24 @@ def vuelta(conjunto, maximo=500, etapas=ETAPAS):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--conjunto", default="anotados")
+    ap.add_argument("--conjunto", default="anotados", help="uno o varios, separados por coma")
     ap.add_argument("--cada", type=float, default=120, help="minutos entre vueltas")
     ap.add_argument("--max", type=int, default=500, help="clips por tar")
     ap.add_argument("--una", action="store_true")
     a = ap.parse_args()
+    conjuntos = [c for c in a.conjunto.split(",") if c]
+    """VARIOS CONJUNTOS, separados por coma, en el orden dado (2026-10-09). La noche de florete
+    respalda `anotados,foil`: sin esto, los anotados de espada y sable rehechos el 09/10 no los
+    subia nadie. El registro es comun, asi que un clip que esta en los dos se sube una vez."""
     while True:
-        try:
-            vuelta(a.conjunto, a.max)
-        except Exception as ex:
-            """Un fallo de red o de HF NO puede matar el respaldo de una corrida de semanas: se
-            dice y se reintenta en la vuelta siguiente."""
-            print("   VUELTA FALLIDA %s: %s" % (type(ex).__name__, str(ex)[:200]), flush=True)
+        for conj in conjuntos:
+            try:
+                vuelta(conj, a.max)
+            except Exception as ex:
+                """Un fallo de red o de HF NO puede matar el respaldo de una corrida de semanas:
+                se dice y se reintenta en la vuelta siguiente."""
+                print("   VUELTA FALLIDA %s (%s): %s" % (type(ex).__name__, conj, str(ex)[:200]),
+                      flush=True)
         if a.una:
             break
         time.sleep(a.cada * 60)
