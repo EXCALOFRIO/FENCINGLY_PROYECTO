@@ -1,0 +1,5 @@
+PRUEBA: 1000 clips en la muestra (errores 0); el control 'base' NO reproduce el disco en 0
+  P(1.5)  cambian   81 (nuevos que contestan 10)  produccion 0.3060  nuevo 0.3230  dif +0.0170  IC97.5 clip [+0.0020, +0.0320]  torneo [+0.0038, +0.0375]
+      arma epee   n= 235  produccion 0.268  nuevo 0.294  +0.026
+      arma foil   n= 594  produccion 0.328  nuevo 0.340  +0.012
+      arma sabre  n= 171  produccion 0.281  nuevo 0.304  +0.023

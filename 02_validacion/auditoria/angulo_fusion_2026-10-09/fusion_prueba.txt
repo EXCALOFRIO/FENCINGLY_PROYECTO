@@ -1,0 +1,11 @@
+PRUEBA: clips con etiqueta y zona_ 2130; contestan 1353; con x del angulo (refs de torneo con >= 8 sin el clip) 1207
+  D(2)    e<=inf   cambian  263  produccion 0.3089  nuevo 0.3338  dif +0.0249  IC97.5 por clip [+0.0113, +0.0380]
+detalle D(2) e<=inf: IC97.5 por torneo [+0.0062, +0.0476]; discrepancia |x_h-x_a| mediana 0.66 m (n=1207)
+   arma epee   n=  503  produccion 0.264  nuevo 0.270  +0.006
+   arma foil   n= 1282  produccion 0.328  nuevo 0.347  +0.019
+   arma sabre  n=  345  produccion 0.301  nuevo 0.377  +0.075
+   via  lights csv sin luces       n=   36  produccion 0.000  nuevo 0.000  +0.000
+   via  tras_v2_general_tras_roi   n=   33  produccion 0.394  nuevo 0.394  +0.000
+   via  tras_v2_roi_sede           n=   20  produccion 0.100  nuevo 0.150  +0.050
+   via  v2_fie                     n= 1324  produccion 0.245  nuevo 0.282  +0.036
+   via  v2_generic                 n=  699  produccion 0.452  nuevo 0.456  +0.004

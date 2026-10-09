@@ -85,6 +85,25 @@ def main():
             print("   %-8s %-26s n=%5d  zona %.3f  middle %.3f  %+.3f"
                   % (nombre, v, m.sum(), ok_z[m].mean(), ok_m[m].mean(),
                      ok_z[m].mean() - ok_m[m].mean()))
+    finales = []
+    for f in con:
+        p = RU.TRABAJO / ("zona_%s.csv" % f[0])
+        with open(p, encoding="utf-8") as fh:
+            r = next(csv.DictReader(fh), None) or {}
+        finales.append((r.get("zona_final") or None, r.get("via_zona") or None))
+    if any(z for z, _ in finales):
+        """LA ZONA FINAL (`zona_fusion.py`, regla D(2) de `ANGULO_FUSION_2026-10-09.md`): la de la
+        homografia desempatada con el angulo del borde lejano. Mismos clips que arriba."""
+        zf = np.array([fin if fin else zh for (fin, _), zh in zip(finales, z)])
+        ok_f = zf == y
+        lo_f, hi_f = boot(ok_z, ok_f)
+        print()
+        print("ZONA FINAL (zona_fusion): %.3f contra la homografia %.3f: %+.3f IC95 por clip [%+.3f, %+.3f]"
+              % (ok_f.mean(), ok_z.mean(), ok_f.mean() - ok_z.mean(), lo_f, hi_f))
+        vias = np.array([str(v) for _, v in finales])
+        for v in sorted(set(vias)):
+            m = vias == v
+            print("   via_zona %-24s n=%5d  final %.3f  homografia %.3f" % (v, m.sum(), ok_f[m].mean(), ok_z[m].mean()))
     mot = {}
     for f in filas:
         if f[4] is None:

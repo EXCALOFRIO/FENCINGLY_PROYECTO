@@ -83,6 +83,13 @@ en lugar de la x de la etapa 7 y medir su cabeza `strip_location` (hoy 0,463 con
 
 COLUMNAS = ["clip", "motivo", "cuadro_tocado", "via_luz", "cuadro_usado", "x_izq_m", "x_der_m",
             "x_tocado_m", "zona", "conf_h", "metodo_h", "frac_cuadros_con_h", "s", "via_h"]
+FUSION = os.environ.get("FENCINGLY_ZONA_FUSION", "1") == "1"
+"""LA ZONA FINAL, desempatada con el angulo del borde lejano (`ANGULO_FUSION_2026-10-09.md`, regla
+D(2), ADOPTADA: acierto TOTAL de zona en PRUEBA 0,3089 -> 0,3338, +0,0249 IC97,5 por clip [+0,0113,
++0,0380], n = 2.130). El modelo del angulo es POR TORNEO, asi que aqui solo se miden los rasgos
+(`angulo_lejano.rasgos`, ~0,4 s) y la zona final queda `pendiente_torneo` hasta que corra
+`01_extraccion/zona_fusion.py` sobre el conjunto. `=0` no mide nada y deja las columnas vacias."""
+COLUMNAS += ["ang_lejano", "desp_pies_m", "dos_pies", "x_angulo_m", "x_final_m", "zona_final", "via_zona"]
 
 ZONAS = ["fotl_warning_box", "fotl_half", "middle", "fotr_half", "fotr_warning_box"]
 
@@ -279,6 +286,18 @@ def corre(clip, ctx):
     """Para `pipeline.py`. Escribe SIEMPRE el CSV, tambien cuando no hay respuesta: un clip sin luz
     es un clip hecho cuya respuesta es `sin luz`, y si no se escribiera se reintentaria sin fin."""
     r = analiza(clip, ctx["video"], ctx.get("torneo"))
+    if FUSION:
+        try:
+            import angulo_lejano as AL
+            ra = AL.rasgos(clip, r, ctx["video"])
+            r.update(ang_lejano=None if ra["ang"] is None else round(ra["ang"], 6),
+                     desp_pies_m=None if ra["desp"] is None else round(ra["desp"], 6),
+                     dos_pies=ra["dos_pies"])
+        except Exception as ex:
+            print("%s: rasgos del angulo no medidos (%s)" % (clip, type(ex).__name__))
+        if r.get("motivo") == "ok":
+            r.update(x_final_m=r.get("x_tocado_m"), zona_final=r.get("zona"),
+                     via_zona="pendiente_torneo")
     escribe(r)
     return "%s%s" % (r.get("motivo"), (" x=%.2f m %s" % (r["x_tocado_m"], r["zona"]))
                      if r.get("motivo") == "ok" else "")
