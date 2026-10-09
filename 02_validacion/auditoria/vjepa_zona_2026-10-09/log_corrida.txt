@@ -1,0 +1,141 @@
+SONDA DE ZONA SOBRE V-JEPA 2 (protocolo VJEPA_ZONA_2026-10-09)
+========================================================================================
+clips con strip_location + zona_ + embedding V-JEPA: 5524
+media cargada: 45.3 MB en 3.0 s
+ancho de marco (W) que falta (cx=0.0 neutro): 0 de 5524
+AJUSTE: 3394 clips, 74 torneos; PRUEBA: 2130 clips, 75 torneos
+particion interna de AJUSTE: entrenamiento 2614 clips (56 torneos), validacion 780 clips (18 torneos)
+
+ELIGIENDO HIPERPARAMETROS (sin mirar PRUEBA)
+   interna sin_caja L2 1e-04 pesos no   acierto 0.421  nll 2.1743
+   interna sin_caja L2 1e-04 pesos si   acierto 0.297  nll 2.8221
+   interna sin_caja L2 1e-03 pesos no   acierto 0.426  nll 2.0904
+   interna sin_caja L2 1e-03 pesos si   acierto 0.294  nll 2.6027
+   interna sin_caja L2 1e-02 pesos no   acierto 0.433  nll 2.0529
+   interna sin_caja L2 1e-02 pesos si   acierto 0.324  nll 2.2917
+   interna sin_caja L2 3e-02 pesos no   acierto 0.435  nll 2.0541
+   interna sin_caja L2 3e-02 pesos si   acierto 0.347  nll 2.2631
+   interna sin_caja L2 1e-01 pesos no   acierto 0.424  nll 2.0299
+   interna sin_caja L2 1e-01 pesos si   acierto 0.359  nll 2.3279
+   interna sin_caja L2 3e-01 pesos no   acierto 0.437  nll 1.9333
+   interna sin_caja L2 3e-01 pesos si   acierto 0.360  nll 2.2829
+   interna sin_caja L2 1e+00 pesos no   acierto 0.435  nll 1.9965
+   interna sin_caja L2 1e+00 pesos si   acierto 0.347  nll 2.3059
+elegida SIN caja: L2 3e-01 pesos False (interna 0.437)
+   interna caja     L2 1e-04 pesos no   acierto 0.424  nll 2.1745
+   interna caja     L2 1e-04 pesos si   acierto 0.296  nll 2.8099
+   interna caja     L2 1e-03 pesos no   acierto 0.421  nll 2.0994
+   interna caja     L2 1e-03 pesos si   acierto 0.294  nll 2.5760
+   interna caja     L2 1e-02 pesos no   acierto 0.432  nll 2.0434
+   interna caja     L2 1e-02 pesos si   acierto 0.319  nll 2.3157
+   interna caja     L2 3e-02 pesos no   acierto 0.437  nll 2.0575
+   interna caja     L2 3e-02 pesos si   acierto 0.350  nll 2.2422
+   interna caja     L2 1e-01 pesos no   acierto 0.431  nll 2.0056
+   interna caja     L2 1e-01 pesos si   acierto 0.350  nll 2.3153
+   interna caja     L2 3e-01 pesos no   acierto 0.444  nll 1.9112
+   interna caja     L2 3e-01 pesos si   acierto 0.362  nll 2.2681
+   interna caja     L2 1e+00 pesos no   acierto 0.432  nll 2.0030
+   interna caja     L2 1e+00 pesos si   acierto 0.345  nll 2.2906
+elegida CON caja: L2 3e-01 pesos False (interna 0.444)
+
+REENTRENANDO EN TODO AJUSTE con lo elegido
+control del espejo (AJUSTE) sin_caja 1.0000  con_caja 1.0000
+
+ELIGIENDO C DE LA FUSION (solo AJUSTE que contesta, sin mirar PRUEBA)
+   interna fusion C 0.01    acierto 0.560
+   interna fusion C 0.1     acierto 0.587
+D:\FENCINGLY_PY\venv\Lib\site-packages\sklearn\linear_model\_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 2000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=2000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+   interna fusion C 1.0     acierto 0.597
+D:\FENCINGLY_PY\venv\Lib\site-packages\sklearn\linear_model\_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 2000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=2000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+   interna fusion C 10.0    acierto 0.592
+D:\FENCINGLY_PY\venv\Lib\site-packages\sklearn\linear_model\_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 2000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=2000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+   interna fusion C 100.0   acierto 0.592
+D:\FENCINGLY_PY\venv\Lib\site-packages\sklearn\linear_model\_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 2000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=2000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+elegida C fusion: 1.0
+
+========================================================================================
+MIDIENDO UNA VEZ EN PRUEBA
+========================================================================================
+control del espejo (PRUEBA) sin_caja 1.0000  con_caja 1.0000
+
+USO 1 (RESPALDO) -- PRUEBA que NO contesta la produccion: n=777
+   sonda(sin caja) 0.489  middle 0.492  dif -0.003
+   IC95 por clip   [-0.041, +0.036]
+   IC95 por torneo [-0.050, +0.050]
+   CRITERIO (dif >= +0,05 e IC95 por clip > 0): NO PASA
+   (informativo, CON caja) sonda 0.492  dif +0.000  IC95 clip [-0.041, +0.039]
+   por arma:
+   arma       epee                     n=  189  sonda 0.466  middle 0.397  dif +0.069
+   arma       foil                     n=  468  sonda 0.466  middle 0.502  dif -0.036
+   arma       sabre                    n=  120  sonda 0.617  middle 0.600  dif +0.017
+
+USO 2 (FUSION) -- PRUEBA que SI contesta la produccion: n=1353
+   zona_final 0.525  fusion 0.473  dif -0.052
+   IC95 por clip   [-0.079, -0.024]
+   IC95 por torneo [-0.085, +0.002]
+   CRITERIO (dif >= +0,02 e IC95 por TORNEO > 0): NO PASA
+   por arma:
+   arma       epee                     n=  314  fusion 0.379  zona_final 0.433  dif -0.054
+   arma       foil                     n=  814  fusion 0.494  zona_final 0.545  dif -0.052
+   arma       sabre                    n=  225  fusion 0.529  zona_final 0.578  dif -0.049
+   por via_zona:
+   via_zona   angulo_torneo            n=  300  fusion 0.433  zona_final 0.413  dif +0.020
+   via_zona   homografia               n=  907  fusion 0.490  zona_final 0.573  dif -0.084
+   via_zona   homografia_sin_modelo    n=  146  fusion 0.452  zona_final 0.452  dif +0.000
+
+USO 3 (INFORMATIVO) -- TODO PRUEBA: n=2130
+   sonda(sin caja) 0.450  middle 0.404  dif +0.046
+   IC95 por clip   [+0.021, +0.069]
+   IC95 por torneo [+0.017, +0.077]
+   (informativo, CON caja) sonda 0.450  dif +0.046  IC95 clip [+0.021, +0.070]
+   a una zona o menos: sin_caja 0.899  con_caja 0.898
+   por arma:
+   arma       epee                     n=  503  sonda 0.384  middle 0.288  dif +0.095
+   arma       foil                     n= 1282  sonda 0.449  middle 0.397  dif +0.052
+   arma       sabre                    n=  345  sonda 0.551  middle 0.600  dif -0.049
+   por via_zona:
+   via_zona   angulo_torneo            n=  300  sonda 0.383  middle 0.300  dif +0.083
+   via_zona   homografia               n=  907  sonda 0.445  middle 0.372  dif +0.074
+   via_zona   homografia_sin_modelo    n=  146  sonda 0.411  middle 0.356  dif +0.055
+   via_zona   sin_zona                 n=  777  sonda 0.489  middle 0.492  dif -0.003
+   matriz de confusion (filas=humano, columnas=sonda), orden ['fotl_warning_box', 'fotl_half', 'middle', 'fotr_half', 'fotr_warning_box']:
+      fotl_warning_box      0  177   81   33    0
+      fotl_half             0  212  175   23    0
+      middle                0  165  553  143    0
+      fotr_half             0   24  188  194    0
+      fotr_warning_box      0    8   46  108    0
+
+guardado: C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_zona_2026-10-09\resumen_prueba.json
+guardado: C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_zona_2026-10-09\predicciones_prueba.csv
