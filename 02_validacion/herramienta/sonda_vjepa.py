@@ -295,7 +295,7 @@ def logits_etiquetador(mod, filas, idx, espejo=False):
         return mod.inicia(P, S).numpy().astype("float64")
 
 
-def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False):
+def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False, semillas=1):
     """Particion INTERNA sobre las filas `tr` (SOLO el entrenamiento externo). Devuelve la config
     elegida de B y Blin, y los pesos de las fusiones, todo sin mirar el reservado externo."""
     tr = np.asarray(tr)
@@ -304,6 +304,11 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False):
     i_tr, i_va = tr[ev_i["itr"]], tr[ev_i["ire"]]
     """`ev_i` indexa `filas_tr`; `tr[...]` lo lleva a indices de `filas` y de X."""
     La = logits_etiquetador(mod_i, filas_tr, ev_i["ire"])
+    if semillas > 1:
+        """CAMBIO 2 del protocolo: con varias semillas, el etiquetador interno es la media de los
+        logits de `semillas` entrenamientos sobre el mismo reparto interno."""
+        La = np.mean([logits_etiquetador(entrena_etiquetador_fijo(filas, i_tr, semilla=ET.SEMILLA + k),
+                                         filas, i_va) for k in range(semillas)], axis=0)
     yv = y[i_va]
     rej = [(e, w) for e in REJILLA_EPOCAS for w in REJILLA_WD]
     if rapido:
@@ -328,6 +333,13 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False):
         ll = float(_nll(L, yv))
         if mejor_l is None or (acc, -ll) > (mejor_l[2], -mejor_l[3]):
             mejor_l, Ll_va = (e, w, acc, ll), L
+    if semillas > 1:
+        Lb_va = np.mean([logits_sonda(entrena_sonda(X, i_tr, y[i_tr], mejor[0], mejor[1],
+                                                    semilla=ET.SEMILLA + k), X, i_va)
+                         for k in range(semillas)], axis=0)
+        print("   interna con %d semillas: B %.3f  etiquetador %.3f"
+              % (semillas, float((decide(Lb_va) == yv).mean()), float((decide(La) == yv).mean())),
+              flush=True)
     if verboso:
         print("   interna: B elegida epocas %d wd %.0e (%.3f); Blin epocas %d wd %.0e (%.3f); "
               "etiquetador %.3f  n=%d"
@@ -377,11 +389,14 @@ def main():
     ap.add_argument("--dir", default=str(RU.SCRATCH / "vjepa"))
     ap.add_argument("--rapido", action="store_true", help="un punto de rejilla: SOLO para probar")
     ap.add_argument("--tarea", choices=("initiated", "prioridad"), default="initiated")
+    ap.add_argument("--semillas", type=int, default=1,
+                    help="cambio 2 del protocolo: media de logits de N entrenamientos (decide N=5)")
     a = ap.parse_args()
     d = pathlib.Path(a.dir)
     global TAREA
     TAREA = a.tarea
-    print("SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea %s" % TAREA)
+    print("SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea %s, %d semilla(s)"
+          % (TAREA, a.semillas))
     print("=" * 80)
     filas_todas = ET.reune(cabeza="initiated") if TAREA == "initiated" else filas_prioridad()
     con = [f for f in filas_todas if (d / ("vjepa_%s.npz" % f["clip"])).is_file()
@@ -409,18 +424,22 @@ def main():
     V = np.stack([luces_clip(c) for c in clips])
     print("tokens cargados: %.1f GB en %.0f s" % (X.nbytes / 1e9, time.time() - t0), flush=True)
 
-    mejor, mejor_l, fus = elige_y_fusiona(filas, tr, X, M, V, y, rapido=a.rapido)
+    mejor, mejor_l, fus = elige_y_fusiona(filas, tr, X, M, V, y, rapido=a.rapido,
+                                          semillas=a.semillas)
 
-    mod_a = entrena_etiquetador_fijo(filas, tr)
+    S = range(a.semillas)
+    mods_a = [entrena_etiquetador_fijo(filas, tr, semilla=ET.SEMILLA + k) for k in S]
     """El etiquetador externo se entrena SOLO con `tr`, no con `ET.entrena(filas)`, porque su
     particion cogeria otros torneos: aqui el reservado ya esta fijado arriba."""
-    La = logits_etiquetador(mod_a, filas, re)
-    La_e = logits_etiquetador(mod_a, filas, re, espejo=True)
-    mb = entrena_sonda(X, tr, y[tr], mejor[0], mejor[1])
-    Lb = logits_sonda(mb, X, re)
-    Lb_e = logits_sonda(mb, X, re, espejo=True)
-    ml = entrena_sonda(M, tr, y[tr], mejor_l[0], mejor_l[1], lineal=True)
-    Ll = logits_sonda(ml, M, re)
+    La = np.mean([logits_etiquetador(m, filas, re) for m in mods_a], axis=0)
+    La_e = np.mean([logits_etiquetador(m, filas, re, espejo=True) for m in mods_a], axis=0)
+    mbs = [entrena_sonda(X, tr, y[tr], mejor[0], mejor[1], semilla=ET.SEMILLA + k) for k in S]
+    Lb = np.mean([logits_sonda(m, X, re) for m in mbs], axis=0)
+    Lb_e = np.mean([logits_sonda(m, X, re, espejo=True) for m in mbs], axis=0)
+    mls = [entrena_sonda(M, tr, y[tr], mejor_l[0], mejor_l[1], lineal=True, semilla=ET.SEMILLA + k)
+           for k in S]
+    Ll = np.mean([logits_sonda(m, M, re) for m in mls], axis=0)
+    """Con `--semillas 1` (el protocolo original) todo esto es exactamente lo de antes."""
     Vr = V[re]
     Vr_e = Vr[:, [1, 0, 3, 2]]
     pred = {
