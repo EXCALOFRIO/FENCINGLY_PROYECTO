@@ -181,7 +181,8 @@ def main():
                                                      semilla=ET.SEMILLA + k), X, i_va)
                     for k in S], axis=0)
     fus = ajusta_logistica(np.concatenate([La_v, Lb_v], 1), yv)
-    print("   interna (n=%d): B elegida epocas %d wd %.0e; con %d semillas A %.3f  B %.3f  C %.3f"
+    print("   interna (n=%d): B elegida epocas %d wd %.0e; con %d semillas A %.3f  B %.3f  "
+          "C %.3f (C ajustada en estos mismos clips: optimista)"
           % (len(yv), mejor[0], mejor[1], a.semillas, (La_v.argmax(1) == yv).mean(),
              (Lb_v.argmax(1) == yv).mean(),
              (aplica(fus, np.concatenate([La_v, Lb_v], 1)).argmax(1) == yv).mean()), flush=True)
