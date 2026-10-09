@@ -320,6 +320,86 @@ def _continuidad(B, pres, W, H, T):
     return quitados
 
 
+SALTO_PIE = os.environ.get("FENCINGLY_SALTO_PIE", "0") == "1"
+"""PUERTA DE SALTOS DEL PIE (2026-10-09, `04_documentacion/informes/SALTOS_2026-10-09.md`).
+**MEDIDA Y APAGADA.** `FENCINGLY_SALTO_PIE=1` la enciende.
+
+El problema es real: de 30 clips al azar con un salto del pie > 0,75 altos de caja en <= 8 cuadros,
+en **14 la caja pasa a OTRA persona** (arbitro, publico, tirador de otra pista; IC95 [0,30, 0,64]),
+en 12 es el tirador con la caja cortada, y **ninguno** es un fondo o una flecha de verdad. El filtro de
+`_continuidad` no los ve porque mide el CENTRO en anchos de caja y no compara a traves de huecos > 3.
+
+La regla (abajo) quita lo que tras un salto no es coherente con el tramo MAS LARGO del lado. Cambia
+158 de 5.744 clips de anotados. En la validacion declarada (30 al azar de los que cambian, fuera del
+desarrollo): ARREGLA 12, NEUTRO 14, **EMPEORA 4**, con el criterio en <= 1. **No pasa.** Falla
+siempre igual: el tramo mas largo NO es el tirador -- la caja estuvo la mayor parte del clip sobre un
+oficial del fondo (`CloudyPoliteFieldmouse`, `ForcefulBonyBilby`), o el tramo largo es un primer
+plano de antes de una transicion de los anillos de Tokio 2020 y lo quitado es el plano ancho bueno
+(`AbleSillyArcticfox`, `ActualThatEgret`).
+
+Y NO HACE FALTA DECIDIRLO ANTES DE LA CORRIDA: la regla solo QUITA cuadros, no pone cajas, asi que se
+puede aplicar despues sobre `poses_` en CPU (marcar esos cuadros como no medidos, reinventar y
+recortar) sin repetir la etapa 4."""
+SALTO_PIE_U = 0.75
+SALTO_PIE_HUECO = 8
+SALTO_PIE_ALTO, SALTO_PIE_PIE, SALTO_PIE_ALTO_SOLO = 1.5, 0.5, 2.0
+SALTO_PIE_VEC = 5
+
+
+def _incoherente_pie(h, y2, h_ref, y2_ref):
+    r = max(h, h_ref) / max(min(h, h_ref), 1e-6)
+    return r > SALTO_PIE_ALTO_SOLO or (r > SALTO_PIE_ALTO and abs(y2 - y2_ref) > SALTO_PIE_PIE * h_ref)
+
+
+def _saltos_pie(B, pres, mask):
+    """QUE HACE: por lado, parte los cuadros presentes en TRAMOS en cada salto del pie (y2) de mas de
+    `SALTO_PIE_U` altos de caja con hueco <= `SALTO_PIE_HUECO`; quita (`pres = False`, `B = NaN`) los
+    tramos incoherentes con el MAS LARGO (razon de altos medianos > 2, o > 1,5 y el pie mediano a mas
+    de 0,5 altos) y los cuadros que tocan un salto incoherentes con sus 5 vecinos a cada lado. Deja el
+    hueco, como `_continuidad`; lo de los extremos lo recorta `_recorta`. QUE DEVUELVE: cuadros quitados.
+    """
+    quitados = 0
+    for lado in (0, 1):
+        ks = np.nonzero(mask & pres[:, lado] & np.isfinite(B[:, lado]).all(1))[0]
+        if len(ks) < 3:
+            continue
+        b = B[ks, lado]
+        h = b[:, 3] - b[:, 1]
+        y2 = b[:, 3]
+        dp = np.abs(np.diff(y2)) / np.maximum(h[:-1], 1e-6)
+        dk = np.diff(ks)
+        cortes = [i + 1 for i in range(len(dp)) if dk[i] <= SALTO_PIE_HUECO and dp[i] > SALTO_PIE_U]
+        if not cortes:
+            continue
+        tramos = np.split(np.arange(len(ks)), cortes)
+        prin = max(tramos, key=len)
+        hp, yp = float(np.median(h[prin])), float(np.median(y2[prin]))
+        fuera = set()
+        for t in tramos:
+            if t is prin:
+                continue
+            if _incoherente_pie(float(np.median(h[t])), float(np.median(y2[t])), hp, yp):
+                fuera.update(int(i) for i in t)
+        bordes = set()
+        for c in cortes:
+            bordes.update((c - 1, c))
+        for i in bordes:
+            if i in fuera:
+                continue
+            vec = [j for j in range(max(0, i - SALTO_PIE_VEC), min(len(ks), i + SALTO_PIE_VEC + 1))
+                   if j != i and j not in fuera]
+            if len(vec) < 3:
+                continue
+            if _incoherente_pie(float(h[i]), float(y2[i]), float(np.median(h[vec])),
+                                float(np.median(y2[vec]))):
+                fuera.add(i)
+        for i in fuera:
+            pres[ks[i], lado] = False
+            B[ks[i], lado] = np.nan
+        quitados += len(fuera)
+    return quitados
+
+
 def _de_las_crudas(cajas, cuadros, k, est, W, H, prohibida=None):
     """QUE HACE: busca entre las detecciones YA HECHAS del cuadro completo una compatible con `est`.
 
@@ -460,13 +540,15 @@ def procesa(cajas, cuadros, W, H, T, yolo=None, frames=None, gris=None, cron=Non
     que una caja redetectada podia colar un salto despues del filtro. Medido: con una sola pasada
     quedaba un aviso de 1,22 anchos en `BabyishIdioticCockerspaniel`."""
     nsalto += _continuidad(B, pres, W, H, T)
+    nsaltopie = _saltos_pie(B, pres, mask) if SALTO_PIE else 0
     ntiras = _quita_tiras(B, pres, W, H, T)
     mask, ini, recortados = _recorta(pres, mask)
     marca("limpieza", t)
     ambos = float((pres[mask].sum(axis=1) == 2).mean()) if mask.any() else float("nan")
     return {"B": B, "Be": Be, "pres": pres, "tipo": tipo, "mask": mask,
             "fundidos": fundidos, "recortados": recortados, "ini": ini, "duplicados": ndup,
-            "saltos_quitados": nsalto, "de_las_crudas": ncrudas, "tiras": ntiras,
+            "saltos_quitados": nsalto, "saltos_pie": nsaltopie, "de_las_crudas": ncrudas,
+            "tiras": ntiras,
             "tramos": util["tramos"], "fuera": util["fuera"],
             "ntray": len(tr), "nfus": res["nfus"], "motivo": res["motivo"],
             "borde_descartadas": res.get("borde_descartadas", 0),
