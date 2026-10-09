@@ -1,0 +1,46 @@
+SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea initiated
+================================================================================
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+   con etiqueta de initiated: 5536
+filas con initiated 5536; con embedding y luces 5536; sin embedding 0; sin lights_ 0
+reservado: 42 torneos, 1384 clips (de 1384 en el reparto completo); entrenamiento 4152
+tokens cargados: 11.6 GB en 288 s
+C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\01_extraccion\codigo\etiquetador.py:895: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:821.)
+  tot += float(p) * len(j)
+   interna B  epocas  20  wd 1e-03  acierto 0.667  nll 1.2593  (103 s)
+   interna B  epocas  20  wd 1e-02  acierto 0.661  nll 1.2494  (95 s)
+   interna B  epocas  20  wd 5e-02  acierto 0.656  nll 1.2826  (95 s)
+   interna B  epocas  40  wd 1e-03  acierto 0.646  nll 2.7517  (188 s)
+   interna B  epocas  40  wd 1e-02  acierto 0.642  nll 2.6847  (189 s)
+   interna B  epocas  40  wd 5e-02  acierto 0.642  nll 2.8631  (156 s)
+   interna B  epocas  80  wd 1e-03  acierto 0.632  nll 3.2677  (270 s)
+   interna B  epocas  80  wd 1e-02  acierto 0.645  nll 3.6645  (280 s)
+   interna B  epocas  80  wd 5e-02  acierto 0.655  nll 3.2801  (280 s)
+   interna: B elegida epocas 20 wd 1e-03 (0.667); Blin epocas 20 wd 5e-02 (0.677); etiquetador 0.587  n=1208
+
+RESERVADO: 1384 clips, 42 torneos
+                                              acierto   contra A' (IC95 por torneo)
+--------------------------------------------------------------------------------
+clase mayoritaria del entrenamiento             0.461
+A                                               0.590   -0.037  [-0.080, -0.003]
+A'                                              0.626   (linea base que decide)
+B                                               0.639   +0.013  [-0.030, +0.064]
+Blin                                            0.646   +0.020  [-0.028, +0.057]
+C                                               0.658   +0.032  [-0.010, +0.086]
+C'                                              0.663   +0.037  [+0.005, +0.070]
+techo humano (n=911)                            0.688
+
+control del espejo B    1.0000
+control del espejo C'   1.0000
+B contra A (informativo): +0.050 [+0.030, +0.116]
+
+por arma y por via del ancla (informativo):
+   arma       epee     n= 209   A' 0.632   B 0.684   C' 0.689
+   arma       foil     n=1040   A' 0.621   B 0.621   C' 0.649
+   arma       sabre    n= 135   A' 0.659   B 0.711   C' 0.733
+   via_ancla  final    n=  47   A' 0.404   B 0.362   C' 0.404
+   via_ancla  zona     n=1337   A' 0.634   B 0.649   C' 0.672
+
+CRITERIO (1-3): C' - A' = +0.037 >= +0,02, IC95 [+0.005, +0.070] sin cruzar cero, espejo 1.0000  ->  PASA
+(el 4, el coste en GPU, se lee del extractor: `s_gpu` en cada vjepa_<clip>.npz)

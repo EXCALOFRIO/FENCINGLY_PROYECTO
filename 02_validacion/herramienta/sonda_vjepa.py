@@ -501,7 +501,8 @@ def main():
             lo, hi = boot_torneo(yr, pred["A"], pred[k], tor_r)
             d = float((pred[k] == yr).mean() - (pred["A"] == yr).mean())
             print("   %s - A = %+.3f  IC95 por torneo [%+.3f, %+.3f]  -> %s"
-                  % (k, d, lo, hi, "bate a A" if lo > 0 else "no se distingue de A"))
+                  % (k, d, lo, hi, "bate a A" if lo > 0 else ("PEOR que A" if hi < 0
+                                                              else "no se distingue de A")))
         return 0
     acc_a2 = float((pred["A'"] == yr).mean())
     acc_c2 = float((pred["C'"] == yr).mean())
