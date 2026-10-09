@@ -437,6 +437,137 @@ def mide(tarea, filas, R, verboso=True):
             "ic": (lo, hi), "ic_f": (lo_f, hi_f), "espejo": esp, "pasa": pasa, "imp": imp}
 
 
+# ---------------------------------------------------------------------------------------------
+# MEDIDA 2: contra un GRU de 5 semillas (RASGOS_EXPLICITOS_2026-10-09, "Medida 2")
+# ---------------------------------------------------------------------------------------------
+
+_DATOS = {}
+
+
+def _init_gru(P, S, y):
+    _DATOS.update(P=P, S=S, y=y)
+
+
+def _gru_semilla(args):
+    """Un GRU del etiquetador con el reparto DADO (`tr`) y la semilla dada: misma inicializacion,
+    optimizador, perdida con el espejo como aumento, 60 epocas y ultima epoca que `ET.entrena`.
+    Devuelve los logits en `ev` y en su espejo (ranuras intercambiadas)."""
+    tr, ev, semilla = args
+    import torch
+    torch.set_num_threads(2)
+    P, S, y = _DATOS["P"], _DATOS["S"], _DATOS["y"]
+    torch.manual_seed(semilla)
+    np.random.seed(semilla)
+    mod = ET.construye()
+    opt = torch.optim.AdamW(mod.parameters(), lr=3e-3, weight_decay=1e-4)
+    Pt, St = torch.as_tensor(P[tr]), torch.as_tensor(S[tr])
+    yt = torch.as_tensor(y[tr], dtype=torch.long)
+    n = len(tr)
+    for _ in range(60):
+        mod.train()
+        per = torch.randperm(n)
+        for i in range(0, n, 32):
+            j = per[i:i + 32]
+            opt.zero_grad()
+            lg = mod.inicia(Pt[j], St[j])
+            perd = torch.nn.functional.cross_entropy(lg, yt[j])
+            lge = mod.inicia(Pt[j][:, [1, 0]], St[j])
+            ye = torch.where(yt[j] == 0, torch.ones_like(yt[j]),
+                             torch.where(yt[j] == 1, torch.zeros_like(yt[j]), yt[j]))
+            perd = perd + torch.nn.functional.cross_entropy(lge, ye)
+            perd.backward()
+            torch.nn.utils.clip_grad_norm_(mod.parameters(), 2.0)
+            opt.step()
+    mod.eval()
+    Pe, Se = torch.as_tensor(P[ev]), torch.as_tensor(S[ev])
+    with torch.no_grad():
+        L = mod.inicia(Pe, Se).numpy().astype("float64")
+        Le = mod.inicia(Pe[:, [1, 0]], Se).numpy().astype("float64")
+    return L, Le
+
+
+def _gbm_fit(x, xe, y, semilla):
+    return gbm().set_params(random_state=semilla).fit(np.concatenate([x, xe]),
+                                                      np.concatenate([y, espejo_y(y)]))
+
+
+def mide2(filas, R, procs=4, k_semillas=5):
+    import sonda_vjepa as SV
+    filas = [f for f in filas if f["clip"] in R]
+    y = np.array([f["y_initiated"] for f in filas])
+    torneos = np.array([f["torneo"] for f in filas])
+    tr, re, diag = ET.particion_por_torneo(filas)
+    tr, re = np.array(tr), np.array(re)
+    filas_tr = [filas[i] for i in tr]
+    itr_i, ire_i, _d = ET.particion_por_torneo(filas_tr)
+    gi_tr, gi_va = tr[np.array(itr_i)], tr[np.array(ire_i)]
+    print()
+    print("=" * 80)
+    print("MEDIDA 2, initiated: %d filas; reservado %d clips / %d torneos; interna %d / %d"
+          % (len(filas), len(re), diag["torneos_re"], len(gi_tr), len(gi_va)), flush=True)
+    P = np.stack([f["prop"] for f in filas]).astype("float32")
+    S = np.stack([f["esc"] for f in filas]).astype("float32")
+    semillas = [ET.SEMILLA + k for k in range(k_semillas)]
+    tareas = [(tr, re, s) for s in semillas] + [(gi_tr, gi_va, s) for s in semillas]
+    t0 = time.time()
+    with ProcessPoolExecutor(procs, initializer=_init_gru, initargs=(P, S, y)) as ex:
+        res = list(ex.map(_gru_semilla, tareas))
+    print("   %d GRU entrenados en %.0f s" % (len(tareas), time.time() - t0), flush=True)
+    ext, inte = res[:k_semillas], res[k_semillas:]
+    yr, yv, tor = y[re], y[gi_va], torneos[re]
+    for s_, (L, _Le) in zip(semillas, ext):
+        print("   GRU semilla %d: %.3f" % (s_, float((decide(L, "initiated") == yr).mean())))
+    Lg5 = np.mean([L for L, _ in ext], axis=0)
+    Lg5_e = np.mean([Le for _, Le in ext], axis=0)
+    Lg5_i = np.mean([L for L, _ in inte], axis=0)
+    pred_g5 = decide(Lg5, "initiated")
+    acc_g5 = float((pred_g5 == yr).mean())
+
+    x_tr, xe_tr = matriz(filas, tr, R)
+    x_re, xe_re = matriz(filas, re, R)
+    xi_tr, xie_tr = matriz(filas, gi_tr, R)
+    xi_va, xie_va = matriz(filas, gi_va, R)
+    m = _gbm_fit(x_tr, xe_tr, y[tr], ET.SEMILLA)
+    m2 = _gbm_fit(x_tr, xe_tr, y[tr], ET.SEMILLA + 1)
+    det = bool(np.array_equal(m.predict_proba(x_re), m2.predict_proba(x_re)))
+    print("   GBM determinista (semillas %d y %d dan las mismas probabilidades): %s"
+          % (ET.SEMILLA, ET.SEMILLA + 1, det), flush=True)
+    sem_gbm = [ET.SEMILLA] if det else semillas
+    ms = [m] if det else [_gbm_fit(x_tr, xe_tr, y[tr], s_) for s_ in sem_gbm]
+    ms_i = [_gbm_fit(xi_tr, xie_tr, y[gi_tr], s_) for s_ in sem_gbm]
+    q = np.mean([proba(mm, x_re, xe_re, 3) for mm in ms], axis=0)
+    q_e = np.mean([proba(mm, xe_re, x_re, 3) for mm in ms], axis=0)
+    q_i = np.mean([proba(mm, xi_va, xie_va, 3) for mm in ms_i], axis=0)
+    pred_r = decide(q, "initiated")
+    acc_r = float((pred_r == yr).mean())
+    fus = SV.ajusta_fusion(*SV.rasgos_fusion([SV.parte_logits(Lg5_i), partes_gbm(q_i)]), yv)
+    Lf = SV.aplica_fusion(fus, *SV.rasgos_fusion([SV.parte_logits(Lg5), partes_gbm(q)]))
+    Lf_e = SV.aplica_fusion(fus, *SV.rasgos_fusion([SV.parte_logits(Lg5_e), partes_gbm(q_e)]))
+    pred_f, pred_f_e = decide(Lf, "initiated"), decide(Lf_e, "initiated")
+    empate = np.isclose(Lf[:, 0], Lf[:, 1])
+    esp = float((espejo_y(pred_f) == pred_f_e)[~empate].mean())
+    emp_g = np.isclose(Lg5[:, 0], Lg5[:, 1])
+    esp_g = float((espejo_y(pred_g5) == decide(Lg5_e, "initiated"))[~emp_g].mean())
+    acc_f = float((pred_f == yr).mean())
+    lo_a, hi_a = SV.boot_torneo(yr, pred_g5, pred_r, tor)
+    lo_b, hi_b = SV.boot_torneo(yr, pred_g5, pred_f, tor)
+    print("   pesos de la fusion (impar: GRU5, GBM | par: GRU5, GBM | sesgo):", fus)
+    print()
+    print("%-42s %8s" % ("", "acierto"))
+    print("%-42s %8.3f   (espejo %.4f, empates %d)"
+          % ("GRU5 (media de logits de 5 semillas)", acc_g5, esp_g, int(emp_g.sum())))
+    print("%-42s %8.3f   %+.3f  IC95 por torneo [%+.3f, %+.3f]  (a, informativa)"
+          % ("RASGOS explicitos (GBM)", acc_r, acc_r - acc_g5, lo_a, hi_a))
+    print("%-42s %8.3f   %+.3f  IC95 por torneo [%+.3f, %+.3f]  (b, DECIDE)"
+          % ("fusion GRU5 + rasgos", acc_f, acc_f - acc_g5, lo_b, hi_b))
+    print("control del espejo de la fusion: %.4f  (empates exactos: %d)"
+          % (esp, int(empate.sum())))
+    pasa = (acc_f - acc_g5 >= 0.02) and lo_b > 0 and esp == 1.0
+    print("CRITERIO (b): fusion - GRU5 = %+.3f >= +0,02, IC95 [%+.3f, %+.3f] sin cruzar cero, "
+          "espejo %.4f  ->  %s" % (acc_f - acc_g5, lo_b, hi_b, esp, "PASA" if pasa else "NO PASA"))
+    return pasa
+
+
 def filas_prioridad_de(todas):
     """La misma seleccion que `sonda_vjepa.filas_prioridad`, sobre COPIAS de las filas."""
     out = []
@@ -462,6 +593,7 @@ def main():
     ap.add_argument("--solo-rasgos", action="store_true")
     ap.add_argument("--procs", type=int, default=4)
     ap.add_argument("--tarea", choices=("ambas", "initiated", "prioridad"), default="ambas")
+    ap.add_argument("--medida2", action="store_true", help="initiated contra GRU de 5 semillas")
     a = ap.parse_args()
     print("RASGOS EXPLICITOS (protocolo RASGOS_EXPLICITOS_2026-10-09)")
     todas = ET.reune(cabeza=None)
@@ -480,6 +612,9 @@ def main():
     print("filas: initiated %d, prioridad %d (florete %d, sable %d)"
           % (len(ini), len(pri), sum(f["weapon"] == "foil" for f in pri),
              sum(f["weapon"] == "sabre" for f in pri)))
+    if a.medida2:
+        mide2(ini, R, procs=a.procs)
+        return 0
     if a.tarea in ("ambas", "initiated"):
         mide("initiated", ini, R)
     if a.tarea in ("ambas", "prioridad"):

@@ -1,0 +1,54 @@
+RASGOS EXPLICITOS (protocolo RASGOS_EXPLICITOS_2026-10-09)
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+rasgos: 5791 en cache, 0 por calcular
+cobertura por rasgo (fraccion no NaN, sobre 5791 clips x 2 tiradores):
+   v_ult1s                0.959
+   v_1a2s                 0.948
+   v_2a3s                 0.935
+   frac_avanza_1s         0.959
+   frac_retrocede_1s      0.959
+   acel_final             0.936
+   avanza_en_tocado       0.935
+   t_inicio_avance        0.531
+   ext_tocado             0.904
+   ext_max_1s             0.952
+   t_ext80                0.952
+   vext_pico              0.960
+   t_vext_pico            0.960
+   t_inicio_pie           0.454
+   brazo_menos_pie        0.453
+   parte_cierre_1s        0.927
+   m_a_su_fondo           0.595
+   t_ult_marcha           0.450
+   t_ult_romper           0.402
+   t_ult_fondo            0.321
+   t_ult_brazo            0.861
+   n_marcha_2s            0.999
+   n_romper_2s            0.999
+   n_fondo_2s             0.999
+   n_brazo_2s             0.999
+   dist_menos1s           0.944
+   dist_menos05s          0.934
+   dist_tocado            0.929
+   t_ult_accion           0.980
+   via_ancla              1.000
+   fps                    1.000
+filas: initiated 5536, prioridad 1076 (florete 795, sable 281)
+
+================================================================================
+MEDIDA 2, initiated: 5536 filas; reservado 1384 clips / 42 torneos; interna 2944 / 1208
+   10 GRU entrenados en 4070 s
+   GRU semilla 20260922: 0.581
+   GRU semilla 20260923: 0.590
+   GRU semilla 20260924: 0.592
+   GRU semilla 20260925: 0.592
+   GRU semilla 20260926: 0.582
+   GBM determinista (semillas 20260922 y 20260923 dan las mismas probabilidades): True
+   pesos de la fusion (impar: GRU5, GBM | par: GRU5, GBM | sesgo): (array([0.04217065, 0.57418705]), array([0.0971459 , 0.42661972]), -0.35712626646752127)
+
+                                            acierto
+GRU5 (media de logits de 5 semillas)          0.633   (espejo 1.0000, empates 0)
+RASGOS explicitos (GBM)                       0.628   -0.005  IC95 por torneo [-0.049, +0.028]  (a, informativa)
+fusion GRU5 + rasgos                          0.652   +0.019  IC95 por torneo [+0.002, +0.054]  (b, DECIDE)
+control del espejo de la fusion: 1.0000  (empates exactos: 0)
+CRITERIO (b): fusion - GRU5 = +0.019 >= +0,02, IC95 [+0.002, +0.054] sin cruzar cero, espejo 1.0000  ->  NO PASA

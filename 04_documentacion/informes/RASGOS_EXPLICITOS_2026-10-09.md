@@ -110,3 +110,59 @@ amenaza tiene la prioridad), pero con estos datos no da para un clasificador.
   proyecto en esta tarea, 0,644, pero es informativa: lo que paso el criterio es el GBM solo).
 - `prioridad`: **NO**. La medida buena necesita los ~21.000 clips de florete con dos luces.
 - Coste: ~0,05 s de CPU por clip a partir de `poses_` y la etapa 7; no toca la GPU ni el video.
+
+## Medida 2 (contra GRU de 5 semillas): DECLARADA ANTES de medir (2026-10-09)
+
+**Por que.** El agente del 3D (`3D_LEVANTADO_2026-10-09.md`) midio en el MISMO reservado de 1.384
+clips que el GRU va de 0,576 a 0,616 segun la semilla de entrenamiento, y que promediando los
+logits de 5 semillas llega a 0,645. La comparacion de arriba fue contra UN GRU (semilla 20260922,
+0,590): el +0,038 puede ser ruido de semilla de la linea base.
+
+**Linea base GRU5**: la media de los logits de 5 GRU entrenados con semillas `ET.SEMILLA + k`,
+k = 0..4, con el MISMO reparto fijo (el canonico, `particion_por_torneo` con `ET.SEMILLA`; la
+semilla solo cambia la inicializacion y el orden de los lotes), el mismo modelo, la misma perdida
+con el espejo como aumento, 60 epocas, la ultima epoca. La media de logits impares es impar: la
+antisimetria se conserva.
+
+**Se compara, solo en `initiated`:**
+- (a) **informativa**: el GBM de rasgos (el mismo de arriba) contra GRU5.
+- (b) **la que decide**: la fusion GRU5 + rasgos contra GRU5. Fusion logistica impar
+  (`sonda_vjepa.ajusta_fusion`) con pesos ajustados en la particion INTERNA del entrenamiento, donde
+  la parte GRU es tambien GRU5 (5 semillas entrenadas sobre la parte interna). El GBM
+  (`HistGradientBoostingClassifier`, sin parada temprana ni submuestreo) es determinista; se
+  comprueba entrenando dos semillas y, si las predicciones difieren, se usan 5 semillas de GBM
+  promediadas.
+
+**Criterio, el mismo**: (b) - GRU5 >= +0,02 en acierto del reservado, IC95 por bootstrap agrupado
+por torneo (2.000 remuestreos) sin cruzar cero, y espejo = 1,0000 (empates exactos aparte). Si (b)
+no pasa, los rasgos explicitos NO se adoptan, aunque el veredicto de arriba fuera PASA: esta
+medida es la mas exigente y la sustituye.
+
+### Resultado de la Medida 2 (`rasgos_explicitos.py --medida2`)
+
+Mismo reservado (1.384 clips / 42 torneos) y misma particion interna (validacion 1.208) que la
+medida 1. 10 GRU (5 externos, 5 internos), 4.070 s de CPU con 4 procesos.
+
+    GRU por semilla (20260922..26)        0,581  0,590  0,592  0,592  0,582
+    GRU5 (media de logits)                0,633   espejo 1,0000, 0 empates
+    (a) RASGOS (GBM), informativa         0,628   -0,005  IC95 por torneo [-0,049, +0,028]
+    (b) fusion GRU5 + rasgos, DECIDE      0,652   +0,019  IC95 por torneo [+0,002, +0,054]
+    espejo de la fusion 1,0000, 0 empates
+    CRITERIO (b): +0,019 < +0,02  ->  NO PASA
+
+- El GBM es determinista (dos semillas dan las mismas probabilidades), asi que basto uno.
+- La semilla 20260922 da 0,581 aqui y 0,590 en la medida 1 con `ET.entrena`: el entrenador es el
+  mismo, pero aqui corre con 2 hilos de torch por proceso. Es la misma variacion de orden de suma
+  que separa unas semillas de otras.
+- Pesos de la fusion: impar GRU5 0,042 y GBM 0,574; par GRU5 0,097 y GBM 0,427. La fusion se apoya
+  sobre todo en los rasgos: con la escala de los logits del GRU5, lo que aporta es la direccion.
+
+**Veredicto final: los rasgos explicitos NO se adoptan.** La medida 2, que es la mas exigente,
+sustituye a la 1 como se declaro. El +0,038 de la medida 1 era, en su mayor parte, ruido de la
+semilla de la linea base: un GRU solo (0,590) contra un GRU5 (0,633). La fusion se queda a 0,001
+del umbral, con un IC que no cruza cero, y eso se apunta como **candidata a repetir con mas datos**
+(los clips de florete), con este mismo criterio y sin tocarlo.
+
+Lo que si queda medido y vale para los siguientes: **promediar 5 semillas del GRU sube `initiated`
+de ~0,587 a 0,633** sin un solo dato nuevo. Cualquier comparacion futura contra el etiquetador
+tiene que ser contra GRU5, no contra un GRU de una semilla.
