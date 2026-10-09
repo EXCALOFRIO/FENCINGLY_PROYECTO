@@ -79,6 +79,69 @@ def carga_tokens(clips, d):
     return tok, med, np.array(via)
 
 
+def carga_variante(clips, d, claves, cache):
+    """LAS VARIANTES de `VJEPA2_VARIANTES_2026-10-09.md` (cambio 1). `claves` p.ej. `rec4+mac4+mic4`:
+    salidas de `vjv_<clip>.npz` en `d`, concatenadas en el eje de los tokens (la vista espejo con los
+    espejos, asi que la antisimetria sigue impuesta). `rec4`/`mic4` salen de `rec8`/`mic8` promediando
+    2x2, exacto. Los tokens van a un MEMMAP en `cache` (no caben en RAM); la media, en RAM, es la
+    concatenacion de las medias de los ojos usados.
+    QUE DEVUELVE: lo mismo que `carga_tokens`."""
+    ks = claves.split("+")
+    n = len(clips)
+    with np.load(d / ("vjv_%s.npz" % clips[0])) as z:
+        D = z[[f for f in z.files if f.startswith(("rec", "mac", "mic", "ent", "pre"))][0]].shape[-1]
+    ntok = sum(512 if k.endswith("4") else 2048 for k in ks)
+    cache.mkdir(parents=True, exist_ok=True)
+    f = cache / ("%s_%s_%d.f16" % (d.name, claves, n))
+    hecho = f.with_suffix(".hecho")
+    X = np.memmap(f, dtype="float16", mode="r" if hecho.is_file() else "w+",
+                  shape=(n, 2, ntok, D))
+    vistas = sorted({k[:3] for k in ks})
+    med = np.empty((n, 2, D * len(vistas)), dtype="float32")
+    via = []
+    for i, c in enumerate(clips):
+        with np.load(d / ("vjv_%s.npz" % c)) as z:
+            if not hecho.is_file():
+                partes = []
+                for k in ks:
+                    if k in z.files:
+                        t = z[k].astype("float32")
+                    else:
+                        t = z[k[:3] + "8"].astype("float32")
+                        t = t.reshape(2, 32, 4, 2, 4, 2, D).mean(axis=(3, 5))
+                    partes.append(t.reshape(2, -1, D))
+                X[i] = np.concatenate(partes, axis=1).astype("float16")
+            med[i] = np.concatenate([z["media_" + v] for v in vistas], axis=1)
+            via.append(str(z["via_ancla"]))
+    if not hecho.is_file():
+        X.flush()
+        hecho.write_text("ok", encoding="utf-8")
+    return X, med, np.array(via)
+
+
+CACHE_ETQ = None
+"""Directorio para guardar los logits del ETIQUETADOR (A) y su reparto interno. No dependen de la
+variante de V-JEPA, y entrenarlos con 5 semillas lleva ~3 h de CPU: con `--cache-etq` las variantes
+los reutilizan. La clave es la tarea, las semillas y la lista exacta de clips."""
+
+
+def _cache_etq(nombre, filas, calcula):
+    if CACHE_ETQ is None:
+        return calcula()
+    import hashlib
+    import pickle
+    h = hashlib.sha1("|".join(f["clip"] for f in filas).encode()).hexdigest()[:12]
+    f = CACHE_ETQ / ("%s_%s_%s.pkl" % (TAREA, nombre, h))
+    if f.is_file():
+        with open(f, "rb") as fh:
+            return pickle.load(fh)
+    v = calcula()
+    CACHE_ETQ.mkdir(parents=True, exist_ok=True)
+    with open(f, "wb") as fh:
+        pickle.dump(v, fh)
+    return v
+
+
 # ---------------------------------------------------------------------------------------------
 # SONDAS, impares por construccion
 # ---------------------------------------------------------------------------------------------
@@ -168,7 +231,10 @@ def entrena_sonda(X, idx, y, epocas, wd, lineal=False, semilla=ET.SEMILLA, lote=
     torch = _torch()
     torch.manual_seed(semilla)
     np.random.seed(semilla)
-    mod = (sonda_lineal() if lineal else sonda_atentiva()).to("cuda")
+    mod = (sonda_lineal(d_in=X.shape[-1]) if lineal
+           else sonda_atentiva(d_in=X.shape[-1], n_tok=X.shape[2])).to("cuda")
+    """Con V0 son los valores por defecto (512 tokens de 1.024); las variantes de
+    `VJEPA2_VARIANTES_2026-10-09.md` traen otros."""
     opt = torch.optim.AdamW(mod.parameters(), lr=lr, weight_decay=wd)
     yt = torch.as_tensor(y, dtype=torch.long)
     n = len(y)
@@ -300,15 +366,21 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False, semillas=
     elegida de B y Blin, y los pesos de las fusiones, todo sin mirar el reservado externo."""
     tr = np.asarray(tr)
     filas_tr = [filas[i] for i in tr]
-    mod_i, ev_i = ET.entrena(filas_tr, "initiated", verboso=False)
-    i_tr, i_va = tr[ev_i["itr"]], tr[ev_i["ire"]]
-    """`ev_i` indexa `filas_tr`; `tr[...]` lo lleva a indices de `filas` y de X."""
-    La = logits_etiquetador(mod_i, filas_tr, ev_i["ire"])
-    if semillas > 1:
-        """CAMBIO 2 del protocolo: con varias semillas, el etiquetador interno es la media de los
-        logits de `semillas` entrenamientos sobre el mismo reparto interno."""
-        La = np.mean([logits_etiquetador(entrena_etiquetador_fijo(filas, i_tr, semilla=ET.SEMILLA + k),
-                                         filas, i_va) for k in range(semillas)], axis=0)
+
+    def interno():
+        mod_i, ev_i = ET.entrena(filas_tr, "initiated", verboso=False)
+        i_tr, i_va = tr[ev_i["itr"]], tr[ev_i["ire"]]
+        """`ev_i` indexa `filas_tr`; `tr[...]` lo lleva a indices de `filas` y de X."""
+        La = logits_etiquetador(mod_i, filas_tr, ev_i["ire"])
+        if semillas > 1:
+            """CAMBIO 2 del protocolo: con varias semillas, el etiquetador interno es la media de los
+            logits de `semillas` entrenamientos sobre el mismo reparto interno."""
+            La = np.mean([logits_etiquetador(entrena_etiquetador_fijo(filas, i_tr,
+                                                                      semilla=ET.SEMILLA + k),
+                                             filas, i_va) for k in range(semillas)], axis=0)
+        return i_tr, i_va, La
+
+    i_tr, i_va, La = _cache_etq("interno_%d" % semillas, filas, interno)
     yv = y[i_va]
     rej = [(e, w) for e in REJILLA_EPOCAS for w in REJILLA_WD]
     if rapido:
@@ -391,7 +463,15 @@ def main():
     ap.add_argument("--tarea", choices=("initiated", "prioridad"), default="initiated")
     ap.add_argument("--semillas", type=int, default=1,
                     help="cambio 2 del protocolo: media de logits de N entrenamientos (decide N=5)")
+    ap.add_argument("--variante", default=None,
+                    help="VJEPA2_VARIANTES: claves de vjv_<clip>.npz en --dir, p.ej. rec4+mac4+mic4")
+    ap.add_argument("--memmap", default="C:/FENCINGLY_TMP/sonda_memmap",
+                    help="donde va el memmap de una variante (NVMe; temporal)")
+    ap.add_argument("--cache-etq", default=None, help="reutiliza los logits del etiquetador")
+    ap.add_argument("--guarda-pred", default=None, help="npz con la prediccion de cada clip")
     a = ap.parse_args()
+    global CACHE_ETQ
+    CACHE_ETQ = pathlib.Path(a.cache_etq) if a.cache_etq else None
     d = pathlib.Path(a.dir)
     global TAREA
     TAREA = a.tarea
@@ -399,11 +479,14 @@ def main():
           % (TAREA, a.semillas))
     print("=" * 80)
     filas_todas = ET.reune(cabeza="initiated") if TAREA == "initiated" else filas_prioridad()
-    con = [f for f in filas_todas if (d / ("vjepa_%s.npz" % f["clip"])).is_file()
+    pref = "vjv_%s.npz" if a.variante else "vjepa_%s.npz"
+    if a.variante:
+        print("VARIANTE %s de %s (VJEPA2_VARIANTES_2026-10-09.md)" % (a.variante, d))
+    con = [f for f in filas_todas if (d / (pref % f["clip"])).is_file()
            and luces_clip(f["clip"]) is not None]
     print("filas con initiated %d; con embedding y luces %d; sin embedding %d; sin lights_ %d"
           % (len(filas_todas), len(con),
-             sum(not (d / ("vjepa_%s.npz" % f["clip"])).is_file() for f in filas_todas),
+             sum(not (d / (pref % f["clip"])).is_file() for f in filas_todas),
              sum(luces_clip(f["clip"]) is None for f in filas_todas)))
     itr_t, ire_t, diag = ET.particion_por_torneo(filas_todas)
     res_t = {filas_todas[i]["torneo"] for i in ire_t}
@@ -420,7 +503,8 @@ def main():
     torneos = np.array([f["torneo"] for f in filas])
     armas = np.array([f["weapon"] for f in filas])
     t0 = time.time()
-    X, M, via = carga_tokens(clips, d)
+    X, M, via = (carga_variante(clips, d, a.variante, pathlib.Path(a.memmap)) if a.variante
+                 else carga_tokens(clips, d))
     V = np.stack([luces_clip(c) for c in clips])
     print("tokens cargados: %.1f GB en %.0f s" % (X.nbytes / 1e9, time.time() - t0), flush=True)
 
@@ -428,11 +512,14 @@ def main():
                                           semillas=a.semillas)
 
     S = range(a.semillas)
-    mods_a = [entrena_etiquetador_fijo(filas, tr, semilla=ET.SEMILLA + k) for k in S]
-    """El etiquetador externo se entrena SOLO con `tr`, no con `ET.entrena(filas)`, porque su
-    particion cogeria otros torneos: aqui el reservado ya esta fijado arriba."""
-    La = np.mean([logits_etiquetador(m, filas, re) for m in mods_a], axis=0)
-    La_e = np.mean([logits_etiquetador(m, filas, re, espejo=True) for m in mods_a], axis=0)
+    def externo():
+        mods_a = [entrena_etiquetador_fijo(filas, tr, semilla=ET.SEMILLA + k) for k in S]
+        """El etiquetador externo se entrena SOLO con `tr`, no con `ET.entrena(filas)`, porque su
+        particion cogeria otros torneos: aqui el reservado ya esta fijado arriba."""
+        return (np.mean([logits_etiquetador(m, filas, re) for m in mods_a], axis=0),
+                np.mean([logits_etiquetador(m, filas, re, espejo=True) for m in mods_a], axis=0))
+
+    La, La_e = _cache_etq("externo_%d" % a.semillas, filas, externo)
     mbs = [entrena_sonda(X, tr, y[tr], mejor[0], mejor[1], semilla=ET.SEMILLA + k) for k in S]
     Lb = np.mean([logits_sonda(m, X, re) for m in mbs], axis=0)
     Lb_e = np.mean([logits_sonda(m, X, re, espejo=True) for m in mbs], axis=0)
@@ -457,6 +544,11 @@ def main():
                                                        parte_logits(Lb_e)]))),
     }
     yr, tor_r, arm_r, via_r = y[re], torneos[re], armas[re], via[re]
+    if a.guarda_pred:
+        np.savez(a.guarda_pred, clips=np.array([clips[i] for i in re]), y=yr, torneo=tor_r,
+                 arma=arm_r, via=via_r, La=La, Lb=Lb, Ll=Ll, variante=str(a.variante or "V0"),
+                 **{"pred_" + k.replace("'", "p"): v for k, v in pred.items()},
+                 **{"esp_" + k.replace("'", "p"): v for k, v in pred_e.items()})
     techo = CA.techo_humano()["initiated"]
     may = float((yr == np.bincount(y[tr]).argmax()).mean())
     print()
