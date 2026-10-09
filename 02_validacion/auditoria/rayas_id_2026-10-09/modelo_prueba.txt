@@ -1,0 +1,5 @@
+PRUEBA: torneos con referencias 67, referencias 1317
+desp=False robusto=False n= 1215  |err| mediana 1.37 m  p75 2.71  <1m 0.39  zona=zona_prod 0.547
+desp=False robusto=True  n= 1215  |err| mediana 1.33 m  p75 2.53  <1m 0.40  zona=zona_prod 0.563
+desp=True  robusto=False n= 1215  |err| mediana 0.81 m  p75 2.27  <1m 0.55  zona=zona_prod 0.624
+desp=True  robusto=True  n= 1215  |err| mediana 0.67 m  p75 1.95  <1m 0.61  zona=zona_prod 0.663

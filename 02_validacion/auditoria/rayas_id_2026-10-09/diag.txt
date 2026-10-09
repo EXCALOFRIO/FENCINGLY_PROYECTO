@@ -1,0 +1,8 @@
+referencias     n=1986  estatura/alto imagen mediana 0.33 (p75 0.38)  |ang| mediana 4.1  rayas vistas mediana 2.0
+sin homografia  n=1096  estatura/alto imagen mediana 0.36 (p75 0.41)  |ang| mediana 2.0  rayas vistas mediana 0.0
+confusion (filas verdad, columnas prediccion): ['fotl_warning_box', 'fotl_half', 'middle', 'fotr_half', 'fotr_warning_box']
+[[  7  30  33   7   0]
+ [  5  48 116   5   2]
+ [  3  25 421  13   1]
+ [  1   9 111  43   8]
+ [  0   0  28  17   4]]

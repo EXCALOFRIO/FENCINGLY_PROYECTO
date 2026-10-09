@@ -1,0 +1,1 @@
+AJUSTE, referencias (tienen homografia), n=1865: angulo (dejando uno fuera) 0.511   homografia de produccion 0.485   middle 0.357

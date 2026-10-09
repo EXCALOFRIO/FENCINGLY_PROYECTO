@@ -1,0 +1,5 @@
+AJUSTE: torneos con referencias 67, referencias 1964
+desp=False robusto=False n= 1865  |err| mediana 1.42 m  p75 2.80  <1m 0.39  zona=zona_prod 0.550
+desp=False robusto=True  n= 1865  |err| mediana 1.20 m  p75 2.46  <1m 0.43  zona=zona_prod 0.569
+desp=True  robusto=False n= 1865  |err| mediana 1.18 m  p75 2.42  <1m 0.44  zona=zona_prod 0.584
+desp=True  robusto=True  n= 1865  |err| mediana 0.73 m  p75 2.14  <1m 0.57  zona=zona_prod 0.649
