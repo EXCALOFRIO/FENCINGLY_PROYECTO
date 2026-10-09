@@ -61,6 +61,16 @@ regla de siempre no contesta: rehace los rasgos con la franja en `BANDA_RESPALDO
 regla (calibracion hasta el tocado + 3, confianza >= 0,35, +-0,5 s). Un clip que ya contestaba sale
 identico por construccion. La salida lo dice en `via_h` (`estricta` / `rotulo_<b>`). La cifra y la
 decision (que es la que pone el defecto de arriba) estan en el informe."""
+TRIPODE = os.environ.get("FENCINGLY_CAMARA_TRIPODE", "0") == "1"
+TRIPODE_REGLA = (10, 3, True, True)
+"""EL RESPALDO DE LA CAMARA DE TRIPODE (`CAMARA_TRIPODE_2026-10-09.md`, `pista_tripode.py`). Solo
+actua donde la regla de siempre (y el respaldo del rotulo, si esta encendido) no contesta: ajusta una
+camara fisica (pan, tilt, roll pequenio, zoom; pies sobre la linea central, estatura ~1,65 m) contra
+las aristas ORIENTADAS de los 2 s antes del tocado, encadenados con el movimiento de camara, y acepta
+con la regla `TRIPODE_REGLA` = (margen minimo, rayas minimas, tres seguidas, plausible) elegida en
+AJUSTE. La salida lo dice en `via_h = tripode` y `metodo_h = tripode`. La cifra y la decision (que es
+la que pone el defecto de arriba) estan en el informe."""
+TRIPODE_VENT_S = 2.0
 CIFRA = ("Zona ADOPTADA (2026-10-08, 1.313 clips anotados con respuesta): acierto 0,476 contra 0,353 "
          "de `middle`, +0,123 IC95 [+0,090, +0,155]; contra la etapa 7 en los mismos 694 clips 0,484 "
          "contra 0,343, +0,141 IC95 [+0,094, +0,187]. Correlacion x-zona 0,292 (etapa 7: -0,034). "
@@ -193,6 +203,14 @@ def analiza(clip, video, torneo=None):
                 cal = cal2
                 Hs, conf = cal["H"], cal["conf"]
                 r["via_h"] = "rotulo_%.2f" % BANDA_RESPALDO
+    if not cand and TRIPODE:
+        rt = _tripode(pf, pies, alt, tq, fps, W, H)
+        if rt is not None:
+            xs = rt["xs"]
+            r.update(motivo="ok", cuadro_usado=tq, x_izq_m=xs[0], x_der_m=xs[1],
+                     x_tocado_m=round(float(rt["x"]), 3), zona=ZONAS[zona(rt["x"])], conf_h=None,
+                     metodo_h="tripode", via_h="tripode", s=round(time.perf_counter() - t0, 1))
+            return r
     if not cand:
         r["motivo"] = "sin homografia confiable en +-%.1f s del tocado" % VENTANA_S
         r["s"] = round(time.perf_counter() - t0, 1)
@@ -209,6 +227,25 @@ def analiza(clip, video, torneo=None):
              zona=ZONAS[zona(x)], conf_h=round(float(conf[tt]), 3), metodo_h=str(cal["method"][tt]),
              s=round(time.perf_counter() - t0, 1))
     return r
+
+
+def _tripode(pf, pies, alt, tq, fps, W, H):
+    """La camara de tripode en el cuadro del tocado; None si no hay ajuste o no pasa la regla."""
+    import pista_tripode as PT
+    paso = max(1, int(round(fps / 15.0)))
+    ini = max(0, tq - int(round(TRIPODE_VENT_S * fps)))
+    ventana = list(range(tq, ini - 1, -paso))[::-1]
+    ar, va = {}, {}
+    for t in ventana:
+        ft = pf.feats[t]
+        e = cv2.Canny(cv2.GaussianBlur(ft.gray, (3, 3), 0), 30, 90)
+        e[ft.valid == 0] = 0
+        ar[t] = e > 0
+        va[t] = ft.valid > 0
+    M = PT.cadena([f.G for f in pf.feats], tq, ventana)
+    ev = PT.Evidencia(ar, va, M, pf.feats[0].s, pf.feats[0].gray.shape)
+    res = PT.ajusta(ev, pies[tq], alt[tq], W, H)
+    return res if PT.acepta(res, *TRIPODE_REGLA) else None
 
 
 def _rasgos(video, W, H, T, tf, Bpx, k26, banda):
