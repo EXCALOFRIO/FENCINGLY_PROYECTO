@@ -28,6 +28,7 @@ import time
 import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import rutas as RU  # noqa: E402
 
 MODELO = "vjepa2-vitl-fpc64-256"
@@ -242,9 +243,18 @@ def main():
     ap.add_argument("--conjunto", default=None, help="anotados: los que tienen `initiated`")
     ap.add_argument("--clips", nargs="*", default=None)
     ap.add_argument("--destino", default=None)
+    ap.add_argument("--todos", action="store_true",
+                    help="todo el conjunto con poses, no solo los que tienen `initiated` (pregunta 2)")
     a = ap.parse_args()
     destino = pathlib.Path(a.destino) if a.destino else DESTINO
-    clips = a.clips if a.clips else clips_initiated()
+    if a.clips:
+        clips = a.clips
+    elif a.conjunto and a.todos:
+        import lotes as LO
+        clips = sorted(c for c in LO.conjunto(a.conjunto)
+                       if (RU.TRABAJO / ("poses_%s.npz" % c)).is_file())
+    else:
+        clips = clips_initiated()
     corre(clips, destino)
 
 

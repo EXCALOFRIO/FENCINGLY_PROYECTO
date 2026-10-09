@@ -145,6 +145,18 @@ def sonda_lineal(d_in=1024):
     return Lin()
 
 
+TAREA = "initiated"
+"""`initiated` (pregunta 1) o `prioridad` (pregunta 2: quien gana con las dos luces). Se fija en
+`main`; las funciones de abajo la leen para decidir entre 3 clases o solo izquierda/derecha."""
+
+
+def decide(L):
+    """La clase de unos logits. En `prioridad` no existe `neither`: gana el de la izquierda o el
+    de la derecha, y decide el signo de `u` (las dos primeras columnas)."""
+    L = np.asarray(L)
+    return L[:, :2].argmax(1) if TAREA == "prioridad" else L.argmax(1)
+
+
 def _espejo_y(y):
     return np.where(y == 0, 1, np.where(y == 1, 0, y))
 
@@ -301,7 +313,7 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False):
         t0 = time.time()
         m = entrena_sonda(X, i_tr, y[i_tr], e, w)
         L = logits_sonda(m, X, i_va)
-        acc = float((L.argmax(1) == yv).mean())
+        acc = float((decide(L) == yv).mean())
         ll = float(_nll(L, yv))
         if verboso:
             print("   interna B  epocas %3d  wd %.0e  acierto %.3f  nll %.4f  (%.0f s)"
@@ -312,7 +324,7 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False):
     for e, w in rej:
         m = entrena_sonda(M, i_tr, y[i_tr], e, w, lineal=True)
         L = logits_sonda(m, M, i_va)
-        acc = float((L.argmax(1) == yv).mean())
+        acc = float((decide(L) == yv).mean())
         ll = float(_nll(L, yv))
         if mejor_l is None or (acc, -ll) > (mejor_l[2], -mejor_l[3]):
             mejor_l, Ll_va = (e, w, acc, ll), L
@@ -320,7 +332,7 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False):
         print("   interna: B elegida epocas %d wd %.0e (%.3f); Blin epocas %d wd %.0e (%.3f); "
               "etiquetador %.3f  n=%d"
               % (mejor[0], mejor[1], mejor[2], mejor_l[0], mejor_l[1], mejor_l[2],
-                 float((La.argmax(1) == yv).mean()), len(yv)), flush=True)
+                 float((decide(La) == yv).mean()), len(yv)), flush=True)
     Vv = V[i_va]
     fus = {
         "A'": ajusta_fusion(*rasgos_fusion([parte_logits(La), parte_luces(Vv)]), yv),
@@ -336,15 +348,42 @@ def _nll(L, y):
     return float(-(L[np.arange(len(y)), y] - np.log(np.exp(L).sum(1))).mean())
 
 
+def filas_prioridad():
+    """Las filas de la pregunta 2: florete y sable, las DOS luces de color, `touch` izq/der. La
+    etiqueta va en `y_initiated` (0 = gana la izquierda, 1 = la derecha) para usar la misma cabeza
+    antisimetrica y el mismo reparto; la etiqueta humana de quien inicio queda en `y_humano`."""
+    filas = []
+    for f in ET.reune(cabeza=None):
+        if f["weapon"] not in ("foil", "sabre") or f["touch"] not in ("left", "right"):
+            continue
+        p = RU.TRABAJO / ("lights_%s.csv" % f["clip"])
+        if not p.is_file():
+            continue
+        with open(p, encoding="utf-8") as fh:
+            lados = {r.get("lado") for r in csv.DictReader(fh) if r.get("canal") in ("roja", "verde")}
+        if lados != {"L", "R"}:
+            continue
+        f["y_humano"] = f["y_initiated"]
+        f["y_initiated"] = 0 if f["touch"] == "left" else 1
+        filas.append(f)
+    print("prioridad: %d clips con dos luces y touch izq/der (florete %d, sable %d)"
+          % (len(filas), sum(f["weapon"] == "foil" for f in filas),
+             sum(f["weapon"] == "sabre" for f in filas)))
+    return filas
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default=str(RU.SCRATCH / "vjepa"))
     ap.add_argument("--rapido", action="store_true", help="un punto de rejilla: SOLO para probar")
+    ap.add_argument("--tarea", choices=("initiated", "prioridad"), default="initiated")
     a = ap.parse_args()
     d = pathlib.Path(a.dir)
-    print("SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09)")
+    global TAREA
+    TAREA = a.tarea
+    print("SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea %s" % TAREA)
     print("=" * 80)
-    filas_todas = ET.reune(cabeza="initiated")
+    filas_todas = ET.reune(cabeza="initiated") if TAREA == "initiated" else filas_prioridad()
     con = [f for f in filas_todas if (d / ("vjepa_%s.npz" % f["clip"])).is_file()
            and luces_clip(f["clip"]) is not None]
     print("filas con initiated %d; con embedding y luces %d; sin embedding %d; sin lights_ %d"
@@ -385,18 +424,18 @@ def main():
     Vr = V[re]
     Vr_e = Vr[:, [1, 0, 3, 2]]
     pred = {
-        "A": La.argmax(1),
-        "A'": aplica_fusion(fus["A'"], *rasgos_fusion([parte_logits(La), parte_luces(Vr)])).argmax(1),
-        "B": Lb.argmax(1),
-        "Blin": Ll.argmax(1),
-        "C": aplica_fusion(fus["C"], *rasgos_fusion([parte_logits(La), parte_logits(Lb)])).argmax(1),
-        "C'": aplica_fusion(fus["C'"], *rasgos_fusion([parte_logits(La), parte_luces(Vr),
-                                                       parte_logits(Lb)])).argmax(1),
+        "A": decide(La),
+        "A'": decide(aplica_fusion(fus["A'"], *rasgos_fusion([parte_logits(La), parte_luces(Vr)]))),
+        "B": decide(Lb),
+        "Blin": decide(Ll),
+        "C": decide(aplica_fusion(fus["C"], *rasgos_fusion([parte_logits(La), parte_logits(Lb)]))),
+        "C'": decide(aplica_fusion(fus["C'"], *rasgos_fusion([parte_logits(La), parte_luces(Vr),
+                                                       parte_logits(Lb)]))),
     }
     pred_e = {
-        "B": Lb_e.argmax(1),
-        "C'": aplica_fusion(fus["C'"], *rasgos_fusion([parte_logits(La_e), parte_luces(Vr_e),
-                                                       parte_logits(Lb_e)])).argmax(1),
+        "B": decide(Lb_e),
+        "C'": decide(aplica_fusion(fus["C'"], *rasgos_fusion([parte_logits(La_e), parte_luces(Vr_e),
+                                                       parte_logits(Lb_e)]))),
     }
     yr, tor_r, arm_r, via_r = y[re], torneos[re], armas[re], via[re]
     techo = CA.techo_humano()["initiated"]
@@ -406,6 +445,12 @@ def main():
     print("%-44s %8s   %s" % ("", "acierto", "contra A' (IC95 por torneo)"))
     print("-" * 80)
     print("%-44s %8.3f" % ("clase mayoritaria del entrenamiento", may))
+    if TAREA == "prioridad":
+        yh = np.array([filas[i]["y_humano"] for i in re])
+        m = yh <= 1
+        print("%-44s %8.3f   (cobertura %.3f; etiqueta HUMANA, no un modelo)"
+              % ("gana el que inicio", float((yh[m] == yr[m]).mean()) if m.any() else float("nan"),
+                 m.mean()))
     for k in ("A", "A'", "B", "Blin", "C", "C'"):
         acc = float((pred[k] == yr).mean())
         if k == "A'":
@@ -414,7 +459,8 @@ def main():
         lo, hi = boot_torneo(yr, pred["A'"], pred[k], tor_r)
         print("%-44s %8.3f   %+.3f  [%+.3f, %+.3f]"
               % (k, acc, acc - float((pred["A'"] == yr).mean()), lo, hi))
-    print("%-44s %8.3f" % ("techo humano (n=%d)" % techo["n"], techo["acuerdo"]))
+    if TAREA == "initiated":
+        print("%-44s %8.3f" % ("techo humano (n=%d)" % techo["n"], techo["acuerdo"]))
     print()
     for k in ("B", "C'"):
         print("control del espejo %-4s %.4f" % (k, control_espejo(pred[k], pred_e[k])))
@@ -429,6 +475,15 @@ def main():
             print("   %-10s %-8s n=%4d   A' %.3f   B %.3f   C' %.3f"
                   % (nombre, g, m.sum(), (pred["A'"][m] == yr[m]).mean(),
                      (pred["B"][m] == yr[m]).mean(), (pred["C'"][m] == yr[m]).mean()))
+    if TAREA == "prioridad":
+        print()
+        print("PREGUNTA 2 (no decide sola; ver el protocolo):")
+        for k in ("B", "C"):
+            lo, hi = boot_torneo(yr, pred["A"], pred[k], tor_r)
+            d = float((pred[k] == yr).mean() - (pred["A"] == yr).mean())
+            print("   %s - A = %+.3f  IC95 por torneo [%+.3f, %+.3f]  -> %s"
+                  % (k, d, lo, hi, "bate a A" if lo > 0 else "no se distingue de A"))
+        return 0
     acc_a2 = float((pred["A'"] == yr).mean())
     acc_c2 = float((pred["C'"] == yr).mean())
     lo, hi = boot_torneo(yr, pred["A'"], pred["C'"], tor_r)
