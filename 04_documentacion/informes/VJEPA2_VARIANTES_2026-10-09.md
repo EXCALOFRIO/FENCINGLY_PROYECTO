@@ -223,3 +223,14 @@ las dos (A y la mayoritaria). Con ella, C - max(A, mayoritaria) = +0,009, que no
 Con 1.234 clips de 8 clases desbalanceadas y un techo humano de 0,481, esta etiqueta no da para mas
 de lo que da contestar torso. Si se quisiera de verdad, habria que limitarla a lo que el arbitraje
 usa: en florete, valido (torso) o no valido. Eso ya lo da la luz blanca de la etapa 9.
+
+### Calidad de la extraccion G256 (10/10 12:40, muestra de 928 de 4.637 clips ya extraidos, sin etiquetas)
+
+- **Ancla**: `zona` en 892 clips y `final` en 36.
+- **Ojo micro**:
+  - 879 clips por las manos (0,947), 42 por el respaldo y 7 con la imagen entera;
+  - cuadros con las dos manos: mediana 61 de 64, p10 30;
+  - ancho del zoom: p10 209 px, mediana 344 px, p90 678 px. El recorte meso suele medir 700-1.280
+    px, asi que el zoom de la mediana ve ~2x mas detalle.
+- Ningun clip con cuadros que falten y ningun NaN.
+- 9,6 s de GPU por clip, con la GPU compartida con las sondas.
