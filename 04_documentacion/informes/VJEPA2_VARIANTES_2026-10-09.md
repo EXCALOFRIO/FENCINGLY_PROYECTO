@@ -154,7 +154,7 @@ Informativo: `mic8` solo; la zona con la media de `mac` (sonda de `VJEPA_ZONA`);
 acabar). Con 1.536 tokens de 1.408 son ~48 GB, que no caben en 32 GB de RAM. La sonda es la misma y
 lee por indices igual.
 
-## Cambio 2 (2026-10-10 00:45, ANTES de extraer DINOv2 salvo una prueba de humo de 3 clips sin cifras)
+## Cambio 2 (decidido 2026-10-10 00:45, escrito aqui a las 12:24; ANTES de extraer DINOv2, salvo una prueba de humo de 3 clips sin cifras)
 
 **DINOv2 cuadro a cuadro**, la otra idea que propuso el usuario. Un modelo de IMAGEN (DINOv2-L/14,
 Apache-2.0) mira cada cuadro por separado. Eso permite mas cuadros y mas resolucion por cuadro; la

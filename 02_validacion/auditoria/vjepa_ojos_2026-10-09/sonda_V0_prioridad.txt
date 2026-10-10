@@ -1,0 +1,47 @@
+SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea prioridad, 5 semilla(s)
+================================================================================
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+prioridad: 1076 clips con dos luces y touch izq/der (florete 795, sable 281)
+filas con initiated 1076; con embedding y luces 1076; sin embedding 0; sin lights_ 0
+reservado: 17 torneos, 341 clips (de 341 en el reparto completo); entrenamiento 735
+tokens cargados: 2.3 GB en 48 s
+C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\01_extraccion\codigo\etiquetador.py:895: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:821.)
+  tot += float(p) * len(j)
+   interna B  epocas  20  wd 1e-03  acierto 0.629  nll 0.8636  (24 s)
+   interna B  epocas  20  wd 1e-02  acierto 0.629  nll 0.8634  (22 s)
+   interna B  epocas  20  wd 5e-02  acierto 0.637  nll 0.8630  (22 s)
+   interna B  epocas  40  wd 1e-03  acierto 0.563  nll 2.7106  (44 s)
+   interna B  epocas  40  wd 1e-02  acierto 0.555  nll 2.6837  (44 s)
+   interna B  epocas  40  wd 5e-02  acierto 0.580  nll 2.6876  (44 s)
+   interna B  epocas  80  wd 1e-03  acierto 0.571  nll 3.6450  (87 s)
+   interna B  epocas  80  wd 1e-02  acierto 0.563  nll 3.4607  (87 s)
+   interna B  epocas  80  wd 5e-02  acierto 0.543  nll 3.2476  (87 s)
+   interna con 5 semillas: B 0.637  etiquetador 0.608
+   interna: B elegida epocas 20 wd 5e-02 (0.637); Blin epocas 80 wd 5e-02 (0.637); etiquetador 0.608  n=245
+
+RESERVADO: 341 clips, 17 torneos
+                                              acierto   contra A' (IC95 por torneo)
+--------------------------------------------------------------------------------
+clase mayoritaria del entrenamiento             0.522
+gana el que inicio                              0.644   (cobertura 0.947; etiqueta HUMANA, no un modelo)
+A                                               0.651   +0.000  [+0.000, +0.000]
+A'                                              0.651   (linea base que decide)
+B                                               0.592   -0.059  [-0.086, +0.013]
+Blin                                            0.592   -0.059  [-0.112, +0.048]
+C                                               0.657   +0.006  [-0.027, +0.079]
+C'                                              0.657   +0.006  [-0.027, +0.079]
+
+control del espejo B    1.0000
+control del espejo C'   1.0000
+B contra A (informativo): -0.059 [-0.086, +0.013]
+
+por arma y por via del ancla (informativo):
+   arma       foil     n= 229   A' 0.677   B 0.585   C' 0.668
+   arma       sabre    n= 112   A' 0.598   B 0.607   C' 0.634
+   via_ancla  final    n=   3   A' 1.000   B 1.000   C' 1.000
+   via_ancla  zona     n= 338   A' 0.648   B 0.589   C' 0.654
+
+PREGUNTA 2 (no decide sola; ver el protocolo):
+   B - A = -0.059  IC95 por torneo [-0.086, +0.013]  -> no se distingue de A
+   C - A = +0.006  IC95 por torneo [-0.027, +0.079]  -> no se distingue de A
