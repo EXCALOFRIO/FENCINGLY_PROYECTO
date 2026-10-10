@@ -154,6 +154,40 @@ Informativo: `mic8` solo; la zona con la media de `mac` (sonda de `VJEPA_ZONA`);
 acabar). Con 1.536 tokens de 1.408 son ~48 GB, que no caben en 32 GB de RAM. La sonda es la misma y
 lee por indices igual.
 
+## Cambio 2 (2026-10-10 00:45, ANTES de extraer DINOv2 salvo una prueba de humo de 3 clips sin cifras)
+
+**DINOv2 cuadro a cuadro**, la otra idea que propuso el usuario. Un modelo de IMAGEN (DINOv2-L/14,
+Apache-2.0) mira cada cuadro por separado. Eso permite mas cuadros y mas resolucion por cuadro; la
+relacion en el tiempo la aprende la sonda.
+
+- Extractor: `01_extraccion/codigo/dino_cuadros.py`.
+- Mismo recorte y misma ancla que V0.
+- 128 cuadros a paso uniforme en `[a - 4,0 s, a + 0,5 s]`, unos 28/s: a 30 fps, casi todos.
+- 448 px por cuadro (32x32 parches de 14 px), frente a 256 de V0.
+- Se guarda por cuadro el CLS y los parches promediados 4x4: 17 tokens de 1.024; con las dos
+  vistas, 8,9 MB por clip.
+- Coste medido en 3 clips con la GPU COMPARTIDA con G256: 23,4 s/clip. Libre sera menos; se dara el
+  medido.
+
+**Orden de la cola**: G256 (en marcha), luego DINOv2 y luego G384. DINOv2 pasa delante de G384
+porque es la idea mas distinta; G384 solo cambia la resolucion del mismo ojo. La extraccion G256 en
+marcha no se toco.
+
+**Lo que se compara**:
+
+| comparacion | referencia | papel |
+|---|---|---|
+| D0 = DINOv2, 128 x 17 tokens | V0 | decide, con el mismo umbral (C' por pares, >= +0,02, IC95 sin cruzar cero, espejo 1,0000) |
+| D0 | G0 | informativo |
+
+**La sonda de D0** se elige en la particion interna, como la rejilla, entre dos:
+
+- (a) la MISMA sonda atentiva de V-JEPA, sobre los 2.176 tokens con su posicion aprendida;
+- (b) una sonda TEMPORAL: atencion dentro de cada cuadro, luego 2 capas de transformer a lo largo de
+  los 128 cuadros, impar por construccion igual.
+
+Gana la de mejor acierto interno; despues se evalua UNA vez fuera.
+
 ## Resultados
 
 (pendiente)
