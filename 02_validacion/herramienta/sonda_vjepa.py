@@ -119,6 +119,31 @@ def carga_variante(clips, d, claves, cache):
     return X, med, np.array(via)
 
 
+def carga_dino(clips, d, cache):
+    """DINOv2 cuadro a cuadro (`dino_cuadros.py`): `tok` (2, 128, 17, 1024) por clip -> memmap
+    (n, 2, 2176, 1024), cuadro a cuadro y dentro de cada cuadro el CLS y los 16 parches. La media
+    (para Blin) es la del CLS a lo largo de los cuadros."""
+    n = len(clips)
+    cache.mkdir(parents=True, exist_ok=True)
+    f = cache / ("%s_dino_%d.f16" % (d.name, n))
+    hecho = f.with_suffix(".hecho")
+    ntok = N_CUADROS_DINO * N_POR_DINO
+    X = np.memmap(f, dtype="float16", mode="r" if hecho.is_file() else "w+", shape=(n, 2, ntok, 1024))
+    med = np.empty((n, 2, 1024), dtype="float32")
+    via = []
+    for i, c in enumerate(clips):
+        with np.load(d / ("dino_%s.npz" % c)) as z:
+            t = z["tok"]
+            if not hecho.is_file():
+                X[i] = t.reshape(2, ntok, -1)
+            med[i] = t[:, :, 0].astype("float32").mean(axis=1)
+            via.append(str(z["via_ancla"]))
+    if not hecho.is_file():
+        X.flush()
+        hecho.write_text("ok", encoding="utf-8")
+    return X, med, np.array(via)
+
+
 CACHE_ETQ = None
 """Directorio para guardar los logits del ETIQUETADOR (A) y su reparto interno. No dependen de la
 variante de V-JEPA, y entrenarlos con 5 semillas lleva ~3 h de CPU: con `--cache-etq` las variantes
@@ -208,6 +233,62 @@ def sonda_lineal(d_in=1024):
     return Lin()
 
 
+def sonda_temporal(d_in=1024, d=256, cabezas=4, n_cuadros=128, n_por=17, capas=2):
+    """LA RED TEMPORAL sobre DINOv2 cuadro a cuadro (`VJEPA2_VARIANTES_2026-10-09.md`, cambio 2).
+    Por cuadro: proyeccion, posicion dentro del cuadro y una consulta que resume sus `n_por` tokens.
+    Luego `capas` de transformer A LO LARGO de los cuadros, con posicion temporal aprendida, y una
+    consulta final. Las salidas `g` y `s` se combinan igual que en la atentiva: impar por
+    construccion."""
+    torch = _torch()
+    nn = torch.nn
+
+    class GS(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.ln = nn.LayerNorm(d_in)
+            self.proj = nn.Linear(d_in, d)
+            self.pos_in = nn.Parameter(torch.zeros(1, 1, n_por, d))
+            self.q_in = nn.Parameter(torch.randn(1, 1, d) * 0.02)
+            self.att_in = nn.MultiheadAttention(d, cabezas, batch_first=True, dropout=0.1)
+            self.pos_t = nn.Parameter(torch.zeros(1, n_cuadros, d))
+            capa = nn.TransformerEncoderLayer(d, cabezas, dim_feedforward=2 * d, dropout=0.1,
+                                              batch_first=True, norm_first=True)
+            self.tiempo = nn.TransformerEncoder(capa, capas)
+            self.q = nn.Parameter(torch.randn(1, 1, d) * 0.02)
+            self.att = nn.MultiheadAttention(d, cabezas, batch_first=True, dropout=0.1)
+            self.sal = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, 128), nn.GELU(),
+                                     nn.Dropout(0.1), nn.Linear(128, 2))
+
+        def forward(self, x):
+            n = len(x)
+            h = self.proj(self.ln(x)).reshape(n, n_cuadros, n_por, d) + self.pos_in
+            h = h.reshape(n * n_cuadros, n_por, d)
+            o, _ = self.att_in(self.q_in.expand(len(h), -1, -1), h, h, need_weights=False)
+            f = self.tiempo(o[:, 0].reshape(n, n_cuadros, d) + self.pos_t)
+            o, _ = self.att(self.q.expand(n, -1, -1), f, f, need_weights=False)
+            return self.sal(o[:, 0])
+
+    class Sonda(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.gs = GS()
+
+        def forward(self, x):
+            a = self.gs(x[:, 0])
+            b = self.gs(x[:, 1])
+            u = a[:, 0] - b[:, 0]
+            s = a[:, 1] + b[:, 1]
+            return torch.stack([u, -u, s], dim=1)
+
+    return Sonda()
+
+
+SONDAS = ("atentiva",)
+"""Los tipos de sonda que compiten en la particion interna (cambio 2: `atentiva,temporal` para
+DINOv2). Con uno solo, todo es como antes."""
+N_CUADROS_DINO, N_POR_DINO = 128, 17
+
+
 TAREA = "initiated"
 """`initiated` (pregunta 1) o `prioridad` (pregunta 2: quien gana con las dos luces). Se fija en
 `main`; las funciones de abajo la leen para decidir entre 3 clases o solo izquierda/derecha."""
@@ -224,15 +305,21 @@ def _espejo_y(y):
     return np.where(y == 0, 1, np.where(y == 1, 0, y))
 
 
-def entrena_sonda(X, idx, y, epocas, wd, lineal=False, semilla=ET.SEMILLA, lote=64, lr=1e-3):
+def entrena_sonda(X, idx, y, epocas, wd, lineal=False, semilla=ET.SEMILLA, lote=64, lr=1e-3,
+                  tipo="atentiva"):
     """X: tokens (N,2,512,1024) fp16 en CPU, o medias (N,2,1024) si `lineal`; `idx` las filas de X
     con las que se entrena e `y` sus etiquetas. Por indices y no por copia: `X[idx]` copiaria ~8 GB."""
     idx = np.asarray(idx)
     torch = _torch()
     torch.manual_seed(semilla)
     np.random.seed(semilla)
-    mod = (sonda_lineal(d_in=X.shape[-1]) if lineal
-           else sonda_atentiva(d_in=X.shape[-1], n_tok=X.shape[2])).to("cuda")
+    if lineal:
+        mod = sonda_lineal(d_in=X.shape[-1])
+    elif tipo == "temporal":
+        mod = sonda_temporal(d_in=X.shape[-1], n_cuadros=X.shape[2] // N_POR_DINO, n_por=N_POR_DINO)
+    else:
+        mod = sonda_atentiva(d_in=X.shape[-1], n_tok=X.shape[2])
+    mod = mod.to("cuda")
     """Con V0 son los valores por defecto (512 tokens de 1.024); las variantes de
     `VJEPA2_VARIANTES_2026-10-09.md` traen otros."""
     opt = torch.optim.AdamW(mod.parameters(), lr=lr, weight_decay=wd)
@@ -386,17 +473,18 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False, semillas=
     if rapido:
         rej = rej[:1]
     mejor, Lb_va = None, None
-    for e, w in rej:
-        t0 = time.time()
-        m = entrena_sonda(X, i_tr, y[i_tr], e, w)
-        L = logits_sonda(m, X, i_va)
-        acc = float((decide(L) == yv).mean())
-        ll = float(_nll(L, yv))
-        if verboso:
-            print("   interna B  epocas %3d  wd %.0e  acierto %.3f  nll %.4f  (%.0f s)"
-                  % (e, w, acc, ll, time.time() - t0), flush=True)
-        if mejor is None or (acc, -ll) > (mejor[2], -mejor[3]):
-            mejor, Lb_va = (e, w, acc, ll), L
+    for tipo in SONDAS:
+        for e, w in rej:
+            t0 = time.time()
+            m = entrena_sonda(X, i_tr, y[i_tr], e, w, tipo=tipo)
+            L = logits_sonda(m, X, i_va)
+            acc = float((decide(L) == yv).mean())
+            ll = float(_nll(L, yv))
+            if verboso:
+                print("   interna B  %-8s epocas %3d  wd %.0e  acierto %.3f  nll %.4f  (%.0f s)"
+                      % (tipo, e, w, acc, ll, time.time() - t0), flush=True)
+            if mejor is None or (acc, -ll) > (mejor[2], -mejor[3]):
+                mejor, Lb_va = (e, w, acc, ll, tipo), L
     mejor_l, Ll_va = None, None
     for e, w in rej:
         m = entrena_sonda(M, i_tr, y[i_tr], e, w, lineal=True)
@@ -407,15 +495,15 @@ def elige_y_fusiona(filas, tr, X, M, V, y, verboso=True, rapido=False, semillas=
             mejor_l, Ll_va = (e, w, acc, ll), L
     if semillas > 1:
         Lb_va = np.mean([logits_sonda(entrena_sonda(X, i_tr, y[i_tr], mejor[0], mejor[1],
-                                                    semilla=ET.SEMILLA + k), X, i_va)
+                                                    semilla=ET.SEMILLA + k, tipo=mejor[4]), X, i_va)
                          for k in range(semillas)], axis=0)
         print("   interna con %d semillas: B %.3f  etiquetador %.3f"
               % (semillas, float((decide(Lb_va) == yv).mean()), float((decide(La) == yv).mean())),
               flush=True)
     if verboso:
-        print("   interna: B elegida epocas %d wd %.0e (%.3f); Blin epocas %d wd %.0e (%.3f); "
+        print("   interna: B elegida %s epocas %d wd %.0e (%.3f); Blin epocas %d wd %.0e (%.3f); "
               "etiquetador %.3f  n=%d"
-              % (mejor[0], mejor[1], mejor[2], mejor_l[0], mejor_l[1], mejor_l[2],
+              % (mejor[4], mejor[0], mejor[1], mejor[2], mejor_l[0], mejor_l[1], mejor_l[2],
                  float((decide(La) == yv).mean()), len(yv)), flush=True)
     Vv = V[i_va]
     fus = {
@@ -468,10 +556,13 @@ def main():
     ap.add_argument("--memmap", default="C:/FENCINGLY_TMP/sonda_memmap",
                     help="donde va el memmap de una variante (NVMe; temporal)")
     ap.add_argument("--cache-etq", default=None, help="reutiliza los logits del etiquetador")
+    ap.add_argument("--sondas", default="atentiva",
+                    help="tipos que compiten en la particion interna: atentiva,temporal")
     ap.add_argument("--guarda-pred", default=None, help="npz con la prediccion de cada clip")
     a = ap.parse_args()
-    global CACHE_ETQ
+    global CACHE_ETQ, SONDAS
     CACHE_ETQ = pathlib.Path(a.cache_etq) if a.cache_etq else None
+    SONDAS = tuple(t for t in a.sondas.split(",") if t)
     d = pathlib.Path(a.dir)
     global TAREA
     TAREA = a.tarea
@@ -479,7 +570,7 @@ def main():
           % (TAREA, a.semillas))
     print("=" * 80)
     filas_todas = ET.reune(cabeza="initiated") if TAREA == "initiated" else filas_prioridad()
-    pref = "vjv_%s.npz" if a.variante else "vjepa_%s.npz"
+    pref = ("dino_%s.npz" if a.variante == "dino" else "vjv_%s.npz") if a.variante else "vjepa_%s.npz"
     if a.variante:
         print("VARIANTE %s de %s (VJEPA2_VARIANTES_2026-10-09.md)" % (a.variante, d))
     con = [f for f in filas_todas if (d / (pref % f["clip"])).is_file()
@@ -503,8 +594,12 @@ def main():
     torneos = np.array([f["torneo"] for f in filas])
     armas = np.array([f["weapon"] for f in filas])
     t0 = time.time()
-    X, M, via = (carga_variante(clips, d, a.variante, pathlib.Path(a.memmap)) if a.variante
-                 else carga_tokens(clips, d))
+    if a.variante == "dino":
+        X, M, via = carga_dino(clips, d, pathlib.Path(a.memmap))
+    elif a.variante:
+        X, M, via = carga_variante(clips, d, a.variante, pathlib.Path(a.memmap))
+    else:
+        X, M, via = carga_tokens(clips, d)
     V = np.stack([luces_clip(c) for c in clips])
     print("tokens cargados: %.1f GB en %.0f s" % (X.nbytes / 1e9, time.time() - t0), flush=True)
 
@@ -520,7 +615,8 @@ def main():
                 np.mean([logits_etiquetador(m, filas, re, espejo=True) for m in mods_a], axis=0))
 
     La, La_e = _cache_etq("externo_%d" % a.semillas, filas, externo)
-    mbs = [entrena_sonda(X, tr, y[tr], mejor[0], mejor[1], semilla=ET.SEMILLA + k) for k in S]
+    mbs = [entrena_sonda(X, tr, y[tr], mejor[0], mejor[1], semilla=ET.SEMILLA + k, tipo=mejor[4])
+           for k in S]
     Lb = np.mean([logits_sonda(m, X, re) for m in mbs], axis=0)
     Lb_e = np.mean([logits_sonda(m, X, re, espejo=True) for m in mbs], axis=0)
     mls = [entrena_sonda(M, tr, y[tr], mejor_l[0], mejor_l[1], lineal=True, semilla=ET.SEMILLA + k)
