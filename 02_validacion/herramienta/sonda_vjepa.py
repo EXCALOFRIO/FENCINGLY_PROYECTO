@@ -79,6 +79,11 @@ def carga_tokens(clips, d):
     return tok, med, np.array(via)
 
 
+VUELCA = 100
+"""Cada cuantos clips se vuelca el memmap a disco mientras se escribe: sin eso Windows acumula en RAM
+las paginas modificadas (15-60 GB por variante) y el sistema se queda sin memoria."""
+
+
 def carga_variante(clips, d, claves, cache):
     """LAS VARIANTES de `VJEPA2_VARIANTES_2026-10-09.md` (cambio 1). `claves` p.ej. `rec4+mac4+mic4`:
     salidas de `vjv_<clip>.npz` en `d`, concatenadas en el eje de los tokens (la vista espejo con los
@@ -111,6 +116,8 @@ def carga_variante(clips, d, claves, cache):
                         t = t.reshape(2, 32, 4, 2, 4, 2, D).mean(axis=(3, 5))
                     partes.append(t.reshape(2, -1, D))
                 X[i] = np.concatenate(partes, axis=1).astype("float16")
+                if i % VUELCA == VUELCA - 1:
+                    X.flush()
             med[i] = np.concatenate([z["media_" + v] for v in vistas], axis=1)
             via.append(str(z["via_ancla"]))
     if not hecho.is_file():
@@ -136,6 +143,8 @@ def carga_dino(clips, d, cache):
             t = z["tok"]
             if not hecho.is_file():
                 X[i] = t.reshape(2, ntok, -1)
+                if i % VUELCA == VUELCA - 1:
+                    X.flush()
             med[i] = t[:, :, 0].astype("float32").mean(axis=1)
             via.append(str(z["via_ancla"]))
     if not hecho.is_file():
