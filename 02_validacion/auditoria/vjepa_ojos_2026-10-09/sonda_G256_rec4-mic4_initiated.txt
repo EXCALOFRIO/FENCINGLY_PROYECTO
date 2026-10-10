@@ -1,0 +1,7 @@
+SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea initiated, 5 semilla(s)
+================================================================================
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+   con etiqueta de initiated: 5536
+VARIANTE rec4+mic4 de D:\FENCINGLY_SCRATCH\vjepa_g256 (VJEPA2_VARIANTES_2026-10-09.md)
+filas con initiated 5536; con embedding y luces 5536; sin embedding 0; sin lights_ 0
+reservado: 42 torneos, 1384 clips (de 1384 en el reparto completo); entrenamiento 4152

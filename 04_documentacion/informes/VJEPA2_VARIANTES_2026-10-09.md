@@ -190,7 +190,39 @@ Gana la de mejor acierto interno; despues se evalua UNA vez fuera.
 
 ## Resultados
 
-(pendiente)
+### G0 y G1 (10/10, `initiated`, 5 semillas, reservado de 1.384 clips de 42 torneos)
+
+Salidas: `02_validacion/auditoria/vjepa_ojos_2026-10-09/compara_*.txt` y `sonda_G256_*.txt`. Por
+pares en los mismos 1.384 clips, IC95 por bootstrap agrupado por torneo, espejo 1,0000 en todas.
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var | veredicto |
+|---|---:|---:|---|---|---|
+| **G0** (ViT-g, `rec4`) contra V0 | 0,696 | 0,697 | +0,001 [-0,008, +0,022] | 0,703 -> 0,684 | **no se distingue** |
+| **G1** (`rec4 + mac4`) contra G0 | 0,697 | 0,718 | +0,021 [-0,002, +0,032] | 0,684 -> 0,704 | **no se distingue** (el IC cruza cero) |
+| G1 contra V0 (**informativo**: no estaba declarada) | 0,696 | 0,718 | +0,022 [+0,009, +0,036] | 0,703 -> 0,704 | cumpliria el umbral |
+
+Por arma, C' de V0 -> G0 -> G1: espada 0,727 -> 0,722 -> 0,761 (n=209), florete 0,683 -> 0,685
+-> 0,705 (n=1.040), sable 0,748 -> 0,756 -> 0,756 (n=135).
+
+Lectura:
+
+- **El modelo grande solo, con el mismo ojo, no aporta**: +0,001. La sonda sola (B) incluso baja
+  0,019. En la particion interna G0 parecia mejor (0,698 contra 0,667), pero eso no se sostuvo fuera:
+  por eso decide el reservado y no la interna.
+- **El ojo macro (el clip entero, la imagen entera) es lo primero que mueve la aguja**: +0,021 sobre
+  G0, justo en el umbral, pero el IC toca cero (-0,002). No pasa.
+- **G1 contra V0 cumpliria el umbral**, pero esa comparacion no estaba declarada: se miro despues de
+  ver las otras dos, y con 6+ variantes alguna puede pasar por azar. No decide. La declarada que
+  responde a eso es **G3 contra V0** (los tres ojos), que sale despues.
+
+Coste medido de la extraccion G256 con los tres ojos: 5.837 clips en 60.561 s (10,4 s/clip de
+pared, 9,6 s de GPU de mediana).
+
+**Memoria (10/10 tarde).** Escribir y leer los memmap de 15-60 GB dejo dos veces el sistema sin RAM
+disponible (la sonda retenia 20,6 GB de paginas del fichero). Arreglos, que no cambian ninguna cifra:
+`sonda_vjepa.py` vuelca el memmap cada 100 clips al escribirlo y pone un techo duro de 8 GB al
+conjunto de trabajo del proceso (`--tope-gb`). A la sonda G2 en marcha se le puso el mismo techo
+desde fuera: la RAM disponible paso de 0,8 a 13,7 GB.
 
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 

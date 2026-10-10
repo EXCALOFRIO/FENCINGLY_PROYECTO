@@ -1,0 +1,13 @@
+rec4+mac4 (C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_ojos_2026-10-09\pred_G256_rec4-mac4_initiated.npz) contra rec4 (C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_ojos_2026-10-09\pred_G256_rec4_initiated.npz): 1384 clips comunes (ref 1384, var 1384)
+   A     ref 0.650  var 0.650  dif +0.000  IC95 por torneo [+0.000, +0.000]
+   A'    ref 0.655  var 0.655  dif +0.000  IC95 por torneo [+0.000, +0.000]
+   B     ref 0.684  var 0.704  dif +0.020  IC95 por torneo [-0.010, +0.061]
+   Blin  ref 0.664  var 0.660  dif -0.004  IC95 por torneo [-0.020, +0.022]
+   C     ref 0.695  var 0.711  dif +0.016  IC95 por torneo [-0.013, +0.030]
+   C'    ref 0.697  var 0.718  dif +0.021  IC95 por torneo [-0.002, +0.032]
+   espejo C' de la variante 1.0000
+   por arma, C':
+      epee   n= 209  ref 0.722  var 0.761
+      foil   n=1040  ref 0.685  var 0.705
+      sabre  n= 135  ref 0.756  var 0.756
+CRITERIO: C'(var) - C'(ref) >= +0,02, IC95 sin cruzar cero, espejo 1,0000  ->  no se distingue

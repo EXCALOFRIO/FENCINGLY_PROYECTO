@@ -553,6 +553,23 @@ def filas_prioridad():
     return filas
 
 
+def tope_memoria(gb):
+    """Techo DURO del conjunto de trabajo de este proceso (solo Windows). Al leer un memmap de
+    15-60 GB, Windows deja sus paginas en el proceso (20 GB medidos el 10/10) y el sistema se queda
+    sin memoria disponible. Con el techo, las paginas leidas pasan a la cache del sistema (siguen en
+    RAM, pero liberables): no cambia ningun numero, solo cuanta RAM se queda retenida."""
+    if sys.platform != "win32" or not gb:
+        return
+    import ctypes
+    k = ctypes.WinDLL("kernel32", use_last_error=True)
+    k.GetCurrentProcess.restype = ctypes.c_void_p
+    k.SetProcessWorkingSetSizeEx.argtypes = (ctypes.c_void_p, ctypes.c_size_t, ctypes.c_size_t,
+                                             ctypes.c_uint32)
+    ok = k.SetProcessWorkingSetSizeEx(k.GetCurrentProcess(), 256 << 20, int(gb * (1 << 30)), 0x2 | 0x4)
+    print("techo de memoria del proceso: %.0f GB (%s)" % (gb, "ok" if ok else
+                                                          "fallo %d" % ctypes.get_last_error()))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default=str(RU.SCRATCH / "vjepa"))
@@ -568,7 +585,10 @@ def main():
     ap.add_argument("--sondas", default="atentiva",
                     help="tipos que compiten en la particion interna: atentiva,temporal")
     ap.add_argument("--guarda-pred", default=None, help="npz con la prediccion de cada clip")
+    ap.add_argument("--tope-gb", type=float, default=8.0,
+                    help="techo de RAM retenida por el proceso (Windows); 0 lo quita")
     a = ap.parse_args()
+    tope_memoria(a.tope_gb)
     global CACHE_ETQ, SONDAS
     CACHE_ETQ = pathlib.Path(a.cache_etq) if a.cache_etq else None
     SONDAS = tuple(t for t in a.sondas.split(",") if t)
