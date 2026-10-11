@@ -84,6 +84,45 @@ VUELCA = 100
 las paginas modificadas (15-60 GB por variante) y el sistema se queda sin memoria."""
 
 
+class Filas:
+    """Las filas de un `.f16` en disco, leidas con lecturas de fichero y no con memmap. Con 45-60 GB y
+    poca RAM, el memmap pide paginas de 4 KB de una en una: la sonda G3 tardo 6.000 s en 80 epocas,
+    3,6x la G2 con 1,5x los tokens. Aqui cada clip es UNA lectura contigua (8-12 MB) y lo leido queda
+    en la cache del sistema, liberable. Se indexa igual que el memmap (`X[idx]`, `X.shape`)."""
+
+    def __init__(self, f, shape):
+        import threading
+        self.f, self.shape, self.dtype = str(f), tuple(shape), np.dtype("float16")
+        self.b = int(np.prod(self.shape[1:])) * 2
+        self.nbytes = self.b * self.shape[0]
+        self._fh = open(self.f, "rb", buffering=0)
+        self._cerrojo = threading.Lock()
+
+    def __len__(self):
+        return self.shape[0]
+
+    def __getitem__(self, k):
+        if isinstance(k, (int, np.integer)):
+            return self[np.array([k])][0]
+        if isinstance(k, slice):
+            k = np.arange(*k.indices(self.shape[0]))
+        k = np.asarray(k).ravel()
+        out = np.empty((len(k),) + self.shape[1:], dtype=self.dtype)
+        mv = memoryview(out).cast("B")
+        with self._cerrojo:
+            for j, i in enumerate(k):
+                if not 0 <= i < self.shape[0]:
+                    raise IndexError(i)
+                self._fh.seek(int(i) * self.b)
+                hecho = 0
+                while hecho < self.b:
+                    r = self._fh.readinto(mv[j * self.b + hecho:(j + 1) * self.b])
+                    if not r:
+                        raise IOError("fichero corto: %s fila %d" % (self.f, i))
+                    hecho += r
+        return out
+
+
 def carga_variante(clips, d, claves, cache):
     """LAS VARIANTES de `VJEPA2_VARIANTES_2026-10-09.md` (cambio 1). `claves` p.ej. `rec4+mac4+mic4`:
     salidas de `vjv_<clip>.npz` en `d`, concatenadas en el eje de los tokens (la vista espejo con los
@@ -123,7 +162,9 @@ def carga_variante(clips, d, claves, cache):
     if not hecho.is_file():
         X.flush()
         hecho.write_text("ok", encoding="utf-8")
-    return X, med, np.array(via)
+    forma = X.shape
+    del X
+    return Filas(f, forma), med, np.array(via)
 
 
 def carga_dino(clips, d, cache):
@@ -150,7 +191,9 @@ def carga_dino(clips, d, cache):
     if not hecho.is_file():
         X.flush()
         hecho.write_text("ok", encoding="utf-8")
-    return X, med, np.array(via)
+    forma = X.shape
+    del X
+    return Filas(f, forma), med, np.array(via)
 
 
 CACHE_ETQ = None
@@ -336,15 +379,26 @@ def entrena_sonda(X, idx, y, epocas, wd, lineal=False, semilla=ET.SEMILLA, lote=
     n = len(y)
     pasos = epocas * ((n + lote - 1) // lote)
     sch = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=lr, total_steps=pasos, pct_start=0.1)
+
+    def lee(j):
+        jj = j.numpy()
+        orden = np.argsort(idx[jj])
+        return X[idx[jj][orden]], jj[orden]
+
+    from concurrent.futures import ThreadPoolExecutor
+    hilo = ThreadPoolExecutor(1)
+    """Lee el lote siguiente del disco mientras la GPU calcula este (mismo orden, mismos datos)."""
     for ep in range(epocas):
         mod.train()
         per = torch.randperm(n)
-        for i in range(0, n, lote):
-            j = per[i:i + lote]
-            jj = j.numpy()
-            orden = np.argsort(idx[jj])
-            xb = torch.as_tensor(X[idx[jj][orden]]).to("cuda").float()
-            yj = yt[jj[orden]]
+        lotes = [per[i:i + lote] for i in range(0, n, lote)]
+        sig = hilo.submit(lee, lotes[0])
+        for b in range(len(lotes)):
+            xa, jo = sig.result()
+            if b + 1 < len(lotes):
+                sig = hilo.submit(lee, lotes[b + 1])
+            xb = torch.as_tensor(xa).to("cuda").float()
+            yj = yt[jo]
             lg = mod(xb)
             p = torch.nn.functional.cross_entropy(lg, yj.to("cuda"))
             opt.zero_grad()
@@ -352,6 +406,7 @@ def entrena_sonda(X, idx, y, epocas, wd, lineal=False, semilla=ET.SEMILLA, lote=
             torch.nn.utils.clip_grad_norm_(mod.parameters(), 2.0)
             opt.step()
             sch.step()
+    hilo.shutdown()
     mod.eval()
     return mod
 
