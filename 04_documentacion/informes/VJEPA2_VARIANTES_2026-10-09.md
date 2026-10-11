@@ -237,6 +237,13 @@ disponible (la sonda retenia 20,6 GB de paginas del fichero). Arreglos, que no c
 conjunto de trabajo del proceso (`--tope-gb`). A la sonda G2 en marcha se le puso el mismo techo
 desde fuera: la RAM disponible paso de 0,8 a 13,7 GB.
 
+**Velocidad (11/10 13:30).** Con el techo, la sonda G3 (1.536 tokens, 45 GB) leia el memmap por
+paginas de 4 KB y tardo 6.000 s por cada 80 epocas: 3,6 veces lo de G2 con solo 1,5 veces los
+tokens. Desde G0b, las variantes se leen clip a clip con lecturas de fichero (`Filas`), y el lote
+siguiente se lee mientras la GPU calcula. Comprobado antes de usarlo: mismas filas que el memmap en
+los 47,9 GB de G3, el lote de 64 en 0,3 s frente a 0,9 s, y logits identicos (diferencia 0,0) al
+bucle anterior. G3 sigue con el codigo viejo: pararla obligaria a repetir su rejilla.
+
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 
 Salida: `02_validacion/auditoria/vjepa_ojos_2026-10-09/sonda_cuerpo_5semillas.txt`. El reservado son
