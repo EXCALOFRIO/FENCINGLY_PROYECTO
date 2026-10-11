@@ -188,6 +188,40 @@ marcha no se toco.
 
 Gana la de mejor acierto interno; despues se evalua UNA vez fuera.
 
+## Cambio 3 (2026-10-12 00:30, con G0-G3 ya medidos y ANTES de extraer nada de lo que sigue)
+
+**Por que.** Lo medido hasta aqui (ver Resultados):
+
+- el ojo micro es lo que mejora: G2 contra G0, +0,023, MEJORA;
+- el modelo grande solo no aporta: G0 contra V0, +0,001;
+- el macro encima del micro no suma: G3 no se distingue ni de G0 ni de V0.
+
+Falta lo que mas pesa en el presupuesto de la corrida: **si el micro necesita el modelo grande**.
+ViT-g con meso + micro no se ha medido aparte (con los tres ojos son 10,4 s/clip); ViT-L con un ojo
+son 1,2 s/clip.
+
+**G5 = ViT-L 256, `rec4 + mic4`**: V0 mas el ojo micro, con el modelo pequenio. Se extrae con
+`vjepa_variantes.py --modelo vjepa2-vitl-fpc64-256 --salidas rec8,mic8` en
+`D:\FENCINGLY_SCRATCH\vjepa_l256`, sobre los mismos 5.837 clips. Misma sonda, rejilla, 5 semillas,
+reparto y fusiones que las demas.
+
+| comparacion | referencia | papel |
+|---|---|---|
+| G5 | V0 | **decide**, mismo umbral (C' por pares >= +0,02, IC95 sin cruzar cero, espejo 1,0000) |
+| G5 | G2 | informativo: lo que se pierde con el modelo pequenio |
+
+Antes de la sonda se comprueba que el `rec4` de esta extraccion (promedio 2x2 de `rec8`) es el `tok`
+de V0 en los mismos clips. Es una comprobacion del camino, no una cifra de acierto.
+
+**`prioridad` con lo que gane** (ya declarado arriba, informativo). Gano G2, asi que la sonda de
+`prioridad` se hace con `rec4 + mic4`, en vez de con los tres ojos que la cola tenia puestos por
+adelantado. `rec4` se queda.
+
+**Orden.** La extraccion G384 (600 de 5.837) se para y sigue despues de G5: guarda clip a clip y salta
+los hechos. G4 solo mide la resolucion del ojo meso, y en ese ojo el modelo grande no aporto. G5, en
+cambio, decide cuanto cuesta la corrida. La sonda G0b, en marcha, no se toca. Despues de ella van G5,
+`mic8` solo y `prioridad`.
+
 ## Resultados
 
 ### G0 y G1 (10/10, `initiated`, 5 semillas, reservado de 1.384 clips de 42 torneos)
@@ -243,6 +277,31 @@ tokens. Desde G0b, las variantes se leen clip a clip con lecturas de fichero (`F
 siguiente se lee mientras la GPU calcula. Comprobado antes de usarlo: mismas filas que el memmap en
 los 47,9 GB de G3, el lote de 64 en 0,3 s frente a 0,9 s, y logits identicos (diferencia 0,0) al
 bucle anterior. G3 sigue con el codigo viejo: pararla obligaria a repetir su rejilla.
+
+### G3: los tres ojos (11/10 20:20)
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var | veredicto |
+|---|---:|---:|---|---|---|
+| **G3** (`rec4 + mac4 + mic4`) contra G0 | 0,697 | 0,711 | +0,014 [-0,012, +0,034] | 0,684 -> 0,711 | **no se distingue** |
+| **G3** contra V0 (la declarada para "los tres ojos") | 0,696 | 0,711 | +0,015 [-0,005, +0,037] | 0,703 -> 0,711 | **no se distingue** |
+| G2 contra V0 (**informativo**: no estaba declarada) | 0,696 | 0,720 | +0,025 [+0,016, +0,053] | 0,703 -> 0,707 | cumpliria el umbral |
+| G3 contra G2 (**informativo**) | 0,720 | 0,711 | -0,009 [-0,037, +0,006] | 0,707 -> 0,711 | no se distingue |
+
+Espejo 1,0000 en todas. Por arma, C' de G0 -> G2 -> G3: espada 0,722 -> 0,770 -> 0,770, florete
+0,685 -> 0,701 -> 0,695, sable 0,756 -> 0,793 -> 0,741. La rejilla interna de G3 eligio 20 epocas y
+wd 1e-2 (0,685). Contra el etiquetador con luces, G3 da +0,056 [+0,019, +0,099]: V-JEPA sigue
+entrando. Lo que no pasa es la mejora sobre G0 y sobre V0. La sonda sola si sube sobre G0, +0,027
+[+0,007, +0,054], pero la fusion C' no.
+
+Lectura:
+
+- **Los tres ojos juntos no pasan.** Sumar el macro al micro no ayuda: G3 queda 0,009 por debajo de
+  G2.
+- **Lo que queda en pie es el micro.** G2 contra G0 es la unica comparacion declarada que pasa.
+  Contra V0 tambien cumpliria (+0,025), pero esa no estaba declarada. Si el micro necesita el modelo
+  grande lo dice G5 (cambio 3).
+- **En florete la subida es pequenia en todas las variantes**: entre +0,010 y +0,022 sobre G0 o V0
+  (G1 0,705, G2 0,701, G3 0,695, frente a 0,685 de G0 y 0,683 de V0).
 
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 
