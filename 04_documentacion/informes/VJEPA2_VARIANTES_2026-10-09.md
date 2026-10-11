@@ -188,7 +188,7 @@ marcha no se toco.
 
 Gana la de mejor acierto interno; despues se evalua UNA vez fuera.
 
-## Cambio 3 (2026-10-12 00:30, con G0-G3 ya medidos y ANTES de extraer nada de lo que sigue)
+## Cambio 3 (2026-10-12 00:05, con G0-G3 ya medidos y ANTES de extraer nada de lo que sigue)
 
 **Por que.** Lo medido hasta aqui (ver Resultados):
 
