@@ -5,3 +5,41 @@ clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
 VARIANTE rec4+mic4 de D:\FENCINGLY_SCRATCH\vjepa_g256 (VJEPA2_VARIANTES_2026-10-09.md)
 filas con initiated 5536; con embedding y luces 5536; sin embedding 0; sin lights_ 0
 reservado: 42 torneos, 1384 clips (de 1384 en el reparto completo); entrenamiento 4152
+tokens cargados: 31.9 GB en 1195 s
+   interna B  atentiva epocas  20  wd 1e-03  acierto 0.680  nll 1.2338  (437 s)
+   interna B  atentiva epocas  20  wd 1e-02  acierto 0.681  nll 1.2337  (404 s)
+   interna B  atentiva epocas  20  wd 5e-02  acierto 0.686  nll 1.2298  (390 s)
+   interna B  atentiva epocas  40  wd 1e-03  acierto 0.647  nll 3.3513  (758 s)
+   interna B  atentiva epocas  40  wd 1e-02  acierto 0.640  nll 3.4492  (762 s)
+   interna B  atentiva epocas  40  wd 5e-02  acierto 0.644  nll 3.5309  (797 s)
+   interna B  atentiva epocas  80  wd 1e-03  acierto 0.662  nll 3.9415  (1492 s)
+   interna B  atentiva epocas  80  wd 1e-02  acierto 0.637  nll 3.8948  (1813 s)
+   interna B  atentiva epocas  80  wd 5e-02  acierto 0.651  nll 3.6538  (1632 s)
+   interna con 5 semillas: B 0.701  etiquetador 0.630
+   interna: B elegida atentiva epocas 20 wd 5e-02 (0.686); Blin epocas 20 wd 1e-02 (0.685); etiquetador 0.630  n=1208
+
+RESERVADO: 1384 clips, 42 torneos
+                                              acierto   contra A' (IC95 por torneo)
+--------------------------------------------------------------------------------
+clase mayoritaria del entrenamiento             0.461
+A                                               0.650   -0.006  [-0.036, +0.015]
+A'                                              0.655   (linea base que decide)
+B                                               0.707   +0.051  [+0.006, +0.092]
+Blin                                            0.683   +0.027  [-0.013, +0.074]
+C                                               0.712   +0.057  [+0.030, +0.101]
+C'                                              0.720   +0.065  [+0.042, +0.117]
+techo humano (n=911)                            0.688
+
+control del espejo B    1.0000
+control del espejo C'   1.0000
+B contra A (informativo): +0.057 [+0.030, +0.107]
+
+por arma y por via del ancla (informativo):
+   arma       epee     n= 209   A' 0.679   B 0.751   C' 0.770
+   arma       foil     n=1040   A' 0.645   B 0.693   C' 0.701
+   arma       sabre    n= 135   A' 0.696   B 0.741   C' 0.793
+   via_ancla  final    n=  47   A' 0.511   B 0.489   C' 0.511
+   via_ancla  zona     n=1337   A' 0.660   B 0.714   C' 0.728
+
+CRITERIO (1-3): C' - A' = +0.065 >= +0,02, IC95 [+0.042, +0.117] sin cruzar cero, espejo 1.0000  ->  PASA
+(el 4, el coste en GPU, se lee del extractor: `s_gpu` en cada vjepa_<clip>.npz)

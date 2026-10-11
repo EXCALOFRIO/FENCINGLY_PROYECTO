@@ -215,6 +215,19 @@ Lectura:
   ver las otras dos, y con 6+ variantes alguna puede pasar por azar. No decide. La declarada que
   responde a eso es **G3 contra V0** (los tres ojos), que sale despues.
 
+### G2: el ojo micro (11/10 ~02:00)
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var | veredicto |
+|---|---:|---:|---|---|---|
+| **G2** (`rec4 + mic4`) contra G0 | 0,697 | 0,720 | **+0,023 [+0,015, +0,041]** | 0,684 -> 0,707 | **MEJORA** |
+
+Espejo 1,0000. Por arma, C' de G0 -> G2: espada 0,722 -> 0,770, florete 0,685 -> 0,701, sable
+0,756 -> 0,793. La sonda sola sube +0,023 [-0,003, +0,041] y la lineal +0,019 [+0,002, +0,040].
+
+**El zoom a las manos en los 2 ultimos segundos es la primera pieza que pasa el criterio
+declarado.** Lo que no dice todavia: si sumado a V0 (el modelo pequenio) tambien pasa; eso lo
+contesta G3 contra V0, con los tres ojos. En florete la subida es la menor (+0,016).
+
 Coste medido de la extraccion G256 con los tres ojos: 5.837 clips en 60.561 s (10,4 s/clip de
 pared, 9,6 s de GPU de mediana).
 
