@@ -303,6 +303,28 @@ Lectura:
 - **En florete la subida es pequenia en todas las variantes**: entre +0,010 y +0,022 sobre G0 o V0
   (G1 0,705, G2 0,701, G3 0,695, frente a 0,685 de G0 y 0,683 de V0).
 
+### G0b: menos compresion (12/10 20:13)
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var | veredicto |
+|---|---:|---:|---|---|---|
+| **G0b** (`rec8`, 2.048 tokens) contra G0 (`rec4`) | 0,697 | 0,703 | +0,006 [-0,020, +0,033] | 0,684 -> 0,691 | **no se distingue** |
+
+Espejo 1,0000. Por arma, C' de G0 -> G0b: espada 0,722 -> 0,737, florete 0,685 -> 0,690, sable
+0,756 -> 0,748. La rejilla interna eligio 80 epocas y wd 1e-2 (0,678). **Comprimir 8x8 a 4x4 no
+pierde nada que se mida**: `rec4` se queda (y ocupa la cuarta parte).
+
+**Incidente (no cambia la cifra).** Del 12/10 00:11 al 10:50, la extraccion ViT-L de G5 compartio la
+GPU con esta sonda y la sonda fue ~100 veces mas lenta: 64 clips leidos por minuto, frente a 8.035
+con el extractor en pausa (NtSuspendProcess). La configuracion de 80 epocas y wd 1e-3 tardo 42.104 s;
+las dos siguientes, ya a solas, 1.812 s y 1.780 s. El calculo es el mismo (mismos datos, semillas y
+orden), solo mas lento. Desde entonces la cola no deja dos trabajos de GPU a la vez
+(`cadena_cola3.py` / `cadena_cola4.py` en `D:/FENCINGLY_SCRATCH`).
+
+**Coste medido de G5 (ViT-L, `rec8 + mic8`, las dos vistas)**: 2,45 s de GPU por clip de mediana
+(p90 2,48; 2,61 s de pared), en 400 clips extraidos con la GPU a solas. ViT-g con los tres ojos: 9,67
+s. Para florete (106.432 clips): **~3,0 dias** con G5, ~11,9 dias con G3. Si G5 pasa contra V0,
+el micro sale por 1,25 s/clip mas que V0.
+
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 
 Salida: `02_validacion/auditoria/vjepa_ojos_2026-10-09/sonda_cuerpo_5semillas.txt`. El reservado son
