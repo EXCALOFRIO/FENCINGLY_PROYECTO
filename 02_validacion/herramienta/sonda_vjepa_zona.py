@@ -45,6 +45,9 @@ B_BOOT = 2000
 VJEPA_DIR = pathlib.Path(os.environ.get("FENCINGLY_VJEPA_DIR", "D:/FENCINGLY_SCRATCH/vjepa"))
 AJUSTE_TXT = RU.VAL / "auditoria" / "zona_cobertura_2026-10-09" / "torneos_ajuste.txt"
 SALIDA = RU.VAL / "auditoria" / "vjepa_zona_2026-10-09"
+CLAVE, PATRON, D = "media", "vjepa_%s.npz", 1024
+"""Lo de V0. `--clave media_mac --dir D:/FENCINGLY_SCRATCH/vjepa_g256` lee el ojo macro de G256
+(`vjv_<clip>.npz`, 1.408 dimensiones; VJEPA_ZONA cambio 1)."""
 
 GRID_L2 = (1e-4, 1e-3, 1e-2, 3e-2, 1e-1, 3e-1, 1.0)
 GRID_PESOS = (False, True)
@@ -67,7 +70,7 @@ def construye_dataset():
     for _, m in df.iterrows():
         clip = m["clip_id"]
         zp = RU.TRABAJO / ("zona_%s.csv" % clip)
-        vp = VJEPA_DIR / ("vjepa_%s.npz" % clip)
+        vp = VJEPA_DIR / (PATRON % clip)
         if not zp.is_file() or not vp.is_file():
             continue
         with open(zp, encoding="utf-8") as fh:
@@ -88,12 +91,12 @@ def carga_media(filas):
     """QUE DEVUELVE: M (n,2,1024) fp32, CJ (n,4) fp32 (caja en pixeles), via_ancla (n,). SOLO lee
     `media`, `caja`, `via_ancla`: NUNCA `tok` (11,6 GB)."""
     n = len(filas)
-    M = np.empty((n, 2, 1024), dtype="float32")
+    M = np.empty((n, 2, D), dtype="float32")
     CJ = np.empty((n, 4), dtype="float32")
     via = []
     for i, f in enumerate(filas):
         with np.load(f["npz"]) as z:
-            M[i] = z["media"]
+            M[i] = z[CLAVE]
             CJ[i] = z["caja"]
             via.append(str(z["via_ancla"]))
     return M, CJ, np.array(via)
@@ -145,7 +148,7 @@ def sonda_zona(con_caja=False):
 
         def __init__(self):
             super().__init__()
-            self.w = nn.Parameter(torch.zeros(1024, dtype=torch.float64))
+            self.w = nn.Parameter(torch.zeros(D, dtype=torch.float64))
             self.wc = nn.Parameter(torch.zeros((), dtype=torch.float64)) if con_caja else None
             self.p1 = nn.Parameter(torch.zeros((), dtype=torch.float64))
             self.p2 = nn.Parameter(torch.zeros((), dtype=torch.float64))
@@ -364,7 +367,20 @@ def por_grupo(nombre, grupo, y, pred, y_base_ok=None, etiqueta="sonda", etiqueta
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--rapido", action="store_true", help="rejilla minima: SOLO para probar el script")
+    ap.add_argument("--clave", default="media", help="media (V0) o media_mac / media_rec / media_mic (vjv_)")
+    ap.add_argument("--dir", default=None, help="carpeta de los npz (por defecto FENCINGLY_VJEPA_DIR)")
+    ap.add_argument("--salida", default=None, help="carpeta de salida (por defecto la de V0)")
     a = ap.parse_args()
+    global CLAVE, PATRON, D, VJEPA_DIR, SALIDA
+    if a.dir:
+        VJEPA_DIR = pathlib.Path(a.dir)
+    if a.salida:
+        SALIDA = pathlib.Path(a.salida)
+    if a.clave != "media":
+        CLAVE, PATRON = a.clave, "vjv_%s.npz"
+        with np.load(next(VJEPA_DIR.glob("vjv_*.npz"))) as z:
+            D = int(z[CLAVE].shape[-1])
+    print("clave %s de %s (%d dimensiones) -> %s" % (CLAVE, VJEPA_DIR, D, SALIDA))
 
     torch = _torch()
     torch.set_num_threads(4)
@@ -373,6 +389,10 @@ def main():
     print("=" * 88)
 
     filas = construye_dataset()
+    if CLAVE != "media":
+        v0 = pathlib.Path("D:/FENCINGLY_SCRATCH/vjepa")
+        filas = [f for f in filas if (v0 / ("vjepa_%s.npz" % f["clip"])).is_file()]
+        """Los MISMOS clips que la corrida de V0, para comparar con ella."""
     print("clips con strip_location + zona_ + embedding V-JEPA: %d" % len(filas))
     t0 = time.time()
     M, CJ, via_ancla = carga_media(filas)

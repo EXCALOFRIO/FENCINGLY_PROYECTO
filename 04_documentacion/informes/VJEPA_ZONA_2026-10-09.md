@@ -285,3 +285,21 @@ Lo que queda medido:
   homografia. **Recomendacion: probar un recorte ancho (o un recorte secundario de la banda inferior
   del fotograma) antes de invertir mas en sondas sobre el recorte actual.**
 
+
+## Cambio 1 (2026-10-12 11:20, ANTES de correr nada con el macro): la misma sonda sobre el ojo macro
+
+**Por que.** Es la recomendacion de arriba ("un recorte con mas pista") y lo que `VJEPA2_VARIANTES`
+(cambio 1) dejo declarado como informativo: la zona con la media de `mac`. El ojo macro de G256
+(`media_mac`, ViT-g, 1.408 dimensiones) ve la IMAGEN ENTERA, 16:9 estirada a 256x256, asi que la
+pista y sus dos bordes entran siempre.
+
+**Limitacion conocida antes de medir.** En el tiempo, el macro cubre el clip ENTERO (64 cuadros
+repartidos), no la ventana del tocado: la media mezcla toda la frase, no solo donde acaba.
+
+**Todo lo demas, igual**: los mismos 5.524 clips que la corrida de V0, el mismo reparto AJUSTE/PRUEBA,
+la misma particion interna, la misma rejilla y los mismos tres usos con sus criterios. Una sola
+corrida: `sonda_vjepa_zona.py --clave media_mac --dir D:/FENCINGLY_SCRATCH/vjepa_g256 --salida
+02_validacion/auditoria/vjepa_zona_mac_2026-10-12`.
+
+**Es informativo.** PRUEBA ya se miro una vez con V0. Si el uso 1 o el 2 pasaran, no se enciende
+nada: se escribe un protocolo de adopcion aparte.
