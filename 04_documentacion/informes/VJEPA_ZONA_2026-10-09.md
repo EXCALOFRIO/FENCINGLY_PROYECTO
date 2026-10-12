@@ -286,7 +286,7 @@ Lo que queda medido:
   del fotograma) antes de invertir mas en sondas sobre el recorte actual.**
 
 
-## Cambio 1 (2026-10-12 11:20, ANTES de correr nada con el macro): la misma sonda sobre el ojo macro
+## Cambio 1 (2026-10-12 10:55, ANTES de correr nada con el macro): la misma sonda sobre el ojo macro
 
 **Por que.** Es la recomendacion de arriba ("un recorte con mas pista") y lo que `VJEPA2_VARIANTES`
 (cambio 1) dejo declarado como informativo: la zona con la media de `mac`. El ojo macro de G256
@@ -304,7 +304,7 @@ corrida: `sonda_vjepa_zona.py --clave media_mac --dir D:/FENCINGLY_SCRATCH/vjepa
 **Es informativo.** PRUEBA ya se miro una vez con V0. Si el uso 1 o el 2 pasaran, no se enciende
 nada: se escribe un protocolo de adopcion aparte.
 
-### Resultado del cambio 1 (2026-10-12 11:45, una corrida; `vjepa_zona_mac_2026-10-12/`)
+### Resultado del cambio 1 (2026-10-12 11:00, una corrida; `vjepa_zona_mac_2026-10-12/`)
 
 Rejilla interna: sin caja L2 3e-1, sin pesos (0,396; V0 daba 0,437). Fusion C=10. Espejo 1,0000 en
 AJUSTE y en PRUEBA.
