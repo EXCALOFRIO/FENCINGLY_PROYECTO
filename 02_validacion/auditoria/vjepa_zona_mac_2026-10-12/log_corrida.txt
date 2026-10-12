@@ -1,0 +1,106 @@
+clave media_mac de D:\FENCINGLY_SCRATCH\vjepa_g256 (1408 dimensiones) -> C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_zona_mac_2026-10-12
+SONDA DE ZONA SOBRE V-JEPA 2 (protocolo VJEPA_ZONA_2026-10-09)
+========================================================================================
+clips con strip_location + zona_ + embedding V-JEPA: 5524
+media cargada: 62.2 MB en 101.5 s
+ancho de marco (W) que falta (cx=0.0 neutro): 0 de 5524
+AJUSTE: 3394 clips, 74 torneos; PRUEBA: 2130 clips, 75 torneos
+particion interna de AJUSTE: entrenamiento 2614 clips (56 torneos), validacion 780 clips (18 torneos)
+
+ELIGIENDO HIPERPARAMETROS (sin mirar PRUEBA)
+   interna sin_caja L2 1e-04 pesos no   acierto 0.376  nll 2.6520
+   interna sin_caja L2 1e-04 pesos si   acierto 0.263  nll 5.2063
+   interna sin_caja L2 1e-03 pesos no   acierto 0.386  nll 2.4161
+   interna sin_caja L2 1e-03 pesos si   acierto 0.274  nll 3.9047
+   interna sin_caja L2 1e-02 pesos no   acierto 0.385  nll 2.2366
+   interna sin_caja L2 1e-02 pesos si   acierto 0.296  nll 2.6349
+   interna sin_caja L2 3e-02 pesos no   acierto 0.388  nll 2.3097
+   interna sin_caja L2 3e-02 pesos si   acierto 0.321  nll 2.3856
+   interna sin_caja L2 1e-01 pesos no   acierto 0.394  nll 2.2920
+   interna sin_caja L2 1e-01 pesos si   acierto 0.335  nll 2.4736
+   interna sin_caja L2 3e-01 pesos no   acierto 0.396  nll 2.2373
+   interna sin_caja L2 3e-01 pesos si   acierto 0.336  nll 2.4631
+   interna sin_caja L2 1e+00 pesos no   acierto 0.395  nll 2.3536
+   interna sin_caja L2 1e+00 pesos si   acierto 0.340  nll 2.4218
+elegida SIN caja: L2 3e-01 pesos False (interna 0.396)
+   interna caja     L2 1e-04 pesos no   acierto 0.377  nll 2.6518
+   interna caja     L2 1e-04 pesos si   acierto 0.269  nll 5.3544
+   interna caja     L2 1e-03 pesos no   acierto 0.386  nll 2.3845
+   interna caja     L2 1e-03 pesos si   acierto 0.283  nll 3.7493
+   interna caja     L2 1e-02 pesos no   acierto 0.388  nll 2.2944
+   interna caja     L2 1e-02 pesos si   acierto 0.303  nll 2.6487
+   interna caja     L2 3e-02 pesos no   acierto 0.391  nll 2.2825
+   interna caja     L2 3e-02 pesos si   acierto 0.321  nll 2.4116
+   interna caja     L2 1e-01 pesos no   acierto 0.399  nll 2.3359
+   interna caja     L2 1e-01 pesos si   acierto 0.340  nll 2.4450
+   interna caja     L2 3e-01 pesos no   acierto 0.388  nll 2.3004
+   interna caja     L2 3e-01 pesos si   acierto 0.327  nll 2.4494
+   interna caja     L2 1e+00 pesos no   acierto 0.395  nll 2.3520
+   interna caja     L2 1e+00 pesos si   acierto 0.341  nll 2.4883
+elegida CON caja: L2 1e-01 pesos False (interna 0.399)
+
+REENTRENANDO EN TODO AJUSTE con lo elegido
+control del espejo (AJUSTE) sin_caja 1.0000  con_caja 1.0000
+
+ELIGIENDO C DE LA FUSION (solo AJUSTE que contesta, sin mirar PRUEBA)
+   interna fusion C 0.01    acierto 0.600
+   interna fusion C 0.1     acierto 0.629
+   interna fusion C 1.0     acierto 0.632
+   interna fusion C 10.0    acierto 0.637
+   interna fusion C 100.0   acierto 0.634
+elegida C fusion: 10.0
+
+========================================================================================
+MIDIENDO UNA VEZ EN PRUEBA
+========================================================================================
+control del espejo (PRUEBA) sin_caja 1.0000  con_caja 1.0000
+
+USO 1 (RESPALDO) -- PRUEBA que NO contesta la produccion: n=777
+   sonda(sin caja) 0.414  middle 0.492  dif -0.077
+   IC95 por clip   [-0.118, -0.037]
+   IC95 por torneo [-0.117, -0.037]
+   CRITERIO (dif >= +0,05 e IC95 por clip > 0): NO PASA
+   (informativo, CON caja) sonda 0.416  dif -0.076  IC95 clip [-0.117, -0.036]
+   por arma:
+   arma       epee                     n=  189  sonda 0.370  middle 0.397  dif -0.026
+   arma       foil                     n=  468  sonda 0.436  middle 0.502  dif -0.066
+   arma       sabre                    n=  120  sonda 0.400  middle 0.600  dif -0.200
+
+USO 2 (FUSION) -- PRUEBA que SI contesta la produccion: n=1353
+   zona_final 0.525  fusion 0.443  dif -0.081
+   IC95 por clip   [-0.109, -0.052]
+   IC95 por torneo [-0.115, -0.024]
+   CRITERIO (dif >= +0,02 e IC95 por TORNEO > 0): NO PASA
+   por arma:
+   arma       epee                     n=  314  fusion 0.408  zona_final 0.433  dif -0.025
+   arma       foil                     n=  814  fusion 0.437  zona_final 0.545  dif -0.108
+   arma       sabre                    n=  225  fusion 0.516  zona_final 0.578  dif -0.062
+   por via_zona:
+   via_zona   angulo_torneo            n=  300  fusion 0.370  zona_final 0.413  dif -0.043
+   via_zona   homografia               n=  907  fusion 0.464  zona_final 0.573  dif -0.109
+   via_zona   homografia_sin_modelo    n=  146  fusion 0.466  zona_final 0.452  dif +0.014
+
+USO 3 (INFORMATIVO) -- TODO PRUEBA: n=2130
+   sonda(sin caja) 0.405  middle 0.404  dif +0.001
+   IC95 por clip   [-0.023, +0.026]
+   IC95 por torneo [-0.029, +0.038]
+   (informativo, CON caja) sonda 0.411  dif +0.007  IC95 clip [-0.017, +0.031]
+   a una zona o menos: sin_caja 0.884  con_caja 0.886
+   por arma:
+   arma       epee                     n=  503  sonda 0.368  middle 0.288  dif +0.080
+   arma       foil                     n= 1282  sonda 0.401  middle 0.397  dif +0.004
+   arma       sabre                    n=  345  sonda 0.475  middle 0.600  dif -0.125
+   por via_zona:
+   via_zona   angulo_torneo            n=  300  sonda 0.357  middle 0.300  dif +0.057
+   via_zona   homografia               n=  907  sonda 0.409  middle 0.372  dif +0.037
+   via_zona   homografia_sin_modelo    n=  146  sonda 0.432  middle 0.356  dif +0.075
+   via_zona   sin_zona                 n=  777  sonda 0.414  middle 0.492  dif -0.077
+   matriz de confusion (filas=humano, columnas=sonda), orden ['fotl_warning_box', 'fotl_half', 'middle', 'fotr_half', 'fotr_warning_box']:
+      fotl_warning_box      0  175   84   32    0
+      fotl_half             0  206  168   36    0
+      middle                0  223  483  155    0
+      fotr_half             0   32  200  174    0
+      fotr_warning_box      0   15   48   99    0
+
+guardado: C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_zona_mac_2026-10-12\resumen_prueba.json
+guardado: C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_zona_mac_2026-10-12\predicciones_prueba.csv

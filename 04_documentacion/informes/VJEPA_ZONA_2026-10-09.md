@@ -303,3 +303,24 @@ corrida: `sonda_vjepa_zona.py --clave media_mac --dir D:/FENCINGLY_SCRATCH/vjepa
 
 **Es informativo.** PRUEBA ya se miro una vez con V0. Si el uso 1 o el 2 pasaran, no se enciende
 nada: se escribe un protocolo de adopcion aparte.
+
+### Resultado del cambio 1 (2026-10-12 11:45, una corrida; `vjepa_zona_mac_2026-10-12/`)
+
+Rejilla interna: sin caja L2 3e-1, sin pesos (0,396; V0 daba 0,437). Fusion C=10. Espejo 1,0000 en
+AJUSTE y en PRUEBA.
+
+| uso | n | macro (G256) | V0 (recorte) | referencia | dif del macro (IC95 por clip) | veredicto |
+|---|---:|---:|---:|---:|---|---|
+| 1 respaldo | 777 | 0,414 | 0,489 | `middle` 0,492 | **-0,077** [-0,118, -0,037] | NO PASA (peor que `middle`) |
+| 2 fusion | 1.353 | 0,443 | 0,473 | `zona_final` 0,525 | **-0,081** [-0,109, -0,052] (por torneo [-0,115, -0,024]) | NO PASA |
+| 3 informativo | 2.130 | 0,405 | 0,450 | `middle` 0,404 | +0,001 [-0,023, +0,026] | sin senial |
+
+Por arma, en el uso 1: espada -0,026, florete -0,066, sable -0,200. Igual que V0, nunca predice las
+dos zonas de aviso.
+
+**Lectura.** Ver la imagen entera no ayuda a la media; la empeora. La `media` del macro promedia
+toda la imagen y TODO el clip, asi que borra a la vez donde esta la pareja y cuando ocurre el
+tocado. El recorte de V0 al menos sigue a la pareja. **Con medias de V-JEPA no se saca la zona**, ni
+con el recorte ni con la imagen entera. Queda sin probar una sonda atentiva sobre los tokens del
+macro (`mac4`, 512 por vista) cerca del tocado. Pero el macro cubre todo el clip y no la ventana
+del tocado, asi que tampoco se espera mucho: no se lanza sin decidirlo antes.
