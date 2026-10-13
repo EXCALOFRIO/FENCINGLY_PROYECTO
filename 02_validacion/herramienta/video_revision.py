@@ -105,6 +105,8 @@ def fase1(clips, videos=None):
     """
     from ultralytics import YOLO
     import extrae_pareja as EP
+    import torch
+    _hilos_torch(torch)
     yolo = YOLO(RU.pesos_yolo())
     yolo.to("cuda")
     videos = videos or {}
@@ -336,6 +338,20 @@ hay que volver a pasarle esta misma puerta -- no darlo por bueno."""
 
 TUBERIA_POSE = os.environ.get("FENCINGLY_POSE_TUBERIA", "0") == "1"
 HILOS_PREPROC = int(os.environ.get("FENCINGLY_POSE_HILOS", "3"))
+POR_CUADRO = os.environ.get("FENCINGLY_POSE_POR_CUADRO", "0") == "1"
+"""O2b (2026-10-13): con la tuberia, las DOS cajas de un cuadro se preprocesan en UNA llamada (la imagen
+se pasa a float una vez y no dos) y luego van al modelo DE UNA EN UNA, como siempre: la entrada del
+modelo es la misma. Medido en CPU en 159 cuadros reales con dos cajas: `pixel_values` identicos, 172 ->
+100 ms por cuadro. Entra solo con la prueba de identidad de las poses."""
+TORCH_HILOS = int(os.environ.get("FENCINGLY_TORCH_HILOS", "0"))
+"""O9 (2026-10-13): hilos de torch en CPU de este proceso (0 = lo de siempre, todos los nucleos). El
+preproceso de Sapiens va a 38,7 ms por recorte con 12 hilos y a 14,3 con 1, porque los hilos se pisan;
+`pixel_values` identicos con 12, 1, 2 y 4 hilos en 122 cuadros. Entra solo con la prueba de identidad."""
+
+
+def _hilos_torch(torch):
+    if TORCH_HILOS > 0:
+        torch.set_num_threads(TORCH_HILOS)
 """O2 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-13): LA MISMA CUENTA, EN TUBERIA. Un hilo lee los
 cuadros y `HILOS_PREPROC` hilos hacen el preproceso de Sapiens (CPU) mientras la GPU pasa el recorte
 anterior. Cada recorte se preprocesa con la MISMA llamada (`proc(images=[rgb], boxes=[caja])`), la
@@ -358,6 +374,9 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
     def prepara(rgb, caja):
         return proc(images=[rgb], boxes=[caja], return_tensors="pt")
 
+    def prepara_cuadro(rgb, cajas):
+        return proc(images=[rgb], boxes=[[c[0] for c in cajas]], return_tensors="pt")
+
     def lector(ex):
         try:
             cap = cv2.VideoCapture(video)
@@ -370,6 +389,7 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
                 if not mask[k]:
                     continue
                 rgb = None
+                del_cuadro = []
                 for lado in (0, 1):
                     if not pres[k, lado]:
                         continue
@@ -380,7 +400,14 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
                         rgb = np.ascontiguousarray(im[:, :, ::-1])
                     x, y = float(b[0] * W), float(b[1] * H)
                     caja = [[x, y, float(b[2] * W) - x, float(b[3] * H) - y]]
-                    cola.put((k, lado, caja, ex.submit(prepara, rgb, caja)))
+                    if POR_CUADRO:
+                        del_cuadro.append((lado, caja))
+                    else:
+                        cola.put((k, lado, caja, ex.submit(prepara, rgb, caja), 0))
+                if del_cuadro:
+                    fut = ex.submit(prepara_cuadro, rgb, [c for _l, c in del_cuadro])
+                    for j, (lado, caja) in enumerate(del_cuadro):
+                        cola.put((k, lado, caja, fut, j))
             cap.release()
         except BaseException as e:
             error.append(e)
@@ -394,8 +421,10 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
             it = cola.get()
             if it is FIN:
                 break
-            k, lado, caja, fut = it
+            k, lado, caja, fut, j = it
             e = fut.result()
+            if POR_CUADRO:
+                e = {q: v[j:j + 1] for q, v in e.items()}
             with torch.inference_mode():
                 e = {q: (v.to("cuda").half() if v.is_floating_point() else v.to("cuda"))
                      for q, v in e.items()}
@@ -661,6 +690,7 @@ def fase2(clips, video=True):
     """
     import torch
     from transformers import Sapiens2ForPoseEstimation, Sapiens2ImageProcessor
+    _hilos_torch(torch)
     snap = RU.hf_modelo("sapiens2-pose-0.4b")
     proc = Sapiens2ImageProcessor.from_pretrained(str(snap))
     proc.size = RES_POSE
