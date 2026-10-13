@@ -1,0 +1,37 @@
+{
+ "n_clips": 396,
+ "zona": {
+  "n": 396,
+  "acierto_total_sapiens": 0.49242424242424243,
+  "acierto_total_yolo": 0.47474747474747475,
+  "dif": -0.01767676767676768,
+  "ic95_torneo": [
+   -0.04594760404576353,
+   0.018867924528301883
+  ],
+  "cobertura_sapiens": 0.5732323232323232,
+  "cobertura_yolo": 0.5858585858585859
+ },
+ "x_tocado": {
+  "n_ambos": 203,
+  "mediana_abs_m": 0.18100000000000005,
+  "p90_abs_m": 2.8616
+ },
+ "mano": {
+  "n": 695,
+  "coincide": 0.9381294964028777
+ },
+ "eventos": {
+  "sapiens": 5437,
+  "yolo": 5584,
+  "sapiens_encontrados": 0.5247379069339709,
+  "yolo_encontrados": 0.5096704871060171
+ },
+ "criterios": {
+  "1_zona": 0.0,
+  "2_x": false,
+  "3_mano": false,
+  "4_eventos": false
+ },
+ "PASA": 0.0
+}

@@ -221,6 +221,21 @@ Las candidatas, en orden. Ninguna entra sin pasar su criterio:
   - >= 90 % de los eventos de marcha, fondo y brazo coinciden a +-3 cuadros con los de Sapiens.
 
   Si no pasa, los de una luz llevan Sapiens como ahora.
+
+  **RESULTADO (13/10 21:52): NO PASA**, ninguno de los cuatro. 396 anotados con `detx_` (los
+  procesados desde el 08/10), en `D:/FENCINGLY_SCRATCH/o5`; cifras en
+  `02_validacion/auditoria/corrida_florete/o5_yolo17.json`:
+
+  | criterio | pide | sale |
+  |---|---|---|
+  | zona total (no contesta = `middle`) | >= -0,01, IC >= -0,02 | 0,475 contra 0,492: -0,018 [-0,046, +0,019] |
+  | x del tocado, mediana de la diferencia | <= 10 cm | 18 cm (p90 2,9 m), n=203 |
+  | mano armada | >= 95 % | 93,8 % (n=695) |
+  | eventos a +-3 cuadros | >= 90 % | 52 % de los de Sapiens, 51 % de los de YOLO |
+
+  Sin los pies y las manos de Sapiens, la mitad de las marchas, fondos y brazos cambian. **Sapiens se
+  queda en todos los clips.** La division del usuario sigue valiendo para V-JEPA y las sondas (solo
+  dos luces), y por eso la fase 3B desaparece.
 - **O6 (despues, si hace falta)**: en los de dos luces, Sapiens solo en la ventana [tocado - 6 s,
   tocado + 1 s] (68 % de los cuadros utiles, medido en 5.659 anotados). Necesita su propio criterio
   sobre el etiquetador.
