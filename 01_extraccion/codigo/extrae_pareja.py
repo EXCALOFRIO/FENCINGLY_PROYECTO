@@ -91,7 +91,10 @@ encontraba sola.
 
 Se deja el interruptor y el codigo para que quede la medida, no para usarlo."""
 CONF_YOLO = 0.10
-IMGSZ_YOLO = 960
+IMGSZ_YOLO = int(os.environ.get("FENCINGLY_YOLO_IMGSZ", "960"))
+"""960 como siempre. `FENCINGLY_YOLO_IMGSZ` existe para medir O8 (`CORRIDA_FINAL_2026-10-13.md` §10):
+a 768 o 640 YOLO ve 1,6-2,25 veces menos pixeles; entra solo si pasa la misma puerta que fp16 (la pareja
+elegida con IoU >= 0,95 por lado en >= 99,5 % de los cuadros, y la presencia igual)."""
 
 YOLO_HALF = os.environ.get("FENCINGLY_YOLO_HALF", "1") == "1"
 YOLO_LOTE = int(os.environ.get("FENCINGLY_YOLO_LOTE", "8"))
