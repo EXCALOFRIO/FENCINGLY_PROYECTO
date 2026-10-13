@@ -49,6 +49,8 @@ import rutas as RU  # noqa: E402
 
 RAIZ = AQUI.parent
 PY = sys.executable
+os.environ["PYTHONIOENCODING"] = "utf-8"
+"""Salida en UTF-8 para el director y todos sus hijos: ver la nota en `noche.py` (2026-10-14)."""
 FL = (subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW) if os.name == "nt" else 0
 """Sin ventanas, nunca (`launch-without-windows`); y vivo aunque se cierre la consola que lo lanzo."""
 

@@ -59,6 +59,11 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "codigo"))
 import lotes as LO  # noqa: E402
 import rutas as RU  # noqa: E402
 
+os.environ["PYTHONIOENCODING"] = "utf-8"
+"""LOS TRABAJADORES ESCRIBEN SU SALIDA EN UTF-8 (2026-10-14). Con la salida a un fichero, Windows usa
+cp1252, y un `print` de un id como `wanderingGordonSetterKauai‘Ō‘ō` tumbaba el proceso con
+UnicodeEncodeError. Lo heredan todos los hijos (`bucle.py` y lo que lance)."""
+
 LOGS = RU.TRABAJO / "logs_noche"
 MARCA = LOGS / "pids.txt"
 

@@ -448,7 +448,7 @@ def escribe_serie(filas, nombre="serie_eventos.csv"):
     SALIDA.mkdir(parents=True, exist_ok=True)
     cols = COLUMNAS_SERIE + sorted({k for f in filas for k in f} - set(COLUMNAS_SERIE))
     tmp = SALIDA / (nombre + ".part")
-    with open(tmp, "w", newline="") as fh:
+    with open(tmp, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)
@@ -464,7 +464,7 @@ def _escribe(filas, nombre, orden=None):
     todas = {k for f in filas for k in f}
     cols = (list(orden) + sorted(todas - set(orden))) if orden else sorted(todas)
     tmp = SALIDA / (nombre + ".part")
-    with open(tmp, "w", newline="") as fh:
+    with open(tmp, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)

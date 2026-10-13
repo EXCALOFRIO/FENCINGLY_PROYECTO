@@ -265,7 +265,12 @@ def descarga(clip, torneo, destino):
     p = destino / ("%s.mp4" % clip)
     if p.is_file() and p.stat().st_size > 10240:
         return str(p), "ya_estaba"
-    url = CA.url(clip, torneo)
+    import urllib.parse
+    url = urllib.parse.quote(CA.url(clip, torneo), safe=":/")
+    """LA URL VA CODIFICADA (2026-10-14). Con letras fuera de ASCII en el id (`Vicuña`, `Vendéen`,
+    `Kauai‘Ō‘ō`: 544 de 362.950, 177 de florete y 27 de campeonatos) `urllib` fallaba con
+    UnicodeEncodeError y esos clips NO SE BAJABAN NUNCA. Codificada, el CDN da 200. En las 362.406
+    urls en ASCII `quote` no cambia nada (medido: cambian las 544 y solo esas)."""
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     tmp = p.with_name(p.name + ".part")
     try:

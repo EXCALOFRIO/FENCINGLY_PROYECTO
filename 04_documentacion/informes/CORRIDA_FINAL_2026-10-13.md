@@ -242,10 +242,75 @@ Las candidatas, en orden. Ninguna entra sin pasar su criterio:
 - **O7 (necesita instalar)**: TensorRT u ONNX para YOLO. No se instala nada en
   `D:\FENCINGLY_PY\venv`; haria falta otro entorno y el permiso del usuario.
 
-**Estimacion si O2, O3 y O5 pasan** (sin medir; la confirma O1):
-- los de dos luces (~22.000), con Sapiens, de ~37 a ~20-25 s/clip: ~5-6 dias;
-- los de una luz (~87.000), solo YOLO, ~8-12 s/clip: ~8-12 dias;
-- la CPU (7, 9, 11) en paralelo con 4-6 trabajadores: ~6-9 dias;
-- V-JEPA y sondas: ~4 dias.
+~~Estimacion si O2, O3 y O5 pasan~~ (13/10, sin medir): **ya no vale**, O5 no paso. La vigente va en
+"Resultados" abajo.
 
-**Total ~3 semanas, frente a ~8.**
+### Resultados (13-14/10), cada uno con su criterio de arriba
+
+Cifras en `02_validacion/auditoria/corrida_florete/` (`o2_o3_identidad.json`, `o8_imgsz.json`,
+`o5_yolo17.json`). Pruebas en `D:/FENCINGLY_SCRATCH/perfil`, cada pasada en su proceso y su directorio,
+con la GPU a solas.
+
+**Exactas de CPU, ADOPTADAS** (13/10, commit `13505b7`; identicas bit a bit en las salidas):
+- mediana de la placa (`pista._nanmediana0` por `np.nanmedian`): 6,8x; etapa 7 ~8 s menos por clip,
+  identica en 6 clips;
+- fusion de lineas (`pista_lineas._merge_lines` vectorizada): 1,7x; identica en 1.898 cuadros, etapa 11
+  ~2 s menos e identica en 6 clips;
+- busqueda del mp4 (`rutas.video`) con el indice hecho una vez: 0 diferencias en 3.000 clips;
+- escrituras atomicas (`.part` + `os.replace`) en `det_`, `detx_`, `revision_`, `poses_`, `lights_` y
+  las series: un corte a mitad no deja un fichero roto que cuente como hecho.
+
+**O1, el perfil fino: ABANDONADO.** Envolviendo `predict` y las demas llamadas, el proceso reventaba
+(pila desbordada por el `deepcopy` de ultralytics, y luego un acceso a memoria). Los tiempos salen de
+las pruebas de identidad, que no envuelven nada. Dejo un hallazgo: al alternar fp16 (deteccion) y fp32
+(redeteccion), ultralytics reconstruia el predictor en cada cambio -> O10.
+
+**Prueba de identidad 1** (14/10 00:04; 20 anotados de florete; pasadas A base, B tuberias + O10, C =
+B + O2b + O9, A2 base otra vez):
+
+| pasada | etapa 1 | etapa 4 | `det_`/`detx_`/`revision_` = A | `poses_` = A |
+|---|---:|---:|---|---|
+| A (base) | 239 s | 619 s | — | — |
+| B | 139 s | 729 s | 20/20 | **0/20** |
+| C | 201 s | 670 s | 20/20 | **0/20** |
+| A2 (base) | 149 s | 708 s | — | 20/20 (determinista) |
+
+- **El ruido de tiempos es grande**: A y A2 son el mismo codigo y la etapa 1 va de 239 a 149 s (la
+  primera pasada pagaba algo). Con esto no se puede dar la velocidad por medida -> prueba 2, intercalada
+  y con una pasada de calentamiento que no cuenta.
+- **O3 (etapa 1 en tuberia) + O10: IDENTICAS** en los 20 clips. Velocidad sin decidir (contra A2,
+  1,07x; contra A, 1,72x) -> prueba 2.
+- **O2 (etapa 4 en tuberia), primera version: NO PASA.** Poses distintas en 20/20: en los puntos
+  usables (confianza >= 0,3, 3,16 M) p50 0,011 px, p99 0,13 px, **max 936 px**, 4.866 puntos a mas de
+  0,5 px. Y sin ganar tiempo (729 s contra 619-708). LA CAUSA: el codigo de siempre pasa por el modelo
+  **las dos cajas del cuadro juntas** (lote 2), y la tuberia las pasaba de una en una; el lote cambia
+  el nucleo de la GPU y un punto ambiguo salta (lo mismo que se midio con `LOTE_POSE`). Corregida (un
+  lote por cuadro, como siempre) -> **O2'**, prueba 2.
+- **C (O2b + O9)**: mismas poses que B (identicas entre si), o sea que O2b y O9 no cambian nada por su
+  cuenta; heredan el fallo de B. -> prueba 2, sobre O2'.
+
+**O8 (YOLO a menor resolucion): NO PASA** (contra A, mismos 20 clips; puerta: pareja con IoU >= 0,95 en
+>= 99,5 % de los cuadros y presencia igual en >= 99,9 %):
+
+| imgsz | IoU >= 0,95 | presencia igual | etapa 1 |
+|---|---:|---:|---:|
+| 960 (A2) | — | — | 149 s |
+| 768 | 84,8 % | 95,4 % | 141 s |
+| 640 | 80,6 % | 93,8 % | 129 s |
+
+Cambia la pareja en 15-20 % de los cuadros y apenas gana (5-13 %): el tiempo de la etapa 1 no esta en
+la red. Se queda en 960.
+
+**Nombres con letras fuera de ASCII (14/10), DOS FALLOS REALES arreglados**: 544 ids del catalogo
+(`Vicuña`, `Vendéen`, `Kauai‘Ō‘ō`), **177 de florete y 27 de campeonatos**.
+1. `lotes.descarga` no los bajaba NUNCA (`urllib` con la url sin codificar: UnicodeEncodeError). Ahora
+   la url va con `urllib.parse.quote`: el CDN da 200, y en las 362.406 urls ASCII no cambia nada
+   (medido).
+2. Con la salida a un fichero, Windows escribe en cp1252 y un `print` de `Kauai‘Ō‘ō` tumba el proceso.
+   El director y `noche.py` ponen `PYTHONIOENCODING=utf-8`, que heredan todos los trabajadores; las
+   series y CSV de la etapa 7 se escriben con `encoding="utf-8"` (en ASCII, los mismos bytes).
+OpenCV abre esos mp4 sin problema (391 y 833 cuadros leidos). El ensayo de 100 mete 3 de esos clips.
+
+**Prueba de identidad 2** (en cola tras el ensayo de 100; `identidad2.py`, criterios en su cabecera,
+los de arriba con tiempos intercalados): etapa 1 W1 (calentamiento) A1 B1 A1 B1; etapa 4 A4 P4 Q4 A4 P4
+Q4, con P = O2' y Q = O2' + O2b + O9.

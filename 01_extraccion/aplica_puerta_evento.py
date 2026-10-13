@@ -39,7 +39,7 @@ def _escribe(p, filas, orden):
     todas = {k for f in filas for k in f}
     cols = list(orden) + sorted(todas - set(orden))
     tmp = p.with_name(p.name + ".part")
-    with open(tmp, "w", newline="") as fh:
+    with open(tmp, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)
