@@ -32,58 +32,39 @@ clips de entrenamiento de los anotados no se pudo medir (V-JEPA no se distingue 
 medida buena necesita los ~21.000 clips de florete con las dos luces, y en el orden de siempre
 (barajado) estarian completos al final, a las ~7 semanas. La etapa 9 no depende de ninguna otra, asi
 que se pasa primero sobre todo el florete. Con eso sale la lista de clips con dos luces, que van
-delante. **La medida llega hacia los ~13-14 dias (fases 1, 2A y 3A), no a las ~7 semanas, y sin
+delante. **La medida llega hacia los ~14-15 dias (fases `luces` a `sonda_g2`), no a las ~7 semanas, y sin
 calcular nada de mas.**
 
-## 3. Las fases, con su orden de comandos (desde `01_extraccion`, con `D:\FENCINGLY_PY\venv`)
+## 3. Las fases: un solo comando, `corrida_florete.py` (preparado y probado; SIN lanzar)
 
-Un solo trabajo de GPU a la vez en todas las fases (`gpu-one-job-at-a-time`). Todo sin ventanas
-(`CREATE_NO_WINDOW`) y reanudable: el estado es el disco.
+    cd 01_extraccion
+    python corrida_florete.py --seco      que haria y cuanto hay hecho (no lanza nada)
+    python corrida_florete.py --lanza     EL DIA QUE EL USUARIO DIGA "LANZA": arranca el director oculto
+    python corrida_florete.py --estado    cuanto lleva cada fase
+    python corrida_florete.py --para      lo para todo; relanzar con --lanza sigue donde estaba
 
-**Fase 0, prevuelo** (minutos):
+El director corre las fases en orden, **espera a que la GPU este libre antes de cada fase de GPU**
+(ni una sonda ni un extractor ni otra noche corriendo), y si una fase falla escribe `FALLA_<fase>` y
+se para. Marcas y registro en `01_extraccion/pruebas/corrida_florete/`; salidas de las sondas en
+`02_validacion/auditoria/corrida_florete/`. Todo sin ventanas y reanudable.
 
-    python noche.py --prevuelo
-    python ../02_validacion/herramienta/tabla_checks.py tabla
+| fase | que | GPU | dias (estimados) |
+|---|---|---|---:|
+| `luces` | etapa 9 sobre los 106.432 de florete, bajando los ~78.000 mp4 que faltan (~180 GB) | no | ~1-1,5 |
+| `lista` | `03_datos/catalogo/foil_dos_luces.txt` (`lista_dos_luces.py`) | no | minutos |
+| `dos_luces` | etapas 1 y 4 (GPU) y 7, 9 y 11 (CPU) sobre los ~21.000 de la lista, a 96 clips/h | si | ~9 |
+| `vjepa_g2` | ViT-g 256 `rec4,mic4` sobre la lista -> `D:/FENCINGLY_VJEPA/g2` (~5,8 MB/clip) | si | ~1,6 |
+| `vjepa_v0` | ViT-L 256 `rec4` (= V0) sobre la lista -> `D:/FENCINGLY_VJEPA/v0`, para comparar | si | ~0,3 |
+| `sonda_v0`, `sonda_g2` | `prioridad` con ~21.000 decisiones, y G2 contra V0 (protocolo en `VJEPA2_2026-10-09.md`, "Pregunta 2 EN LA CORRIDA", declarado el 13/10) | si | ~2 |
+| `resto` | etapas 1, 4, 7, 9 y 11 sobre los ~85.000 restantes | si | ~37 |
+| `zona_fusion` | la zona final por torneo, con el florete entero | no | horas |
+| (3B) | V-JEPA sobre el resto, G2 (~6 dias) o V0 (~1 dia): **la decide el usuario** con `compara_prioridad_G2_vs_V0_corrida.txt` | si | 1-6 |
 
-**Fase 1, luces de todo el florete** (CPU y red, ~1,5 dias; la GPU queda libre):
-
-    python noche.py --conjunto foil --gpu 3 --etapas-gpu 9 --cpu 0 --descarga
-
-Escribe `lights_<clip>.csv` y baja los mp4 que faltan: 28.511 de los 106.432 ya estan en disco,
-asi que son ~78.000 (~2,3 MB cada uno, ~180 GB en D:). Los
-"trabajadores gpu" de este comando solo corren la etapa 9, que es CPU.
-
-**Fase 2A, los clips con dos luces** (GPU, ~21.000 clips a 96 clips/h medidos, **~9 dias**):
-
-    python lista_dos_luces.py --conjunto foil --salida ../03_datos/catalogo/foil_dos_luces.txt
-    python noche.py --conjunto ../03_datos/catalogo/foil_dos_luces.txt --gpu 3 --cpu 2 --descarga
-
-**Fase 3A, V-JEPA sobre esos clips** (GPU, ~21.000 x ~6,4 s, **~1,6 dias ESTIMADOS**):
-
-    python noche.py --para
-    python codigo/vjepa_variantes.py --todos --conjunto ../03_datos/catalogo/foil_dos_luces.txt ^
-        --modelo vjepa2-vitg-fpc64-256 --salidas rec4,mic4 --destino D:/FENCINGLY_VJEPA/g2
-
-Y la sonda de `prioridad` con las ~21.000 decisiones (GPU, ~1-2 dias). Con el protocolo de
-`VJEPA2_2026-10-09.md` pregunta 2: mismo reparto por torneo, misma rejilla y criterio, declarado
-antes de mirar.
-
-**Fase 2B, el resto del florete** (~85.000 clips, **~37 dias**):
-
-    python noche.py --conjunto foil --gpu 3 --cpu 2 --descarga
-
-(salta solo lo ya hecho).
-
-**Fase 3B, V-JEPA sobre el resto**: G2 (~6,3 dias) o V0 (~1,2 dias), **segun lo que diga la
-`prioridad` medida en la fase 3A**.
-
-**Fase 4, al final** (CPU, horas): `python zona_fusion.py --conjunto foil --escribe`, entrenar el
-etiquetador y etiquetar, y las comprobaciones de `PLAYBOOK.md` §4 (`tabla_checks.py`,
-`busca_errores.py`).
-
-El respaldo a HF privado (`respalda.py`, cada 2 h) va con `noche.py`, como en los anotados. Los
-embeddings de V-JEPA se quedan en D: (~120 GB solo los de dos luces; se pueden rehacer desde los
-videos).
+**Prueba del director (13/10 19:00-19:12)**: `--director --prueba` sobre 3 clips anotados ya
+procesados, con marcas en el scratch y sin respaldo. Hizo `luces`, `lista` y `dos_luces`: lanzo y
+espero a los trabajadores (todos dijeron "TERMINADO: ... estan hechos"), los paro, y no toco ningun
+fichero de esos clips (fechas iguales). `--seco` sobre el florete: 106.432 clips, 28.511 con mp4 en
+disco, 4.251 con luces, D: 1.514 GB libres, C: 330 GB.
 
 ## 4. Cuanto tarda, todo junto
 
@@ -91,10 +72,10 @@ videos).
 |---|---:|---|
 | 1 luces | ~1,5 | libre |
 | 2A dos luces | ~9 | etapas 1 + 4 |
-| 3A V-JEPA G2 + sonda `prioridad` | ~3 | V-JEPA y sonda |
+| 3A V-JEPA G2 y V0 + sondas `prioridad` | ~4 | V-JEPA y sondas |
 | 2B resto | ~37 | etapas 1 + 4 |
 | 3B V-JEPA resto | ~1-6 | V-JEPA |
-| **total** | **~52-57 (7,5-8 semanas)** | |
+| **total** | **~53-58 (7,5-8 semanas)** | |
 
 Si DINOv2 pasa su sonda: +15-28 dias. Disco: C: ~150 GB (poses), con 350 libres; D: ~180 GB de
 videos nuevos + 120-610 GB de V-JEPA, con 1.410 libres.
@@ -122,3 +103,23 @@ videos nuevos + 120-610 GB de V-JEPA, con 1.410 libres.
 **Falta**: la sonda de DINOv2 (D0, mie 14/10 de madrugada) y la medida del coste de G2 a solas (200
 clips, justo despues). Si D0 pasa, el usuario decide si DINOv2 entra (+15-28 dias). **Y la orden
 explicita de lanzar**: la corrida no arranca sin ella.
+
+## 7. Con otro hardware: 2 DGX Spark (pregunta del usuario, 13/10; ESTIMADO, no medido)
+
+Lo publicado: una RTX 4090 es **3,3-4,2 veces** mas rapida que un DGX Spark (GB10) en entrenamiento
+e inferencia, 3,6 en deteccion de objetos (RT-DETRv2) (`mrdbourke/gpu-benchmarking`). Y una 4090 es
+~3,5-5 veces una RTX 3060. Asi que **un Spark es ~1-1,5 veces esta 3060**. Tiene mas nucleos de
+tensor (~100 TFLOPS BF16 medidos), pero menos ancho de banda de memoria (273 GB/s, contra 360 de la
+3060), y lo nuestro son modelos que caben en 12 GB: sus 128 GB no ayudan. Dos Spark: **~2-3 veces**.
+
+| que | esta 3060 | 2 Spark | 2 Spark + esta 3060 |
+|---|---:|---:|---:|
+| florete, el plan de arriba | ~53-58 dias | **~18-29 dias** | ~14-20 dias |
+| las tres armas + campeonatos (362.950 clips), con V0 | ~165 dias | ~55-82 dias | ~41-55 dias |
+| lo mismo, con G2 en todo | ~185 dias | ~62-92 dias | ~46-62 dias |
+
+Lo que cambia esas cifras: el Spark es Linux sobre ARM, y el pipeline corre en Windows. Hay que
+portarlo (las rutas ya van por variables de entorno, `rutas.py`) y comprobar en ~50 clips anotados
+que sale lo mismo antes de fiarse. Y el lote grande que permitiria su memoria ya se rechazo en las
+poses (movia un punto 130 px). El factor de verdad solo se sabe midiendo esos 50 clips en un Spark.
+Para rendimiento puro, **una sola RTX 4090 da mas que dos Spark** (3,3-4,2 veces cada uno).

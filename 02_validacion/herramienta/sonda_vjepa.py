@@ -584,12 +584,14 @@ def _nll(L, y):
     return float(-(L[np.arange(len(y)), y] - np.log(np.exp(L).sum(1))).mean())
 
 
-def filas_prioridad():
+def filas_prioridad(clips=None):
     """Las filas de la pregunta 2: florete y sable, las DOS luces de color, `touch` izq/der. La
     etiqueta va en `y_initiated` (0 = gana la izquierda, 1 = la derecha) para usar la misma cabeza
-    antisimetrica y el mismo reparto; la etiqueta humana de quien inicio queda en `y_humano`."""
+    antisimetrica y el mismo reparto; la etiqueta humana de quien inicio queda en `y_humano` (-1 en
+    los clips sin anotar). `clips` None = los anotados; una lista = esos (la corrida de florete,
+    `--clips-de`, `CORRIDA_FINAL_2026-10-13.md`)."""
     filas = []
-    for f in ET.reune(cabeza=None):
+    for f in ET.reune(clips=clips, cabeza=None):
         if f["weapon"] not in ("foil", "sabre") or f["touch"] not in ("left", "right"):
             continue
         p = RU.TRABAJO / ("lights_%s.csv" % f["clip"])
@@ -642,7 +644,12 @@ def main():
     ap.add_argument("--guarda-pred", default=None, help="npz con la prediccion de cada clip")
     ap.add_argument("--tope-gb", type=float, default=8.0,
                     help="techo de RAM retenida por el proceso (Windows); 0 lo quita")
+    ap.add_argument("--clips-de", default=None, dest="clips_de",
+                    help="solo `prioridad`: fichero con un id por linea (p.ej. foil_dos_luces.txt) en "
+                         "lugar de los anotados")
     a = ap.parse_args()
+    if a.clips_de and a.tarea != "prioridad":
+        raise SystemExit("--clips-de es solo para --tarea prioridad (initiated necesita la etiqueta humana)")
     tope_memoria(a.tope_gb)
     global CACHE_ETQ, SONDAS
     CACHE_ETQ = pathlib.Path(a.cache_etq) if a.cache_etq else None
@@ -653,7 +660,9 @@ def main():
     print("SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea %s, %d semilla(s)"
           % (TAREA, a.semillas))
     print("=" * 80)
-    filas_todas = ET.reune(cabeza="initiated") if TAREA == "initiated" else filas_prioridad()
+    lista = ([l.strip() for l in open(a.clips_de, encoding="utf-8") if l.strip()]
+             if a.clips_de else None)
+    filas_todas = ET.reune(cabeza="initiated") if TAREA == "initiated" else filas_prioridad(lista)
     pref = ("dino_%s.npz" if a.variante == "dino" else "vjv_%s.npz") if a.variante else "vjepa_%s.npz"
     if a.variante:
         print("VARIANTE %s de %s (VJEPA2_VARIANTES_2026-10-09.md)" % (a.variante, d))
