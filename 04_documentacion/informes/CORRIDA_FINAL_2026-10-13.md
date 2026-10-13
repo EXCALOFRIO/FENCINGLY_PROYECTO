@@ -16,7 +16,7 @@ apagado, con su numero (§2 del mismo).
 | 11 | CPU | la x del tocado en metros y su zona (rayas pintadas + movimiento de camara) | entra |
 | 11 + | CPU | **la homografia de cada cuadro** (`FENCINGLY_GUARDA_H`, `pista_h_<clip>.npz`) | entra (decidido 13/10; encendida por defecto) |
 | V-JEPA 2 | GPU | resumen de video para quien inicia y la decision del arbitro | entra: G2 en los clips con dos luces (decidido 13/10) |
-| DINOv2 | GPU | rasgos cuadro a cuadro | pendiente de su sonda (D0, mie 14/10) |
+| DINOv2 | GPU | rasgos cuadro a cuadro | **no entra**: D0 no pasa (13/10; contra V0 -0,010, contra A' +0,030 con el IC cruzando cero) |
 | despues | CPU | `zona_fusion.py` por torneo (zona final), etiquetador entrenado y etiquetas | entra, al final |
 
 Los interruptores ya estan en su valor adoptado por defecto (`FENCINGLY_LUCES_V2=1`,

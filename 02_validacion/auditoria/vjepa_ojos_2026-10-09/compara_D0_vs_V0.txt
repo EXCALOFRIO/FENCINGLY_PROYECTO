@@ -1,0 +1,13 @@
+dino (C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_ojos_2026-10-09\pred_D0_dino_initiated.npz) contra V0 (C:\Users\Alejandro\Desktop\FENCINGLY_PROYECTO\02_validacion\auditoria\vjepa_ojos_2026-10-09\pred_V0_initiated.npz): 1384 clips comunes (ref 1384, var 1384)
+   A     ref 0.650  var 0.650  dif +0.000  IC95 por torneo [+0.000, +0.000]
+   A'    ref 0.655  var 0.655  dif +0.000  IC95 por torneo [+0.000, +0.000]
+   B     ref 0.703  var 0.679  dif -0.024  IC95 por torneo [-0.048, -0.004]
+   Blin  ref 0.641  var 0.571  dif -0.070  IC95 por torneo [-0.110, -0.042]
+   C     ref 0.705  var 0.681  dif -0.024  IC95 por torneo [-0.060, +0.001]
+   C'    ref 0.696  var 0.686  dif -0.010  IC95 por torneo [-0.026, +0.009]
+   espejo C' de la variante 1.0000
+   por arma, C':
+      epee   n= 209  ref 0.727  var 0.732
+      foil   n=1040  ref 0.683  var 0.671
+      sabre  n= 135  ref 0.748  var 0.726
+CRITERIO: C'(var) - C'(ref) >= +0,02, IC95 sin cruzar cero, espejo 1,0000  ->  no se distingue

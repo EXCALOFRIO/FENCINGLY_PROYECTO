@@ -393,6 +393,18 @@ de V-JEPA sola pasa de 0,592 a 0,663** y llega al etiquetador (A 0,651; B - A = 
 0,694 (n=229), frente a 0,668 de V0. No decide, pero apunta en la misma direccion que la receta
 elegida (G2 en los clips con dos luces).
 
+### D0: DINOv2 cuadro a cuadro (13/10 22:30)
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var | veredicto |
+|---|---:|---:|---|---|---|
+| **D0** contra V0 | 0,696 | 0,686 | -0,010 [-0,026, +0,009] | 0,703 -> 0,679 (-0,024 [-0,048, -0,004]) | **no se distingue** |
+| **D0** contra G0 | 0,697 | 0,686 | -0,012 [-0,030, +0,003] | 0,684 -> 0,679 | **no se distingue** |
+| D0 contra A' (su sonda) | 0,655 | 0,686 | +0,030 [-0,003, +0,067] | | NO PASA |
+
+Espejo 1,0000. La rejilla interna eligio la sonda temporal (20 epocas, wd 5e-2; 0,671). Por arma, C':
+espada 0,732, florete 0,671 (V0 0,683), sable 0,726. **DINOv2 no entra en la corrida**: la sonda sola
+queda por debajo de V0, y no bate al etiquetador con luces. No se suman sus 15-28 dias.
+
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 
 Salida: `02_validacion/auditoria/vjepa_ojos_2026-10-09/sonda_cuerpo_5semillas.txt`. El reservado son
