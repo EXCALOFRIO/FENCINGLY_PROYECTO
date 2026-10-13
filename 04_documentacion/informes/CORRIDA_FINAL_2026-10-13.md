@@ -153,3 +153,27 @@ tarda N veces menos y cuesta casi lo mismo.
 Precios: RunPod (Secure Cloud, sep 2026), RunPod docs (almacenamiento y transferencia). Velocidades:
 `mrdbourke/gpu-benchmarking` (4090 frente a GB10) y comparativas publicas 5090/4090/H100. **Ninguna
 medida en nuestro pipeline.**
+
+## 9. TODO con esta 3060 (decision del usuario, 13/10: no se alquila nada; ESTIMADO)
+
+Ritmo medido de las etapas 1 + 4: 96 clips/h. Las de CPU (7, 9, 11) van a la vez y no suman. Lo ya
+hecho (los anotados) se descuenta.
+
+| arma | clips | ya hechos | etapas 1 + 4 | V-JEPA (V0 / G2) | total |
+|---|---:|---:|---:|---:|---:|
+| florete (el plan de arriba) | 106.432 | 4.270 | ~44 dias | ~5-10 dias (con las sondas) | **~51-56 dias** |
+| espada | 140.639 | 1.037 | ~61 dias | ~2 / ~10 dias | ~63-71 dias |
+| sable | 102.618 | 566 | ~44 dias | ~1,4 / ~7,6 dias | ~46-52 dias |
+| campeonatos 2025-26 (`champs`) | 13.260 | 0 | ~6 dias | ~0,2 / ~1 dia | ~6-7 dias |
+| **todo** | **362.950** | 5.873 | **~155 dias** | ~9-29 dias | **~166-186 dias (5,5-6 meses)** |
+
+Si se lanza el jue 15/10: florete hacia el 5-10/12/2026; todo, entre finales de marzo y mediados de
+abril de 2027. Si DINOv2 pasa su sonda y entra: +50-95 dias en todo.
+
+**El disco no da para todo** (si da para el florete): faltan ~730 GB de mp4, ~490 GB de poses (en
+C:, que tiene 330 libres) y 0,5-1,5 TB de V-JEPA, contra 1,84 TB libres entre C: y D:. Hace falta
+un disco mas (~4 TB) o borrar cada mp4 al procesarlo (se pierde poder rehacer sin volver a bajarlo).
+Se decide antes de acabar el florete, no ahora.
+
+Luz: el PC a ~0,3 kW (estimado) 24 h al dia son ~380 kWh en el florete y ~1.300 kWh en todo, unos
+60-95 EUR y 190-320 EUR a 0,15-0,25 EUR/kWh.
