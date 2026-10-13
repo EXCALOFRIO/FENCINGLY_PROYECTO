@@ -592,8 +592,11 @@ def filas_prioridad(clips=None):
     `--clips-de`, `CORRIDA_FINAL_2026-10-13.md`)."""
     filas = []
     for f in ET.reune(clips=clips, cabeza=None):
-        if f["weapon"] not in ("foil", "sabre") or f["touch"] not in ("left", "right"):
+        if f["touch"] not in ("left", "right") or not (
+                f["weapon"] in ("foil", "sabre") or (clips is not None and f["weapon"] == "champs")):
             continue
+        """`champs` solo con lista explicita: la de la corrida lleva los de florete de los campeonatos
+        (`lista_campeonatos_florete.py`, por los nombres). Siguen saliendo como `champs` por arma."""
         p = RU.TRABAJO / ("lights_%s.csv" % f["clip"])
         if not p.is_file():
             continue

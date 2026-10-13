@@ -177,3 +177,60 @@ Se decide antes de acabar el florete, no ahora.
 
 Luz: el PC a ~0,3 kW (estimado) 24 h al dia son ~380 kWh en el florete y ~1.300 kWh en todo, unos
 60-95 EUR y 190-320 EUR a 0,15-0,25 EUR/kWh.
+
+## 10. Acelerar la corrida (13/10, lo pidio el usuario). Criterios DECLARADOS antes de medir nada
+
+**Campeonatos**: los 3.367 clips de florete de `champs` entran (`lista_campeonatos_florete.py`); el
+director corre sobre `foil_y_campeonatos.txt` (lo escribe al lanzar). En la sonda de `prioridad`
+entran como `champs` por arma, solo con la lista explicita.
+
+**La logica del usuario: lo que solo sirve al videoarbitraje, solo en los clips con dos luces; lo de
+scouting, en todos.**
+
+| pieza | sirve para | en que clips |
+|---|---|---|
+| luces (etapa 9) | todo: quien toco y que clips tienen dos luces | todos |
+| YOLO y pareja (etapa 1) | todo | todos |
+| Sapiens 2, 308 puntos (etapa 4) | arbitraje: manos, brazo fino, el zoom de G2 | **solo dos luces** |
+| eventos y posicion (etapa 7) | scouting | todos; en los de una luz, con los 17 puntos de YOLO (O5, a medir) |
+| zona del tocado y homografia por cuadro (etapa 11) | scouting | todos (igual que la 7) |
+| V-JEPA G2/V0 y sondas de `prioridad` | arbitraje | **solo dos luces** |
+| zona final por torneo | scouting | todos |
+
+Las candidatas, en orden. Ninguna entra sin pasar su criterio:
+
+- **O1, perfil (solo mide)**: en que se van los ~42 s de las etapas 1 y 4 (lectura, YOLO,
+  redeteccion, preproceso de Sapiens en CPU, pasada en GPU, postproceso, uso de la GPU), 8 clips
+  anotados con la GPU a solas. `D:/FENCINGLY_SCRATCH/perfil/perfil_etapas.py`, ya en cola: corre
+  solo al acabar D0 y la medida del coste de G2.
+- **O2, mismo resultado**: etapa 4 en tuberia (leer cuadros y preprocesar en hilos de CPU mientras
+  la GPU calcula). Pasa si las poses son IDENTICAS (diferencia maxima 0,0 px en todos los puntos) en
+  20 clips y va >= 1,2 veces mas rapida.
+- **O3, mismo resultado**: etapa 1 en tuberia (lectura en un hilo). Pasa si `det_` y `revision_` son
+  identicos en 20 clips y va >= 1,1 veces mas rapida.
+- **O4, mismo resultado**: hilos de CPU repartidos entre trabajadores y mas trabajadores para 7, 9 y
+  11. Con la GPU mas rapida, esas etapas (~28 s de CPU por clip) pasan a ser el cuello. Pasa con
+  salidas identicas.
+- **O5, cambia la entrada del scouting**: en los clips de una luz, etapas 7 y 11 con los 17 puntos
+  de YOLO (ya guardados en `detx_`), sin Sapiens. Se mide en los anotados con una luz, con el
+  reparto de siempre. Pasa si:
+  - la zona contra `strip_location` no baja mas de 0,01, con el limite inferior del IC95 por
+    torneo de la diferencia >= -0,02;
+  - la x del tocado difiere <= 10 cm en mediana donde las dos tienen homografia;
+  - la mano armada coincide >= 95 %;
+  - >= 90 % de los eventos de marcha, fondo y brazo coinciden a +-3 cuadros con los de Sapiens.
+
+  Si no pasa, los de una luz llevan Sapiens como ahora.
+- **O6 (despues, si hace falta)**: en los de dos luces, Sapiens solo en la ventana [tocado - 6 s,
+  tocado + 1 s] (68 % de los cuadros utiles, medido en 5.659 anotados). Necesita su propio criterio
+  sobre el etiquetador.
+- **O7 (necesita instalar)**: TensorRT u ONNX para YOLO. No se instala nada en
+  `D:\FENCINGLY_PY\venv`; haria falta otro entorno y el permiso del usuario.
+
+**Estimacion si O2, O3 y O5 pasan** (sin medir; la confirma O1):
+- los de dos luces (~22.000), con Sapiens, de ~37 a ~20-25 s/clip: ~5-6 dias;
+- los de una luz (~87.000), solo YOLO, ~8-12 s/clip: ~8-12 dias;
+- la CPU (7, 9, 11) en paralelo con 4-6 trabajadores: ~6-9 dias;
+- V-JEPA y sondas: ~4 dias.
+
+**Total ~3 semanas, frente a ~8.**

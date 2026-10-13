@@ -52,7 +52,11 @@ PY = sys.executable
 FL = (subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW) if os.name == "nt" else 0
 """Sin ventanas, nunca (`launch-without-windows`); y vivo aunque se cierre la consola que lo lanzo."""
 
-CONJUNTO = "foil"
+CAMP = RAIZ / "03_datos" / "catalogo" / "champs_florete_por_nombres.txt"
+CONJUNTO = RAIZ / "03_datos" / "catalogo" / "foil_y_campeonatos.txt"
+"""Los 106.432 de `foil` MAS los de florete de los campeonatos 2025-26 (`lista_campeonatos_florete.py`,
+3.367 por los nombres de los dos tiradores; lo decidio el usuario el 13/10). Lo escribe
+`prepara_conjunto` la primera vez."""
 LISTA = RAIZ / "03_datos" / "catalogo" / "foil_dos_luces.txt"
 VJ = pathlib.Path(os.environ.get("FENCINGLY_VJEPA_CORRIDA", "D:/FENCINGLY_VJEPA"))
 VJ_G2, VJ_V0 = VJ / "g2", VJ / "v0"
@@ -128,6 +132,18 @@ def comprueba_disco():
 
 def ids(conjunto):
     return LO.conjunto(str(conjunto))
+
+
+def prepara_conjunto(cfg):
+    """`foil` + los campeonatos de florete, un id por linea. Si ya existe no se toca (el orden de la
+    corrida sale de la baraja de `lotes.conjunto`, no del fichero)."""
+    if cfg["prueba"] or pathlib.Path(cfg["conjunto"]).is_file():
+        return
+    camp = [l.strip() for l in open(CAMP, encoding="utf-8") if l.strip()] if CAMP.is_file() else []
+    todos = sorted(set(LO.conjunto("foil")) | set(camp))
+    pathlib.Path(cfg["conjunto"]).write_text("\n".join(todos) + "\n", encoding="utf-8")
+    log("conjunto: %d de foil + %d de campeonatos = %d -> %s" % (len(todos) - len(camp), len(camp),
+                                                                 len(todos), cfg["conjunto"]))
 
 
 def cuenta(clips, etapas):
@@ -298,6 +314,7 @@ def director(cfg):
         return 1
     if not cfg["prueba"]:
         comprueba_disco()
+    prepara_conjunto(cfg)
     for f in cfg["fases"]:
         if hecha(f):
             log("fase %s ya hecha: %s" % (f, (MARCAS / ("HECHA_%s.txt" % f)).read_text(encoding="utf-8").strip()))
@@ -361,7 +378,9 @@ def informe(cfg, detallado):
         print("disco %s: %.0f GB libres (pide %d)" % (u, libre_gb(u), DISCO_MIN_GB[u]))
     o = otros_gpu()
     print("GPU: %s" % ("libre" if not o else "OCUPADA por %d proceso(s): %s" % (len(o), o[0][:100])))
-    clips = ids(cfg["conjunto"])
+    clips = ids(cfg["conjunto"]) if pathlib.Path(cfg["conjunto"]).is_file() else ids("foil")
+    if not pathlib.Path(cfg["conjunto"]).is_file():
+        print("(el conjunto %s se escribe al lanzar: aqui se cuenta solo `foil`)" % cfg["conjunto"])
     lista = ids(cfg["lista"]) if cfg["lista"].is_file() else []
     vids = RU.indice_videos()
     """El indice UNA vez: `RU.video` por clip relee las carpetas de descarga en cada fallo, y con
