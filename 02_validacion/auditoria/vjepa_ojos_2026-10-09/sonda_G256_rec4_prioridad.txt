@@ -1,0 +1,46 @@
+techo de memoria del proceso: 8 GB (ok)
+SONDA V-JEPA 2 CONTRA EL ETIQUETADOR (protocolo VJEPA2_2026-10-09), tarea prioridad, 5 semilla(s)
+================================================================================
+clips pedidos 5856, con rasgos 5791, sin poses extraidas 65
+prioridad: 1076 clips con dos luces y touch izq/der (florete 795, sable 281)
+VARIANTE rec4 de D:\FENCINGLY_SCRATCH\vjepa_g256 (VJEPA2_VARIANTES_2026-10-09.md)
+filas con initiated 1076; con embedding y luces 1076; sin embedding 0; sin lights_ 0
+reservado: 17 torneos, 341 clips (de 341 en el reparto completo); entrenamiento 735
+tokens cargados: 3.1 GB en 129 s
+   interna B  atentiva epocas  20  wd 1e-03  acierto 0.539  nll 1.1949  (35 s)
+   interna B  atentiva epocas  20  wd 1e-02  acierto 0.539  nll 1.1958  (13 s)
+   interna B  atentiva epocas  20  wd 5e-02  acierto 0.543  nll 1.2005  (13 s)
+   interna B  atentiva epocas  40  wd 1e-03  acierto 0.576  nll 3.7793  (26 s)
+   interna B  atentiva epocas  40  wd 1e-02  acierto 0.563  nll 3.5835  (29 s)
+   interna B  atentiva epocas  40  wd 5e-02  acierto 0.592  nll 3.4315  (42 s)
+   interna B  atentiva epocas  80  wd 1e-03  acierto 0.547  nll 4.1007  (75 s)
+   interna B  atentiva epocas  80  wd 1e-02  acierto 0.555  nll 4.1226  (62 s)
+   interna B  atentiva epocas  80  wd 5e-02  acierto 0.588  nll 4.0651  (121 s)
+   interna con 5 semillas: B 0.571  etiquetador 0.608
+   interna: B elegida atentiva epocas 40 wd 5e-02 (0.592); Blin epocas 40 wd 5e-02 (0.551); etiquetador 0.608  n=245
+
+RESERVADO: 341 clips, 17 torneos
+                                              acierto   contra A' (IC95 por torneo)
+--------------------------------------------------------------------------------
+clase mayoritaria del entrenamiento             0.522
+gana el que inicio                              0.644   (cobertura 0.947; etiqueta HUMANA, no un modelo)
+A                                               0.651   +0.000  [+0.000, +0.000]
+A'                                              0.651   (linea base que decide)
+B                                               0.584   -0.067  [-0.139, +0.059]
+Blin                                            0.601   -0.050  [-0.096, +0.059]
+C                                               0.680   +0.029  [+0.002, +0.087]
+C'                                              0.680   +0.029  [+0.002, +0.087]
+
+control del espejo B    1.0000
+control del espejo C'   1.0000
+B contra A (informativo): -0.067 [-0.139, +0.059]
+
+por arma y por via del ancla (informativo):
+   arma       foil     n= 229   A' 0.677   B 0.581   C' 0.716
+   arma       sabre    n= 112   A' 0.598   B 0.589   C' 0.607
+   via_ancla  final    n=   3   A' 1.000   B 0.667   C' 1.000
+   via_ancla  zona     n= 338   A' 0.648   B 0.583   C' 0.678
+
+PREGUNTA 2 (no decide sola; ver el protocolo):
+   B - A = -0.067  IC95 por torneo [-0.139, +0.059]  -> no se distingue de A
+   C - A = +0.029  IC95 por torneo [+0.002, +0.087]  -> bate a A

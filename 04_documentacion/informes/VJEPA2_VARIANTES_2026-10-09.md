@@ -222,6 +222,18 @@ los hechos. G4 solo mide la resolucion del ojo meso, y en ese ojo el modelo gran
 cambio, decide cuanto cuesta la corrida. La sonda G0b, en marcha, no se toca. Despues de ella van G5,
 `mic8` solo y `prioridad`.
 
+## Cambio 4 (2026-10-13 ~18:00, lo decidio el usuario; con G5, `mic8` y `prioridad` ya medidos)
+
+**G4 (ViT-g 384, ojo meso) NO se corre.** Su extraccion se queda en 618 de 5.837 clips
+(`D:\FENCINGLY_SCRATCH\vjepa_g384`, sin borrar); `cadena_cola4.py` se paro a mano. Por que: en el ojo
+meso el modelo grande no aporto (G0 contra V0, +0,001) y a 384 cada ojo cuesta ~3 veces mas, asi que
+es muy poco probable que cambie la receta, y retrasaba la corrida ~1 dia. Queda sin medir; no se
+presenta como un resultado.
+
+La receta de la corrida sale de aqui y de `CORRIDA_FINAL_2026-10-13.md`: **G2 (ViT-g, `rec4 +
+mic4`) sobre los clips de florete con dos luces**. Para el resto se elige entre G2 y V0 con la
+`prioridad` medida sobre esos clips.
+
 ## Resultados
 
 ### G0 y G1 (10/10, `initiated`, 5 semillas, reservado de 1.384 clips de 42 torneos)
@@ -357,6 +369,29 @@ Lectura:
   200 clips y la GPU a solas antes de presupuestar.
 - La mediana de `s_gpu` en los 5.837 clips de G5 es 10,63 s (p10 2,44): casi toda la extraccion
   compartio la GPU con la sonda G0b (incidente de arriba). La cifra limpia son los 400 clips a solas.
+
+### `mic8` solo, sin el ojo meso (13/10 13:51, informativo)
+
+C' 0,689 contra A' 0,655: +0,033 [-0,006, +0,062], **no pasa** contra el etiquetador con luces (el
+IC cruza cero). G2 (meso + micro a 4x4) da 0,720 en los mismos clips. **El micro sirve junto al meso,
+no en lugar de el**, y no hace falta guardarlo a 8x8: en la corrida va `mic4`. Por arma, C': espada
+0,670, florete 0,691, sable 0,696. Rejilla interna: 80 epocas, wd 1e-2 (0,666).
+
+### `prioridad`, la decision del arbitro, con el modelo grande (13/10 14:13 y 15:03, informativo)
+
+Los mismos 341 clips de reservado (17 torneos) y 735 de entrenamiento que V0: el IC es ancho y
+**no decide**. La medida buena es la de la corrida, con ~21.000 decisiones.
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var |
+|---|---:|---:|---|---|
+| G0 (`rec4`) contra V0 | 0,657 | 0,680 | +0,023 [-0,024, +0,051] | 0,592 -> 0,584 |
+| **G2 (`rec4 + mic4`) contra V0** | 0,657 | 0,677 | +0,021 [-0,057, +0,066] | **0,592 -> 0,663, +0,070 [+0,030, +0,129]** |
+
+Espejo 1,0000. Las dos "no se distinguen" con el criterio. Lo que si se ve: **con el micro, la sonda
+de V-JEPA sola pasa de 0,592 a 0,663** y llega al etiquetador (A 0,651; B - A = +0,012 [-0,037,
++0,098], no se distingue). Con V0 quedaba por debajo (-0,059). En florete, C' de G2 es
+0,694 (n=229), frente a 0,668 de V0. No decide, pero apunta en la misma direccion que la receta
+elegida (G2 en los clips con dos luces).
 
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 

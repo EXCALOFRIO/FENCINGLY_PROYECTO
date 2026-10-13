@@ -90,9 +90,9 @@ D(2), ADOPTADA: acierto TOTAL de zona en PRUEBA 0,3089 -> 0,3338, +0,0249 IC97,5
 (`angulo_lejano.rasgos`, ~0,4 s) y la zona final queda `pendiente_torneo` hasta que corra
 `01_extraccion/zona_fusion.py` sobre el conjunto. `=0` no mide nada y deja las columnas vacias."""
 COLUMNAS += ["ang_lejano", "desp_pies_m", "dos_pies", "x_angulo_m", "x_final_m", "zona_final", "via_zona"]
-GUARDA_H = os.environ.get("FENCINGLY_GUARDA_H", "0") == "1"
-"""LA HOMOGRAFIA DE CADA CUADRO (2026-10-13, propuesta para la corrida de florete; la decide el
-usuario). Esta etapa ya calcula una homografia y su confianza en cada cuadro hasta el tocado + 3,
+GUARDA_H = os.environ.get("FENCINGLY_GUARDA_H", "1") == "1"
+"""LA HOMOGRAFIA DE CADA CUADRO (2026-10-13, para la corrida de florete; ENCENDIDA por defecto porque
+lo decidio el usuario ese dia). Esta etapa ya calcula una homografia y su confianza en cada cuadro hasta el tocado + 3,
 pero solo guardaba la x del cuadro usado. Con `=1` guarda tambien `pista_h_<clip>.npz` (H, conf,
 metodo, pies en pixeles, largo del cuerpo): ~10-20 KB por clip y ningun calculo nuevo. Sirve para
 lo que no se puede hacer sin volver a leer los videos: la posicion en metros de los dos tiradores
