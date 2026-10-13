@@ -45,7 +45,9 @@ PRE_DESDE_S = 8.5
 """La ventana anterior acaba donde empieza la de `vjepa.py` (a - 4,0 s) y dura lo mismo (4,5 s), con
 la misma densidad (64 cuadros, ~14/s). Medido sobre los anotados: el tocado cae a una mediana de 7,4 s
 del inicio del clip, asi que la ventana de `vjepa.py` deja fuera ~3,4 s y esta los cubre."""
-SALIDAS = ("rec8", "ent8", "pre4", "rec4", "mac4", "mic8")
+SALIDAS = ("rec8", "ent8", "pre4", "rec4", "mac4", "mic8", "mic4")
+"""`mic4` (2026-10-13, para la corrida): el ojo micro promediado 4x4, que es lo que midio la sonda de
+G2 (`rec4 + mic4`, sacado de `mic8` por 2x2). Ocupa la cuarta parte que `mic8`."""
 MIC_ANTES_S, MIC_DESPUES_S = 1.5, 0.5
 """El ojo micro: 2 s alrededor del tocado en 64 cuadros, ~32/s: a 30 fps casi todos los cuadros del
 video (60 de 64), a 25 fps alguno repetido, a 50 fps uno de cada ~1,6."""
@@ -145,7 +147,7 @@ def caja_manos(KP, SC, B, idx, W, H):
 
 
 VISTA = {"rec8": ("rec", 8), "rec4": ("rec", 4), "ent8": ("ent", 8), "pre4": ("pre", 4),
-         "mac4": ("mac", 4), "mic8": ("mic", 8)}
+         "mac4": ("mac", 4), "mic8": ("mic", 8), "mic4": ("mic", 4)}
 """salida -> (vista, promedio k x k). Una vista se pasa UNA vez por el modelo aunque salgan dos
 salidas de ella (`rec8` y `rec4`)."""
 
@@ -161,8 +163,9 @@ def prepara(clip, salidas, lado):
         B, mask = z["B"], z["mask"]
         W, H, T = int(z["W"]), int(z["H"]), int(z["T"])
         fps = float(z["fps"]) if "fps" in z.files else 0.0
-        KP = z["KP"] if "mic8" in salidas else None
-        SC = z["SC"] if "mic8" in salidas else None
+        con_mic = any(VISTA[s][0] == "mic" for s in salidas)
+        KP = z["KP"] if con_mic else None
+        SC = z["SC"] if con_mic else None
     video = RU.video(clip)
     if not video:
         return None, "sin video"

@@ -90,6 +90,14 @@ D(2), ADOPTADA: acierto TOTAL de zona en PRUEBA 0,3089 -> 0,3338, +0,0249 IC97,5
 (`angulo_lejano.rasgos`, ~0,4 s) y la zona final queda `pendiente_torneo` hasta que corra
 `01_extraccion/zona_fusion.py` sobre el conjunto. `=0` no mide nada y deja las columnas vacias."""
 COLUMNAS += ["ang_lejano", "desp_pies_m", "dos_pies", "x_angulo_m", "x_final_m", "zona_final", "via_zona"]
+GUARDA_H = os.environ.get("FENCINGLY_GUARDA_H", "0") == "1"
+"""LA HOMOGRAFIA DE CADA CUADRO (2026-10-13, propuesta para la corrida de florete; la decide el
+usuario). Esta etapa ya calcula una homografia y su confianza en cada cuadro hasta el tocado + 3,
+pero solo guardaba la x del cuadro usado. Con `=1` guarda tambien `pista_h_<clip>.npz` (H, conf,
+metodo, pies en pixeles, largo del cuerpo): ~10-20 KB por clip y ningun calculo nuevo. Sirve para
+lo que no se puede hacer sin volver a leer los videos: la posicion en metros de los dos tiradores
+cuadro a cuadro y el registro entre clips del mismo torneo con acuerdo de referencias
+(`REGISTRO_TORNEO_2026-10-09.md`). No cambia ninguna columna de `zona_<clip>.csv`."""
 
 ZONAS = ["fotl_warning_box", "fotl_half", "middle", "fotr_half", "fotr_warning_box"]
 
@@ -210,6 +218,10 @@ def analiza(clip, video, torneo=None):
                 cal = cal2
                 Hs, conf = cal["H"], cal["conf"]
                 r["via_h"] = "rotulo_%.2f" % BANDA_RESPALDO
+    r["_cal"] = {"H": np.asarray(Hs, np.float32), "conf": np.asarray(conf, np.float32),
+                 "metodo": np.array([str(m) for m in cal["method"]]), "pies": pies, "alt": alt,
+                 "fps": fps, "W": W, "H_px": H, "cuadro_tocado": tf}
+    """Para `GUARDA_H`; `escribe` solo saca las `COLUMNAS`, asi que esto no llega al CSV."""
     if not cand and TRIPODE:
         rt = _tripode(pf, pies, alt, tq, fps, W, H)
         if rt is not None:
@@ -282,6 +294,24 @@ def escribe(r):
     return p
 
 
+def guarda_h(r):
+    """`pista_h_<clip>.npz` (ver `GUARDA_H`). Solo si la etapa llego a calibrar (hay luz y poses)."""
+    c = r.get("_cal")
+    if c is None:
+        return None
+    p = RU.TRABAJO / ("pista_h_%s.npz" % r["clip"])
+    tmp = p.with_name(p.name + ".part")
+    with open(tmp, "wb") as fh:
+        np.savez_compressed(fh, H=c["H"], conf=c["conf"], metodo=c["metodo"],
+                            pies=np.asarray(c["pies"], np.float32), alt=np.asarray(c["alt"], np.float32),
+                            fps=np.float64(c["fps"]), W=np.int32(c["W"]), H_px=np.int32(c["H_px"]),
+                            cuadro_tocado=np.int32(c["cuadro_tocado"]), cuadro_usado=np.int32(
+                                r["cuadro_usado"] if r.get("cuadro_usado") is not None else -1),
+                            min_conf=np.float32(CFG_PISTA["min_conf"]))
+    tmp.replace(p)
+    return p
+
+
 def corre(clip, ctx):
     """Para `pipeline.py`. Escribe SIEMPRE el CSV, tambien cuando no hay respuesta: un clip sin luz
     es un clip hecho cuya respuesta es `sin luz`, y si no se escribiera se reintentaria sin fin."""
@@ -298,6 +328,8 @@ def corre(clip, ctx):
         if r.get("motivo") == "ok":
             r.update(x_final_m=r.get("x_tocado_m"), zona_final=r.get("zona"),
                      via_zona="pendiente_torneo")
+    if GUARDA_H:
+        guarda_h(r)
     escribe(r)
     return "%s%s" % (r.get("motivo"), (" x=%.2f m %s" % (r["x_tocado_m"], r["zona"]))
                      if r.get("motivo") == "ok" else "")
