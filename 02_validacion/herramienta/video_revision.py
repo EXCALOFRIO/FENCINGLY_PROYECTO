@@ -106,7 +106,9 @@ def fase1(clips, videos=None):
     from ultralytics import YOLO
     import extrae_pareja as EP
     import torch
-    _hilos_torch(torch)
+    """Sin `_hilos_torch` aqui (14/10): en la etapa 1 torch apenas hace cuentas en CPU (el recorte es de
+    cv2 y el NMS va en la GPU), y en la prueba C la etapa 1 con 2 hilos fue 201 s contra 139 de B. O9
+    es para el preproceso de Sapiens, en `fase2`."""
     yolo = YOLO(RU.pesos_yolo())
     yolo.to("cuda")
     yolo_redet = yolo

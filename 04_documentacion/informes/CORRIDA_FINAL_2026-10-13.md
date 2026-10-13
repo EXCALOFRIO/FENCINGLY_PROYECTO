@@ -313,4 +313,29 @@ OpenCV abre esos mp4 sin problema (391 y 833 cuadros leidos). El ensayo de 100 m
 
 **Prueba de identidad 2** (en cola tras el ensayo de 100; `identidad2.py`, criterios en su cabecera,
 los de arriba con tiempos intercalados): etapa 1 W1 (calentamiento) A1 B1 A1 B1; etapa 4 A4 P4 Q4 A4 P4
-Q4, con P = O2' y Q = O2' + O2b + O9.
+Q4, con P = O2' y Q = O2' + O2b + O9. O9 ya solo toca la etapa 4 (en la 1 torch apenas calcula en CPU).
+
+**Lo que decide los dias: el CAUDAL EN PARALELO** (en cola tras la prueba 2; `D:/FENCINGLY_SCRATCH/caudal/caudal.py`).
+Con 3 trabajadores la GPU marca ~80 % (muestreado en el ensayo de 100) y de 1 a 3 trabajadores el caudal
+solo subio 1,10x (`noche.py`): la tarjeta va casi llena de nucleos pequenios, y lo que ahorra CPU en un
+proceso solo puede no notarse. 60 anotados de florete, la corrida montada como de verdad (`noche.py`,
+3 GPU para 1+4 y 4 CPU para 7, 9 y 11), cada brazo desde cero y en su directorio: base1, exacta,
+lote16, base2. Criterios, DECLARADOS ANTES DE MEDIR:
+- **exacta** (lo exacto que haya salido identico en la prueba 2; O9 siempre): todas las salidas
+  identicas a base1 en los 60 (`det_`, `detx_`, `revision_`, `poses_`, `lights_`, `zona_`, series,
+  `pista_h_`), y caudal de 1+4 >= 1,03 x la media de base1 y base2 y por encima de las dos. Si pasa, se
+  adopta.
+- **O11, lote de 16 recortes en Sapiens** (NO exacta). El 08/10 se rechazo con la puerta de pixel (max
+  < 0,5 px; dio 130 px): esa puerta no la pasa ningun cambio de aritmetica, ni otra GPU, porque un punto
+  ambiguo salta. Se mide con la puerta en lo que se usa despues:
+  a. poses, puntos usables: p50 < 0,02 px y p99 < 0,5 px;
+  b. eventos de marcha, fondo y brazo a +-3 cuadros: >= 98 % en los dos sentidos;
+  c. zona del tocado igual en >= 98 % de los clips, |dx| del tocado mediana <= 2 cm;
+  d. mano armada igual en >= 99 %;
+  e. caudal de 1+4 >= 1,15 x base.
+  **Aunque pase, NO se adopta sin el usuario**: cambia la puerta que lo dejo fuera.
+- base1 contra base2 tiene que salir identico (mismo codigo): si un tipo de fichero no lo sale, se dice
+  y no juzga a `exacta`.
+
+**Disco** (medido 14/10): ~1,5 MB por clip en `pruebas` (`poses_` 1,45): los 109.799 de florete +
+campeonatos son ~166 GB en C (360 GB libres). Faltan 81.267 mp4 (~191 GB, a D, 1.510 GB libres).
