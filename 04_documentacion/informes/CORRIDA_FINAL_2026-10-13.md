@@ -123,3 +123,33 @@ portarlo (las rutas ya van por variables de entorno, `rutas.py`) y comprobar en 
 que sale lo mismo antes de fiarse. Y el lote grande que permitiria su memoria ya se rechazo en las
 poses (movia un punto 130 px). El factor de verdad solo se sabe midiendo esos 50 clips en un Spark.
 Para rendimiento puro, **una sola RTX 4090 da mas que dos Spark** (3,3-4,2 veces cada uno).
+
+## 8. Alquilando GPU (pregunta del usuario, 13/10; ESTIMADO con precios publicos de sep-oct 2026)
+
+**Horas de trabajo, en horas de esta 3060**: florete con el plan de arriba ~1.230-1.350 h (etapas
+1 + 4: 106.432 x 37,5 s = 1.109 h; V-JEPA y sondas, el resto). Todo el corpus (362.950 clips):
+~3.900 h con V0, ~4.430 h con G2 en todo. El trabajo se reparte por clips, asi que con N GPU se
+tarda N veces menos y cuesta casi lo mismo.
+
+| GPU (RunPod Secure Cloud, centro de datos) | $/h | velocidad frente a la 3060 (estimada) | florete | todo el corpus (V0 / G2) |
+|---|---:|---:|---:|---:|
+| **RTX 5090** (recomendada) | 0,99 | ~4-6x | **~$200-340** | ~$650-970 / ~$730-1.100 |
+| RTX 4090 | 0,74 | ~3-4,5x | ~$200-330 | ~$640-960 / ~$730-1.090 |
+| H100 SXM | 3,49 | ~5-8x | ~$540-940 | no compensa |
+
+- Almacenamiento: $0,07/GB/mes (el primer TB); sin coste de transferencia. Florete ~0,5-1 TB unos
+  dias: ~$10-20.
+- Con 4 RTX 5090, el florete son ~2-3,5 dias; con 8, todo el corpus son ~4-6 dias.
+- La 5090 frente a la 4090: ~1,5 veces mas rapida y cuesta ~1,35 veces mas. La H100 cuesta 3,5 veces
+  mas para ~1,3 veces la 5090: lo suyo son los lotes grandes y los modelos de 80 GB, y aqui no los
+  hay (el lote de las poses se rechazo).
+- Hosts de particulares (Vast.ai, RunPod Community): ~la mitad de precio, pero los videos y las
+  poses de atletas identificables quedan en la maquina de un desconocido. No recomendado.
+- Antes de gastar nada: **una prueba de ~$5** (1 GPU, ~3 h) con 50 clips anotados, comparando las
+  salidas con las nuestras (criterio escrito antes) y midiendo los clips/hora reales. Con eso, el
+  precio de verdad. Lo que pide: Linux x86 (el camino de Colab ya existe), >=16 vCPU por GPU (las
+  etapas 7, 9 y 11 son ~30 s de CPU por clip) y el token de HF en la maquina, para el respaldo.
+
+Precios: RunPod (Secure Cloud, sep 2026), RunPod docs (almacenamiento y transferencia). Velocidades:
+`mrdbourke/gpu-benchmarking` (4090 frente a GB10) y comparativas publicas 5090/4090/H100. **Ninguna
+medida en nuestro pipeline.**
