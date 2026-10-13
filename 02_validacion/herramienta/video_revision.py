@@ -109,11 +109,15 @@ def fase1(clips, videos=None):
     _hilos_torch(torch)
     yolo = YOLO(RU.pesos_yolo())
     yolo.to("cuda")
+    yolo_redet = yolo
+    if DOS_YOLO:
+        yolo_redet = YOLO(RU.pesos_yolo())
+        yolo_redet.to("cuda")
     videos = videos or {}
     PRUEBAS.mkdir(parents=True, exist_ok=True)
     for cid in clips:
         try:
-            _fase1_uno(cid, yolo, EP, videos)
+            _fase1_uno(cid, yolo, EP, videos, yolo_redet)
         except Exception as ex:
             """UN CLIP QUE CASCA NO SE LLEVA EL LOTE (2026-10-09). Antes la excepcion salia
             del bucle y los clips que quedaban del lote no se procesaban NUNCA: en cada vuelta
@@ -124,6 +128,11 @@ def fase1(clips, videos=None):
                   flush=True)
 
 
+DOS_YOLO = os.environ.get("FENCINGLY_YOLO_DOS", "0") == "1"
+"""O10 (2026-10-13): un SEGUNDO YOLO solo para la redeteccion en recorte. La deteccion va en fp16
+(`quantize=16`) y la redeteccion no lo pasa (fp32); con UN objeto, ultralytics reconstruye el predictor
+(copia, fusiona y calienta el modelo) en cada cambio. Medido: deteccion + redeteccion alternadas 476 ms
+por par, con dos objetos 172 ms, y la redeteccion identica. Entra solo con la prueba de identidad."""
 TUBERIA_YOLO = os.environ.get("FENCINGLY_YOLO_TUBERIA", "0") == "1"
 """O3 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-13): la lectura de cuadros de la etapa 1 en un hilo
 aparte (`LectorHilo`), para que la decodificacion no espere a YOLO ni YOLO a ella. Mismos cuadros, en
@@ -175,7 +184,7 @@ class LectorHilo:
         self.cap.release()
 
 
-def _fase1_uno(cid, yolo, EP, videos):
+def _fase1_uno(cid, yolo, EP, videos, yolo_redet=None):
     ruta = videos.get(cid) or RU.video(cid)
     if not ruta:
         print("%-40s SIN VIDEO, no se procesa" % cid[:40])
@@ -226,7 +235,7 @@ def _fase1_uno(cid, yolo, EP, videos):
     cap.release()
     gris = [cv2.cvtColor(cv2.resize(f, (160, 90)), cv2.COLOR_BGR2GRAY).astype("float32")
             for f in frames]
-    r = EP.procesa(cajas, cuadros, W, H, T, yolo=yolo, frames=frames, gris=gris)
+    r = EP.procesa(cajas, cuadros, W, H, T, yolo=yolo_redet or yolo, frames=frames, gris=gris)
     _savez_atomico(PRUEBAS / ("revision_%s.npz" % cid),
                         B=r["B"], Be=r["Be"], pres=r["pres"], tipo=r["tipo"], mask=r["mask"],
                         W=W, H=H, T=T, motivo=r["motivo"], video=ruta,
