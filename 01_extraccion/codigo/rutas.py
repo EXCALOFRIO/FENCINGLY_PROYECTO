@@ -56,6 +56,11 @@ en `pruebas` hay **0** `det_*.pkl` y en el scratchpad **117**. O sea que en cuan
 etapa 7 devolvera `sin pickle de detecciones` para todos los clips -- un fallo blando, que imprime
 una linea ordenada y no escribe nada."""
 
+PISTA = _env("FENCINGLY_PISTA", PISTA)
+"""Las series de la etapa 7. Por defecto `02_validacion/pista`, como siempre. `FENCINGLY_PISTA` existe
+para los ENSAYOS (2026-10-13): con `FENCINGLY_TRABAJO` y esta en un scratch, un ensayo de la corrida
+no escribe nada en las salidas de verdad."""
+
 VIDEOS = _env("FENCINGLY_VIDEOS", "D:/FENCINGLY_VIDEOS_RAW")
 SCRATCH = _env("SCRATCH", "D:/FENCINGLY_SCRATCH")
 HF = _env("HF_HOME", "D:/FENCINGLY_HF")
@@ -247,6 +252,12 @@ def video(clip, raiz=None):
         p = d / ("%s.mp4" % clip)
         if p.is_file():
             return str(p)
+    if raiz is None and _indice_arbol is not None:
+        return _indice_arbol.get(clip)
+    """(2026-10-13) Lo mismo que `indice_videos().get(clip)`, sin rehacerlo: las dos carpetas de
+    descarga ya se han mirado arriba por ruta directa, asi que solo queda el arbol, que esta en cache.
+    Antes, cada clip que no estaba en las descargas volvia a listar `_descargados` (~80.000 ficheros
+    en la corrida) y a copiar el indice entero."""
     return indice_videos(raiz).get(clip)
 
 

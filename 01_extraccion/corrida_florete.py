@@ -64,6 +64,11 @@ MEMMAP = pathlib.Path(os.environ.get("FENCINGLY_MEMMAP", str(pathlib.Path.home()
 CACHE_ETQ = RU.SCRATCH / "sonda_cache_etq_corrida"
 SAL = RAIZ / "02_validacion" / "auditoria" / "corrida_florete"
 MARCAS = RU.TRABAJO / "corrida_florete"
+N_CPU = int(os.environ.get("FENCINGLY_CPU_TRABAJADORES", "2"))
+"""Trabajadores de CPU (etapas 7, 9, 11) en las fases con GPU. 2 como en los anotados; O4 de §10 mide
+si mas trabajadores alcanzan mejor a la GPU."""
+PAUSA = int(os.environ.get("FENCINGLY_DIRECTOR_PAUSA", "300"))
+"""Segundos entre miradas del director a sus trabajadores (300 en la corrida; los ensayos la bajan)."""
 RESPALDO_MIN = 120
 """El respaldo a HF privado va con cada fase de `noche.py`, cada 2 h, como en los anotados."""
 
@@ -116,7 +121,7 @@ def espera_gpu_libre():
         if not avisado:
             log("GPU ocupada, se espera: %s" % " | ".join(x[:120] for x in o[:3]))
             avisado = True
-        time.sleep(300)
+        time.sleep(PAUSA)
 
 
 def libre_gb(unidad):
@@ -158,7 +163,7 @@ def espera_noche(pids, clips):
     gpu = [p for n, p, *_ in pids if n.startswith("gpu")]
     cpu = [p for n, p, *_ in pids if n.startswith("cpu")]
     while any(NO._vive(p) for p in gpu):
-        time.sleep(300)
+        time.sleep(PAUSA)
     log("trabajadores de GPU terminados")
     antes, quietas = None, 0
     while cpu and any(NO._vive(p) for p in cpu):
@@ -168,10 +173,11 @@ def espera_noche(pids, clips):
             break
         quietas = quietas + 1 if pend == antes else 0
         if quietas >= 6:
-            log("la CPU lleva 1 h sin avanzar con %d pendientes: se para (se reintentan al relanzar)" % pend)
+            log("la CPU lleva %d s sin avanzar con %d pendientes: se para (se reintentan al relanzar)"
+                % (12 * PAUSA, pend))
             break
         antes = pend
-        time.sleep(600)
+        time.sleep(2 * PAUSA)
     NO.para()
 
 
@@ -193,9 +199,16 @@ def corre(cmd, salida, cwd):
 
 
 def acabo_extractor(log_):
+    """Lo que hizo la ULTIMA pasada del extractor (el registro se anade): `hechos N en` o, si ya no
+    quedaba nada, `M ya hechos, 0 pendientes` (0). None si la ultima pasada no acabo."""
     t = log_.read_text(encoding="utf-8", errors="replace") if log_.is_file() else ""
-    m = re.findall(r"^hechos (\d+) en \d+ s", t, re.M)
-    return int(m[-1]) if m else None
+    m = [(x.start(), int(x.group(1))) for x in re.finditer(r"^hechos (\d+) en \d+ s", t, re.M)]
+    m += [(x.start(), 0) for x in re.finditer(r"^\d+ clips, \d+ ya hechos, 0 pendientes", t, re.M)]
+    ini = [x.start() for x in re.finditer(r"^\d+ clips, \d+ ya hechos, \d+ pendientes", t, re.M)]
+    if not m or (ini and max(ini) > max(m)[0] and not re.match(r"^\d+ clips, \d+ ya hechos, 0 pendientes",
+                                                                t[max(ini):])):
+        return None
+    return max(m)[1]
 
 
 # ---------------------------------------------------------------------------------------------
@@ -228,7 +241,7 @@ def f_dos_luces(cfg):
         assert cuenta(clips, [1, 4]) == len(clips), "en --prueba solo clips con las etapas 1 y 4 hechas"
     else:
         espera_gpu_libre()
-    espera_noche(lanza_noche(cfg["lista"], 3, 2, "1,4", cfg["respaldo"]), clips)
+    espera_noche(lanza_noche(cfg["lista"], 3, N_CPU, "1,4", cfg["respaldo"]), clips)
     return "etapas 1+4 en %d, 7+9+11 en %d, de %d" % (cuenta(clips, [1, 4]), cuenta(clips, [7, 9, 11]),
                                                        len(clips))
 
@@ -288,7 +301,7 @@ def f_sonda_g2(cfg):
 def f_resto(cfg):
     clips = ids(cfg["conjunto"])
     espera_gpu_libre()
-    espera_noche(lanza_noche(cfg["conjunto"], 3, 2, "1,4", cfg["respaldo"]), clips)
+    espera_noche(lanza_noche(cfg["conjunto"], 3, N_CPU, "1,4", cfg["respaldo"]), clips)
     return "etapas 1+4 en %d, 7+9+11 en %d, de %d" % (cuenta(clips, [1, 4]), cuenta(clips, [7, 9, 11]),
                                                        len(clips))
 
@@ -426,6 +439,9 @@ def main():
     g.add_argument("--lanza", action="store_true")
     g.add_argument("--para", action="store_true")
     g.add_argument("--director", action="store_true", help="(interno) el proceso que corre las fases")
+    ap.add_argument("--ensayo", default=None,
+                    help="fichero de ids: la corrida ENTERA (sin las sondas) sobre ellos, con "
+                         "FENCINGLY_TRABAJO y FENCINGLY_PISTA en un scratch (obligatorio) y sin respaldo")
     ap.add_argument("--prueba", default=None,
                     help="fichero de ids YA PROCESADOS: corre luces, lista y dos_luces sobre ellos, con "
                          "marcas y salidas en el scratch y sin respaldo. No usa la GPU: lo comprueba")
@@ -437,7 +453,15 @@ def main():
         SAL = MARCAS / "salidas"
         cfg.update(conjunto=pathlib.Path(a.prueba).resolve(), lista=MARCAS / "lista_prueba.txt",
                    fases=["luces", "lista", "dos_luces"], respaldo=0, prueba=True)
-    extra = ["--prueba", str(pathlib.Path(a.prueba).resolve())] if a.prueba else []
+    if a.ensayo:
+        defecto = RAIZ / "01_extraccion" / "pruebas"
+        if RU.TRABAJO.resolve() == defecto.resolve() or RU.PISTA.resolve() == (RAIZ / "02_validacion" / "pista").resolve():
+            raise SystemExit("--ensayo pide FENCINGLY_TRABAJO y FENCINGLY_PISTA fuera de las salidas de verdad")
+        SAL = RU.TRABAJO / "salidas"
+        cfg.update(conjunto=pathlib.Path(a.ensayo).resolve(), lista=RU.TRABAJO / "lista_ensayo.txt",
+                   fases=[f for f in FASES if not f.startswith("sonda_")], respaldo=0)
+    extra = (["--prueba", str(pathlib.Path(a.prueba).resolve())] if a.prueba else
+             ["--ensayo", str(pathlib.Path(a.ensayo).resolve())] if a.ensayo else [])
     if a.seco or a.estado:
         informe(cfg, a.seco)
         return 0

@@ -123,6 +123,7 @@ from __future__ import annotations
 
 import gc
 import json
+import os
 import pathlib
 import pickle
 import sys
@@ -262,6 +263,12 @@ def _pp(W, H):
 def indice_videos() -> dict:
     """QUE HACE: el mapa `stem` -> ruta del mp4, cacheado."""
     return RU.indice_videos()
+
+
+def video_clip(clip):
+    """La ruta del mp4 de UN clip: `RU.video`, con la misma precedencia que `indice_videos()` (trabajo,
+    descargas, arbol) y sin rehacer el mapa entero en cada clip (2026-10-13)."""
+    return RU.video(clip)
 
 
 def pareja(clip: str, frames=None):
@@ -478,6 +485,26 @@ def estabiliza(frames, ks, cajas, cuadros, W, H, rot, ref=None) -> tuple:
     return Ms, dmax
 
 
+MEDIANA_NUMPY = os.environ.get("FENCINGLY_MEDIANA_NUMPY", "0") == "1"
+
+
+def _nanmediana0(v):
+    """`np.nanmedian(v, axis=0)` EXACTO y ~7 veces mas rapido (2026-10-13, `CORRIDA_FINAL` §10).
+
+    Con el eje corto (< 600, aqui los ~48 cuadros de la placa) numpy va por `np.ma.median`, que ordena
+    un array enmascarado y costaba ~8 s de los ~20 de la etapa 7 en cada clip. Aqui: ordenar (los NaN
+    quedan al final), contar los finitos y coger el del medio, o la media de los dos del medio en el
+    mismo tipo, como numpy. Comprobado: 3.000 arrays al azar (1-69 cuadros, NaN al azar) y una franja
+    de 48x64x1280x3, identicos bit a bit, NaN incluidos. `FENCINGLY_MEDIANA_NUMPY=1` vuelve a numpy."""
+    s = np.sort(v, axis=0)
+    n = (~np.isnan(v)).sum(axis=0)
+    lo = np.take_along_axis(s, np.maximum((n - 1) // 2, 0)[None], 0)[0]
+    hi = np.take_along_axis(s, np.minimum(n // 2, s.shape[0] - 1)[None], 0)[0]
+    med = np.where(n % 2 == 1, lo, (lo + hi) / np.asarray(2, v.dtype)).astype(v.dtype)
+    med[n == 0] = np.nan
+    return med
+
+
 def placa(frames, sel, Ms, cajas, cuadros, W, H) -> tuple:
     """QUE HACE: el suelo sin personas y sin arrastre de camara, por mediana temporal en el sistema
     del cuadro de referencia."""
@@ -503,7 +530,7 @@ def placa(frames, sel, Ms, cajas, cuadros, W, H) -> tuple:
         v = V8[:, a:b].astype("float32")
         v[~M[:, a:b]] = np.nan
         with np.errstate(all="ignore"):
-            q = np.nanmedian(v, axis=0)
+            q = np.nanmedian(v, axis=0) if MEDIANA_NUMPY else _nanmediana0(v)
         pl[a:b] = np.where(np.isfinite(q), q, 0.0).astype("uint8")
     cob = M.sum(axis=0)
     return pl, cob
@@ -2078,7 +2105,7 @@ def analiza(clip: str, video: str = None, frames: list = None,
     W, H, T = r["W"], r["H"], r["T"]
     if frames is None:
         if video is None:
-            video = indice_videos().get(clip)
+            video = video_clip(clip)
         if video is None:
             return {"clip": clip, "ok": False, "motivo": "sin video en disco"}
         frames = lee(video, T)

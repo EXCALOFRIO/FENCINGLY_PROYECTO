@@ -51,6 +51,7 @@ A stage that does not work is off with its number next to it, not quietly includ
 """
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 import time
@@ -178,10 +179,13 @@ def _luces(clip, ctx):
     p = PRUEBAS / ("lights_%s.csv" % clip)
     cols = (["clip", "via"] + sorted({k for f in filas for k in f} - {"clip", "via"})) \
         if filas else ["clip", "via"]
-    with open(p, "w", newline="", encoding="utf-8") as fh:
+    tmp = p.with_name(p.name + ".part")
+    with open(tmp, "w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas or [{"clip": clip, "via": via}])
+    os.replace(tmp, p)
+    """(2026-10-13) A un `.part` y luego `os.replace`: un corte a mitad no deja un fichero roto que cuente como hecho."""
     return "%d lights, via=%s (see LUCES_POR_FUENTE_2026-10-09.md for the rate by via)" % (len(filas), via)
 
 

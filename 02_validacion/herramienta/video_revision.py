@@ -84,6 +84,15 @@ MANOS = list(range(21, 63))
 CARA_DESDE = 63
 
 
+def _savez_atomico(p, **arrays):
+    """`np.savez_compressed` a `<p>.part` y `os.replace`. (2026-10-13) A un `.part` y luego `os.replace`: un corte a mitad no deja un fichero roto que cuente como hecho. Mismos arrays, misma
+    compresion."""
+    tmp = p.with_name(p.name + ".part")
+    with open(tmp, "wb") as fh:
+        np.savez_compressed(fh, **arrays)
+    os.replace(tmp, p)
+
+
 def mapa_videos():
     return RU.indice_videos()
 
@@ -113,13 +122,64 @@ def fase1(clips, videos=None):
                   flush=True)
 
 
+TUBERIA_YOLO = os.environ.get("FENCINGLY_YOLO_TUBERIA", "0") == "1"
+"""O3 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-13): la lectura de cuadros de la etapa 1 en un hilo
+aparte (`LectorHilo`), para que la decodificacion no espere a YOLO ni YOLO a ella. Mismos cuadros, en
+el mismo orden: `det_` y `revision_` tienen que salir IDENTICOS. Apagada por defecto hasta medirlo."""
+
+
+class LectorHilo:
+    """Un `cv2.VideoCapture` que lee por delante en un hilo (cola de 32 cuadros). `read` y `get` como
+    el original; `release` para el hilo."""
+
+    def __init__(self, ruta):
+        import queue
+        import threading
+        self.cap = cv2.VideoCapture(ruta)
+        self.props = {p: self.cap.get(p) for p in (cv2.CAP_PROP_FPS, cv2.CAP_PROP_FRAME_WIDTH,
+                                                     cv2.CAP_PROP_FRAME_HEIGHT, cv2.CAP_PROP_FRAME_COUNT)}
+        self.cola = queue.Queue(maxsize=32)
+        self.parar = threading.Event()
+        self.fin = False
+        self.th = threading.Thread(target=self._lee, daemon=True)
+        self.th.start()
+
+    def _lee(self):
+        while not self.parar.is_set():
+            ok, im = self.cap.read()
+            self.cola.put((ok, im))
+            if not ok:
+                return
+
+    def get(self, p):
+        return self.props[p] if p in self.props else self.cap.get(p)
+
+    def read(self):
+        if self.fin:
+            return False, None
+        ok, im = self.cola.get()
+        if not ok:
+            self.fin = True
+        return ok, im
+
+    def release(self):
+        self.parar.set()
+        while self.th.is_alive():
+            try:
+                self.cola.get_nowait()
+            except Exception:
+                pass
+            self.th.join(timeout=0.05)
+        self.cap.release()
+
+
 def _fase1_uno(cid, yolo, EP, videos):
     ruta = videos.get(cid) or RU.video(cid)
     if not ruta:
         print("%-40s SIN VIDEO, no se procesa" % cid[:40])
         return
     ca = PRUEBAS / ("det_%s.pkl" % cid)
-    cap = cv2.VideoCapture(ruta)
+    cap = LectorHilo(ruta) if TUBERIA_YOLO else cv2.VideoCapture(ruta)
     fps_clip = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
     """LA CADENCIA SE GUARDA EN EL NPZ, y no se vuelve a deducir mas tarde.
 
@@ -149,9 +209,11 @@ def _fase1_uno(cid, yolo, EP, videos):
             cap.release()
             print("%-40s VIDEO ILEGIBLE (0 cuadros): no se escribe nada" % cid[:40], flush=True)
             return
-        with open(ca, "wb") as fh:
+        with open(ca.with_name(ca.name + ".part"), "wb") as fh:
             pickle.dump((cajas, cuadros, W, H, T), fh)
-        np.savez_compressed(
+        os.replace(ca.with_name(ca.name + ".part"), ca)
+        """(2026-10-13) A un `.part` y luego `os.replace`: un corte a mitad no deja un fichero roto que cuente como hecho."""
+        _savez_atomico(
             PRUEBAS / ("detx_%s.npz" % cid),
             conf=(np.concatenate(ex["conf"]) if ex.get("conf") else np.zeros(0)).astype("float16"),
             kp=(np.concatenate(ex["kp"]) if ex.get("kp") else np.zeros((0, 17, 3))).astype("float16"))
@@ -163,7 +225,7 @@ def _fase1_uno(cid, yolo, EP, videos):
     gris = [cv2.cvtColor(cv2.resize(f, (160, 90)), cv2.COLOR_BGR2GRAY).astype("float32")
             for f in frames]
     r = EP.procesa(cajas, cuadros, W, H, T, yolo=yolo, frames=frames, gris=gris)
-    np.savez_compressed(PRUEBAS / ("revision_%s.npz" % cid),
+    _savez_atomico(PRUEBAS / ("revision_%s.npz" % cid),
                         B=r["B"], Be=r["Be"], pres=r["pres"], tipo=r["tipo"], mask=r["mask"],
                         W=W, H=H, T=T, motivo=r["motivo"], video=ruta,
                         tramos=np.array(r["tramos"], dtype="int32").reshape(-1, 2),
@@ -272,6 +334,85 @@ en la GPU de Colab, con otro preproceso y otro nucleo, el reparto puede ser dist
 hay que volver a pasarle esta misma puerta -- no darlo por bueno."""
 
 
+TUBERIA_POSE = os.environ.get("FENCINGLY_POSE_TUBERIA", "0") == "1"
+HILOS_PREPROC = int(os.environ.get("FENCINGLY_POSE_HILOS", "3"))
+"""O2 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-13): LA MISMA CUENTA, EN TUBERIA. Un hilo lee los
+cuadros y `HILOS_PREPROC` hilos hacen el preproceso de Sapiens (CPU) mientras la GPU pasa el recorte
+anterior. Cada recorte se preprocesa con la MISMA llamada (`proc(images=[rgb], boxes=[caja])`), la
+pasada y el postproceso van en el mismo orden y de uno en uno, como con `LOTE_POSE = 1`: el
+resultado tiene que salir IDENTICO bit a bit. Solo entra si lo sale (criterio declarado antes de
+medir: diferencia maxima 0,0 px en 20 clips, y >= 1,2 veces mas rapida). Apagada por defecto."""
+
+
+def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frames):
+    import queue
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+    KP = np.full((T, 2, N_PTS, 2), np.nan, dtype="float32")
+    SC = np.zeros((T, 2, N_PTS), dtype="float32")
+    frames = []
+    cola = queue.Queue(maxsize=64)
+    FIN = object()
+    error = []
+
+    def prepara(rgb, caja):
+        return proc(images=[rgb], boxes=[caja], return_tensors="pt")
+
+    def lector(ex):
+        try:
+            cap = cv2.VideoCapture(video)
+            for k in range(T):
+                ok, im = cap.read()
+                if not ok:
+                    break
+                if guarda_frames:
+                    frames.append(im)
+                if not mask[k]:
+                    continue
+                rgb = None
+                for lado in (0, 1):
+                    if not pres[k, lado]:
+                        continue
+                    b = B[k, lado]
+                    if not (np.isfinite(b).all() and b[2] > b[0] and b[3] > b[1]):
+                        continue
+                    if rgb is None:
+                        rgb = np.ascontiguousarray(im[:, :, ::-1])
+                    x, y = float(b[0] * W), float(b[1] * H)
+                    caja = [[x, y, float(b[2] * W) - x, float(b[3] * H) - y]]
+                    cola.put((k, lado, caja, ex.submit(prepara, rgb, caja)))
+            cap.release()
+        except BaseException as e:
+            error.append(e)
+        finally:
+            cola.put(FIN)
+
+    with ThreadPoolExecutor(HILOS_PREPROC) as ex:
+        th = threading.Thread(target=lector, args=(ex,), daemon=True)
+        th.start()
+        while True:
+            it = cola.get()
+            if it is FIN:
+                break
+            k, lado, caja, fut = it
+            e = fut.result()
+            with torch.inference_mode():
+                e = {q: (v.to("cuda").half() if v.is_floating_point() else v.to("cuda"))
+                     for q, v in e.items()}
+                o = mod(**e)
+                r = proc.post_process_pose_estimation(o, boxes=[caja], threshold=None)
+            rr = r[0][0] if isinstance(r[0], list) else r[0]
+            kp = np.asarray(rr["keypoints"].cpu(), dtype="float32")
+            sc = np.asarray(rr["scores"].cpu(), dtype="float32")
+            n = min(len(kp), N_PTS)
+            KP[k, lado, :n] = kp[:n]
+            SC[k, lado, :n] = _fuera_de_caja(kp[:n], sc[:n], caja[0])
+        th.join()
+    if error:
+        raise error[0]
+    return KP, SC, frames
+
+
 def poses_del_clip(proc, mod, torch, video, B, pres, mask, W, H, T, lote=None,
                    guarda_frames=True):
     """QUE HACE: la pose de Sapiens 2 en las cajas presentes, y devuelve tambien los fotogramas.
@@ -288,6 +429,8 @@ def poses_del_clip(proc, mod, torch, video, B, pres, mask, W, H, T, lote=None,
     lista por imagen, asi que meter las dos cajas en una sola imagen da lista vacia.
     """
     lote = int(lote or LOTE_POSE)
+    if TUBERIA_POSE and lote == 1 and not PREPROC_GPU:
+        return _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frames)
     KP = np.full((T, 2, N_PTS, 2), np.nan, dtype="float32")
     SC = np.zeros((T, 2, N_PTS), dtype="float32")
     cap = cv2.VideoCapture(video)
@@ -557,7 +700,7 @@ def _fase2_uno(cid, proc, mod, torch, video):
     filtro existiera tienen poses medidas de 0 a 8 puntos utiles dentro, y un check que no
     distinga los dos casos acusa a la tuberia de un fallo que ya no comete. Es el mismo principio
     que `origen` y `tipo`: el dato lleva escrito como se obtuvo."""
-    np.savez_compressed(PRUEBAS / ("poses_%s.npz" % cid),
+    _savez_atomico(PRUEBAS / ("poses_%s.npz" % cid),
                         KP=KP, SC=SC, origen=origen, hueco=hueco,
                         B=B, Be=Be, pres=pres, mask=mask,
                         W=W, H=H, T=T, motivo=motivo, video=ruta_video,

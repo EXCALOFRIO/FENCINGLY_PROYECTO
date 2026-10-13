@@ -51,6 +51,8 @@ tirador que no se mueve.
 """
 from __future__ import annotations
 
+import os
+import os
 import pathlib
 import sys
 
@@ -364,7 +366,7 @@ def una(clip, con_figura=True):
         una unidad de imagen sin suponer nada sobre la escala, y es justo la que hace falta como
         puerta de la regla de prioridad de otro agente. De los 10 clips de su conjunto reservado, 6
         no tienen homografia y sin esto daban cero."""
-        fps = PO._fps(PI.indice_videos().get(clip) or "")
+        fps = PO._fps(PI.video_clip(clip) or "")
         ev = PO.eventos_sin_homografia(res, fps, PO.carga_poses(clip))
         if not ev:
             print("%-38s SIN HOMOGRAFIA y sin accion: %s" % (clip, res.get("motivo")))
@@ -378,7 +380,9 @@ def una(clip, con_figura=True):
         return {"clip": clip, "res": res, "ap": None, "ev": ev, "fps": fps, "ruido": {},
                 "ancla": {"fiable": False}, "serie": serie, "publicable": False,
                 "puerta_dos_lados": False}
-    video = PI.indice_videos()[clip]
+    video = PI.video_clip(clip)
+    if video is None:
+        raise KeyError(clip)
     fps = PO._fps(video)
     poses = PO.carga_poses(clip)
     ap = PO.apoyos(res, poses)
@@ -443,10 +447,13 @@ def escribe_serie(filas, nombre="serie_eventos.csv"):
     import csv
     SALIDA.mkdir(parents=True, exist_ok=True)
     cols = COLUMNAS_SERIE + sorted({k for f in filas for k in f} - set(COLUMNAS_SERIE))
-    with open(SALIDA / nombre, "w", newline="") as fh:
+    tmp = SALIDA / (nombre + ".part")
+    with open(tmp, "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)
+    os.replace(tmp, SALIDA / nombre)
+    """(2026-10-13) A un `.part` y luego `os.replace`: un corte a mitad no deja un fichero roto que cuente como hecho."""
     return SALIDA / nombre
 
 
@@ -456,10 +463,12 @@ def _escribe(filas, nombre, orden=None):
     SALIDA.mkdir(parents=True, exist_ok=True)
     todas = {k for f in filas for k in f}
     cols = (list(orden) + sorted(todas - set(orden))) if orden else sorted(todas)
-    with open(SALIDA / nombre, "w", newline="") as fh:
+    tmp = SALIDA / (nombre + ".part")
+    with open(tmp, "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction="ignore")
         w.writeheader()
         w.writerows(filas)
+    os.replace(tmp, SALIDA / nombre)
     return SALIDA / nombre
 
 
