@@ -325,6 +325,39 @@ orden), solo mas lento. Desde entonces la cola no deja dos trabajos de GPU a la 
 s. Para florete (106.432 clips): **~3,0 dias** con G5, ~11,9 dias con G3. Si G5 pasa contra V0,
 el micro sale por 1,25 s/clip mas que V0.
 
+### G5: el micro con el modelo pequenio (13/10 01:18)
+
+| comparacion | C' ref | C' var | dif (IC95) | B ref -> var | veredicto |
+|---|---:|---:|---|---|---|
+| **G5** (ViT-L, `rec4 + mic4`) contra V0 (la que decide) | 0,696 | 0,694 | -0,001 [-0,019, +0,014] | 0,703 -> 0,666 | **no se distingue** |
+| G5 contra G2 (**informativo**: lo que se pierde con el modelo pequenio) | 0,720 | 0,694 | -0,026 [-0,061, -0,012] | 0,707 -> 0,666 | G5 queda por debajo |
+
+Espejo 1,0000. Por arma, C' de V0 -> G5: espada 0,727 -> 0,718, florete 0,683 -> 0,685, sable
+0,748 -> 0,733. La rejilla interna eligio 80 epocas y wd 1e-3 (0,680). La sonda sola (B) baja
+-0,037 [-0,072, -0,016] contra V0; la lineal sube +0,020 [+0,006, +0,038]. Contra el etiquetador
+con luces, G5 da +0,039 [+0,020, +0,069]: V-JEPA sigue entrando, igual que con V0.
+
+**Comprobacion del camino** (declarada para antes de la sonda; se hizo despues, el 13/10 a las 12:00,
+y no cambia nada porque no es una cifra de acierto): en 40 clips al azar, el `rec4` de esta
+extraccion (promedio 2x2 de `rec8`) es el `tok` de V0, coseno minimo 0,9999997 y diferencia maxima
+0,023 (redondeo de fp16). El ojo micro encontro las manos en 5.562 de 5.837 clips (95,3 %); 227 van
+por el respaldo y 48 por la imagen entera.
+
+Lectura:
+
+- **El micro solo ayuda con el modelo grande.** Con ViT-L, el zoom a las manos no mueve nada
+  (-0,001) y queda 0,026 por debajo del mismo ojo con ViT-g (IC sin cruzar cero). La version barata
+  (~3 dias en florete) no sirve.
+- **Lo que queda en pie para la corrida es G2, ViT-g `rec4 + mic4`.** La comparacion declarada que
+  pasa es G2 contra G0. Contra V0 da +0,025, pero esa no estaba declarada; como G0 y V0 empatan
+  (+0,001), es lo esperable.
+- **Coste de G2, ESTIMADO (no medido a solas)**: cada ojo es una pasada igual del modelo (64 cuadros
+  de 256 x 2 por el espejo; `embebe_todo`), y en ViT-L uno cuesta 1,2 s y dos 2,45 s. Asi, G2 son
+  ~2/3 de los 9,67 s de los tres ojos: **~6,4 s de GPU/clip, ~7,9 dias en florete**. Se mide con
+  200 clips y la GPU a solas antes de presupuestar.
+- La mediana de `s_gpu` en los 5.837 clips de G5 es 10,63 s (p10 2,44): casi toda la extraccion
+  compartio la GPU con la sonda G0b (incidente de arriba). La cifra limpia son los 400 clips a solas.
+
 ### Pregunta 3, `body_location` con V0 y 5 semillas (10/10 00:06)
 
 Salida: `02_validacion/auditoria/vjepa_ojos_2026-10-09/sonda_cuerpo_5semillas.txt`. El reservado son
