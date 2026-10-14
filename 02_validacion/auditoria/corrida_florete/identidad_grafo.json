@@ -1,0 +1,40 @@
+{
+ "inicio": "2026-10-14 21:16",
+ "W": {
+  "s": 451.5677314000204,
+  "identicas": 20,
+  "vram_max_MB": 1591,
+  "fallas": []
+ },
+ "A1": {
+  "s": 553.505306600011,
+  "identicas": 20,
+  "vram_max_MB": 2048,
+  "fallas": []
+ },
+ "G1": {
+  "s": 367.1760405000532,
+  "identicas": 20,
+  "vram_max_MB": 1690,
+  "fallas": []
+ },
+ "A2": {
+  "s": 419.461614400032,
+  "identicas": 20,
+  "vram_max_MB": 1331,
+  "fallas": []
+ },
+ "G2": {
+  "s": 360.50167120003607,
+  "identicas": 20,
+  "vram_max_MB": 1617,
+  "fallas": []
+ },
+ "x_un_proceso": 1.337084955820454,
+ "identicas_G": [
+  20,
+  20
+ ],
+ "pasa_un_proceso": true,
+ "fin": "2026-10-14 21:52"
+}

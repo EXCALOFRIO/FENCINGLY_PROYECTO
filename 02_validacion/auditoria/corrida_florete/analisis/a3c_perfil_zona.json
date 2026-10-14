@@ -1,0 +1,70 @@
+{
+ "wanderingKauai‘Ō‘ōOleanderHawkMoth": {
+  "analiza": {
+   "s": 24.18,
+   "motivo": "ok",
+   "via_h": "estricta",
+   "calibrate_acum_s": 14.2,
+   "calibrate_llamadas": 1,
+   "_rasgos_acum_s": 9.71,
+   "_rasgos_llamadas": 1,
+   "read_llamadas": 30,
+   "read_s": 0.0,
+   "top_acum": [
+    "3977762 function calls (3977699 primitive calls) in 24.178 seconds",
+    "1    0.018    0.018   24.179   24.179 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\02_validacion\\auditoria\\corrida_florete\\analisis\\a3c_per",
+    "1    0.003    0.003   24.001   24.001 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\zona_tocado.py:174(analiza)",
+    "1    0.034    0.034   14.198   14.198 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:524(calibrate)",
+    "1    0.172    0.172    9.712    9.712 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\zona_tocado.py:270(_rasgos)",
+    "250    0.139    0.001    8.858    0.035 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:50(process)",
+    "250    0.135    0.001    7.093    0.028 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:251(observe)",
+    "475    6.476    0.014    6.476    0.014 {HoughLinesP}",
+    "14620    0.289    0.000    6.476    0.000 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:408(_H_from)",
+    "84    0.039    0.000    6.355    0.076 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:471(hypothesize)",
+    "13157    4.986    0.000    4.986    0.000 {findHomography}",
+    "225    0.117    0.001    4.176    0.019 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:305(transverse_in",
+    "1042    0.816    0.001    2.711    0.003 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:369(_zone_change",
+    "250    1.249    0.005    2.674    0.011 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:178(_merge_lines)"
+   ]
+  },
+  "angulo": {
+   "s": 0.36,
+   "read_llamadas": 27,
+   "read_s": 0.0
+  }
+ },
+ "comfortableRedSpittingCobraBison": {
+  "analiza": {
+   "s": 13.94,
+   "motivo": "ok",
+   "via_h": "estricta",
+   "calibrate_acum_s": 3.47,
+   "calibrate_llamadas": 1,
+   "_rasgos_acum_s": 10.25,
+   "_rasgos_llamadas": 1,
+   "read_llamadas": 33,
+   "read_s": 0.0,
+   "top_acum": [
+    "918527 function calls (918466 primitive calls) in 13.940 seconds",
+    "1    0.025    0.025   13.941   13.941 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\02_validacion\\auditoria\\corrida_florete\\analisis\\a3c_per",
+    "1    0.006    0.006   13.916   13.916 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\zona_tocado.py:174(analiza)",
+    "1    0.197    0.197   10.253   10.253 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\zona_tocado.py:270(_rasgos)",
+    "318    0.270    0.001    8.470    0.027 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:50(process)",
+    "464    5.825    0.013    5.825    0.013 {HoughLinesP}",
+    "1    0.009    0.009    3.467    3.467 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:524(calibrate)",
+    "318    0.056    0.000    3.343    0.011 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:251(observe)",
+    "146    0.080    0.001    2.236    0.015 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:305(transverse_in",
+    "318    1.556    0.005    1.556    0.005 {method 'read' of 'cv2.VideoCapture' objects}",
+    "317    1.508    0.005    1.508    0.005 {goodFeaturesToTrack}",
+    "318    0.420    0.001    0.991    0.003 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\pista_lineas.py:178(_merge_lines)",
+    "318    0.610    0.002    0.610    0.002 {resize}",
+    "317    0.566    0.002    0.566    0.002 {calcOpticalFlowPyrLK}"
+   ]
+  },
+  "angulo": {
+   "s": 0.55,
+   "read_llamadas": 30,
+   "read_s": 0.0
+  }
+ }
+}

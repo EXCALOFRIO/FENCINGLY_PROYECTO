@@ -1,0 +1,15 @@
+clips con pista_h_: 253 (la 7 con H 137, sin H 116); se prueban 20 y 20
+"QUE HACE: todo el paso 2 sobre un clip, y devuelve la homografia con sus tres co"
+claves de un evento: ['cuadro', 'dur_s', 'fin', 'inicio', 'lado', 'magnitud_m', 'pos_m', 'tipo']
+CON homografia en la 7 (20 clips, 452 s):
+   marcha  eventos 7  144, v2   97 | de los de la 7 con pareja en v2 +-3 cuadros 23 % | de v2 en la 7 34 %
+   romper  eventos 7  145, v2   73 | de los de la 7 con pareja en v2 +-3 cuadros 18 % | de v2 en la 7 36 %
+   fondo   eventos 7   49, v2   30 | de los de la 7 con pareja en v2 +-3 cuadros 22 % | de v2 en la 7 37 %
+   alto    eventos 7  109, v2   13 | de los de la 7 con pareja en v2 +-3 cuadros 5 % | de v2 en la 7 38 %
+   brazo   eventos 7  159, v2  159 | de los de la 7 con pareja en v2 +-3 cuadros 100 % | de v2 en la 7 100 %
+   magnitud brazo   n= 159  7 p50 0.31  v2 p50 0.31  |dif| p50 0.00  corr 1.00
+   magnitud marcha  n=  33  7 p50 0.32  v2 p50 0.30  |dif| p50 0.07  corr 0.35
+   magnitud fondo   n=  11  7 p50 0.44  v2 p50 0.72  |dif| p50 0.33  corr -0.29
+   magnitud romper  n=  26  7 p50 0.33  v2 p50 0.28  |dif| p50 0.09  corr 0.40
+   magnitud alto    n=   5  7 p50 0.29  v2 p50 0.32  |dif| p50 0.04  corr 0.95
+SIN homografia en la 7 (20 probados, 20 con eventos v2): {'brazo': 163, 'accion': 16, 'romper': 57, 'fondo': 21, 'marcha': 75, 'bote': 3, 'alto': 19}

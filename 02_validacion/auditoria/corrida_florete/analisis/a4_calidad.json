@@ -1,0 +1,123 @@
+{
+ "sabre": {
+  "util_frac": {
+   "n": 564,
+   "media": 0.818,
+   "p10": 0.511,
+   "mediana": 0.915
+  },
+  "dos_poses": {
+   "n": 564,
+   "media": 1.0,
+   "p10": 1.0,
+   "mediana": 1.0
+  },
+  "dos_medidas": {
+   "n": 564,
+   "media": 0.951,
+   "p10": 0.856,
+   "mediana": 0.997
+  },
+  "inventadas": {
+   "n": 564,
+   "media": 0.025,
+   "p10": 0.0,
+   "mediana": 0.002
+  },
+  "sin_cuadros_utiles": 2,
+  "redetectado": {
+   "n": 565,
+   "media": 0.015,
+   "p10": 0.0,
+   "mediana": 0.0
+  },
+  "clips_con_menos_de_50%_dos_poses": 0,
+  "clips_con_algun_cuadro_redetectado": 178
+ },
+ "epee": {
+  "util_frac": {
+   "n": 1030,
+   "media": 0.92,
+   "p10": 0.729,
+   "mediana": 1.0
+  },
+  "dos_poses": {
+   "n": 1030,
+   "media": 1.0,
+   "p10": 1.0,
+   "mediana": 1.0
+  },
+  "dos_medidas": {
+   "n": 1030,
+   "media": 0.962,
+   "p10": 0.88,
+   "mediana": 1.0
+  },
+  "inventadas": {
+   "n": 1030,
+   "media": 0.02,
+   "p10": 0.0,
+   "mediana": 0.0
+  },
+  "sin_cuadros_utiles": 7,
+  "redetectado": {
+   "n": 1037,
+   "media": 0.014,
+   "p10": 0.0,
+   "mediana": 0.0
+  },
+  "clips_con_menos_de_50%_dos_poses": 0,
+  "clips_con_algun_cuadro_redetectado": 301
+ },
+ "foil": {
+  "util_frac": {
+   "n": 4237,
+   "media": 0.874,
+   "p10": 0.556,
+   "mediana": 0.996
+  },
+  "dos_poses": {
+   "n": 4237,
+   "media": 1.0,
+   "p10": 1.0,
+   "mediana": 1.0
+  },
+  "dos_medidas": {
+   "n": 4237,
+   "media": 0.957,
+   "p10": 0.869,
+   "mediana": 1.0
+  },
+  "inventadas": {
+   "n": 4237,
+   "media": 0.022,
+   "p10": 0.0,
+   "mediana": 0.0
+  },
+  "sin_cuadros_utiles": 33,
+  "redetectado": {
+   "n": 4261,
+   "media": 0.014,
+   "p10": 0.0,
+   "mediana": 0.0
+  },
+  "clips_con_menos_de_50%_dos_poses": 0,
+  "clips_con_algun_cuadro_redetectado": 1159
+ },
+ "series": {
+  "clips": 5839,
+  "sin marcha/romper/fondo/alto": 2821,
+  "0 filas": 1
+ },
+ "series_filas_publicables_y_fisica_ok": 17346,
+ "series_imposibles": {
+  "no_publicable_filas": 108889,
+  "no_publicable_|x|>8m": 15148,
+  "no_publicable_paso>1,5m": 3552,
+  "publicable_filas": 17346,
+  "publicable_|x|>8m": 516,
+  "publicable_paso>1,5m": 210,
+  "no_publicable_v>9m/s": 2691,
+  "publicable_v>9m/s": 1
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "PortlyVariableGrosbeak": {
+  "read_s": 1.15,
+  "n": 368,
+  "W": 1280,
+  "grab_s": 0.22,
+  "grab2_read1_s": 0.56
+ },
+ "comfortableRedSpittingCobraBison": {
+  "read_s": 1.96,
+  "n": 393,
+  "W": 1920,
+  "grab_s": 0.38,
+  "grab2_read1_s": 1.02,
+  "procesa_sin_cuadros_s": 0.44
+ }
+}

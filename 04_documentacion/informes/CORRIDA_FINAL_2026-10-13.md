@@ -428,6 +428,10 @@ algo mas largos (mediana de cuadros 331-423 contra 300; los usados, parecidos), 
 | `resto` (1+4, con 7, 9, 11 en paralelo) | ~86.000 | 105-116/h | **30,9-34,1** |
 | **TOTAL** | | | **~41-45 dias** |
 
+**Con O12 encendido** (14/10 ~23:30; +2,9 % en el caudal en paralelo, ABAB de 45 clips): 1+4 a ~108-119
+clips/h, `dos_luces` 6,8-7,5 dias y `resto` 30,0-33,1: **TOTAL ~40-44 dias**. Es una estimacion con el
+factor medido en 45 anotados; el ruido entre brazos iguales fue ~1,7 %.
+
 Antes de esta tanda (13/10) la cifra era **~51 dias**, con el ritmo real de las noches de anotados (96
 clips/h, codigo de entonces y la maquina compartida). Hoy, con todo montado como en la corrida y la
 maquina a solas: base 113-120 clips/h y exacta 121. **Si la maquina se usa para otra cosa durante la
@@ -475,3 +479,37 @@ tiradores en metros CUADRO A CUADRO con la homografia de la etapa 11 (`pista_h_`
 en cada clip con luz, con los pies en pixeles). Se calcula despues, en CPU, de lo guardado. Necesita su
 criterio declarado antes de medirla (contra `strip_location` y la fisica: separacion entre tiradores,
 velocidades) y que el usuario la quiera.
+
+**O12, CUDA graphs en la pasada de Sapiens** (criterio DECLARADO el 14/10 21:10, antes de medir nada). La
+MISMA pasada eager capturada en un `torch.cuda.CUDAGraph` (sin `torch.compile` ni fusiones; dos grafos,
+lote 1 y lote 2; el postproceso fuera del grafo), para quitar el coste de lanzar cientos de nucleos
+pequenios por pasada. Pasa si:
+- `poses_` IDENTICAS bit a bit (0,0 px, NaN en los mismos sitios) en los 20 clips de
+  `D:/FENCINGLY_SCRATCH/perfil/identidad_clips.txt` contra `id_A`; y
+- >= 1,05x en el caudal en paralelo (3 trabajadores) o >= 1,10x en un proceso solo, con pasadas
+  intercaladas y calentamiento.
+Antes, un prototipo fuera del pipeline: heatmaps de eager contra grafo, bit a bit, en ~200 recortes reales.
+Si no sale identico, se queda apagado con su numero. YOLO (etapa 1), lo mismo, solo si encaja facil.
+
+**O12, RESULTADO (14/10 23:16): PASA por la rama de un proceso; en paralelo gana poco.**
+- Prototipo: heatmaps identicos bit a bit en 165 de 165 cuadros reales (45 de lote 1, 120 de lote 2), max
+  |dif| 0; pasada de ~79 a ~55 ms por cuadro.
+- Identidad en el pipeline (`FENCINGLY_POSE_GRAFO=1`, con la tuberia y O2b/O9 por defecto;
+  `identidad_grafo.json`): `poses_` identicas a `id_A` en **20/20 en las dos pasadas**. Etapa 4, 20 clips,
+  intercalado W A G A G: A 553 y 419 s, G 367 y 361 s: **1,34x** (pide >= 1,10). VRAM igual (1,3-2,0 GB).
+- Caudal en paralelo (`caudal_grafo.json`; 45 anotados, 3 GPU + 2 CPU como la corrida, base_a grafo_a
+  base_b grafo_b): base 127,8 y 130,0 clips/h, grafo 133,2 y 132,0: **1,029x** (pide >= 1,05; no llega). GPU
+  93-95 % en todos los brazos, CPU 63-65 % (80 % en grafo_b, con otros 9 procesos de Python de fuera de la
+  prueba vivos en los cuatro brazos). `poses_` y `revision_` identicas entre base_a y grafo_a en 45/45. VRAM
+  maxima 4,5 GB con grafo contra 3,9 sin el.
+- Con 3 trabajadores la GPU ya va casi llena (93-95 %), asi que quitar el coste de lanzar nucleos ahorra
+  poco: ~3 %, ~1 dia de los ~31-34 de `resto`.
+- **DECISION (14/10 ~23:30): ENCENDIDO por defecto** (`FENCINGLY_POSE_GRAFO`, "1"). Es exacto (la misma
+  cuenta, bit a bit, comprobado tres veces) y pasa el criterio declarado; las fases de GPU de la corrida van
+  una detras de otra, asi que los +0,6 GB de VRAM no chocan con V-JEPA. Se anade un respaldo: si grabar el
+  grafo de una forma falla, esa forma sigue eager el resto del proceso. Re-chequeo con TODO por defecto
+  (sin la variable en el entorno): `recheck_grafo_defecto.json`: **20/20 identicas**, 0 grafos sin grabar. Para apagarlo:
+  `FENCINGLY_POSE_GRAFO=0`.
+- YOLO (etapa 1): no se probo. La pasada va dentro del `predictor` de ultralytics (que se rehace y copia el
+  modelo), las formas cambian por video y en el ultimo lote, la redeteccion es de tamanio variable en fp32,
+  y con lotes de 8 cuadros a 960 los nucleos son grandes: el coste de lanzarlos pesa poco.

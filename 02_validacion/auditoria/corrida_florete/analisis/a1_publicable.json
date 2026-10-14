@@ -1,0 +1,251 @@
+{
+ "todos": {
+  "n": 5839,
+  "1_sin_homografia": 2810,
+  "2_con_h_no_publicable": 2505,
+  "2a_de_esos_dos_estaturas_en_rango": 2,
+  "2b_de_esos_alguna_estatura_fuera": 2503,
+  "3_publicable": 524,
+  "3a_publicable_y_dos_estaturas_en_rango": 194,
+  "3b_publicable_y_pasa_fisica": 97,
+  "3c_publicable_y_ancla_fiable": 129,
+  "4_publicable_y_dos_lados_y_fisica": 40,
+  "por_separado_en_los_con_h": {
+   "puerta_dos_lados": {
+    "True": 196,
+    "False": 2833,
+    "vacio": 0
+   },
+   "pasa_fisica": {
+    "True": 306,
+    "False": 2723,
+    "vacio": 0
+   },
+   "ancla_fiable": {
+    "True": 471,
+    "False": 2558,
+    "vacio": 0
+   },
+   "pasa_dpies": {
+    "True": 1020,
+    "False": 2001,
+    "vacio": 8
+   },
+   "pasa_fuera": {
+    "True": 1550,
+    "False": 1479,
+    "vacio": 0
+   },
+   "pasa_transv": {
+    "True": 1182,
+    "False": 1847,
+    "vacio": 0
+   },
+   "fisica_completa": {
+    "True": 3021,
+    "False": 8,
+    "vacio": 0
+   }
+  },
+  "v2_sin_h7_con_zona11": 1666,
+  "v2_sin_h7_sin_zona11": 1144,
+  "v2_con_h7_no_publicable_con_zona11": 1569,
+  "v2_frac_cuadros_h11_en_sin_h7_mediana": 0.676
+ },
+ "foil": {
+  "n": 4240,
+  "1_sin_homografia": 2030,
+  "2_con_h_no_publicable": 1845,
+  "2a_de_esos_dos_estaturas_en_rango": 0,
+  "2b_de_esos_alguna_estatura_fuera": 1845,
+  "3_publicable": 365,
+  "3a_publicable_y_dos_estaturas_en_rango": 127,
+  "3b_publicable_y_pasa_fisica": 68,
+  "3c_publicable_y_ancla_fiable": 87,
+  "4_publicable_y_dos_lados_y_fisica": 27,
+  "por_separado_en_los_con_h": {
+   "puerta_dos_lados": {
+    "True": 127,
+    "False": 2083,
+    "vacio": 0
+   },
+   "pasa_fisica": {
+    "True": 239,
+    "False": 1971,
+    "vacio": 0
+   },
+   "ancla_fiable": {
+    "True": 340,
+    "False": 1870,
+    "vacio": 0
+   },
+   "pasa_dpies": {
+    "True": 771,
+    "False": 1433,
+    "vacio": 6
+   },
+   "pasa_fuera": {
+    "True": 1127,
+    "False": 1083,
+    "vacio": 0
+   },
+   "pasa_transv": {
+    "True": 864,
+    "False": 1346,
+    "vacio": 0
+   },
+   "fisica_completa": {
+    "True": 2204,
+    "False": 6,
+    "vacio": 0
+   }
+  },
+  "v2_sin_h7_con_zona11": 1207,
+  "v2_sin_h7_sin_zona11": 823,
+  "v2_con_h7_no_publicable_con_zona11": 1155,
+  "v2_frac_cuadros_h11_en_sin_h7_mediana": 0.662
+ },
+ "epee": {
+  "n": 1036,
+  "1_sin_homografia": 536,
+  "2_con_h_no_publicable": 422,
+  "2a_de_esos_dos_estaturas_en_rango": 2,
+  "2b_de_esos_alguna_estatura_fuera": 420,
+  "3_publicable": 78,
+  "3a_publicable_y_dos_estaturas_en_rango": 38,
+  "3b_publicable_y_pasa_fisica": 6,
+  "3c_publicable_y_ancla_fiable": 16,
+  "4_publicable_y_dos_lados_y_fisica": 3,
+  "por_separado_en_los_con_h": {
+   "puerta_dos_lados": {
+    "True": 40,
+    "False": 460,
+    "vacio": 0
+   },
+   "pasa_fisica": {
+    "True": 27,
+    "False": 473,
+    "vacio": 0
+   },
+   "ancla_fiable": {
+    "True": 44,
+    "False": 456,
+    "vacio": 0
+   },
+   "pasa_dpies": {
+    "True": 101,
+    "False": 398,
+    "vacio": 1
+   },
+   "pasa_fuera": {
+    "True": 263,
+    "False": 237,
+    "vacio": 0
+   },
+   "pasa_transv": {
+    "True": 185,
+    "False": 315,
+    "vacio": 0
+   },
+   "fisica_completa": {
+    "True": 499,
+    "False": 1,
+    "vacio": 0
+   }
+  },
+  "v2_sin_h7_con_zona11": 318,
+  "v2_sin_h7_sin_zona11": 218,
+  "v2_con_h7_no_publicable_con_zona11": 275,
+  "v2_frac_cuadros_h11_en_sin_h7_mediana": 0.756
+ },
+ "sabre": {
+  "n": 563,
+  "1_sin_homografia": 244,
+  "2_con_h_no_publicable": 238,
+  "2a_de_esos_dos_estaturas_en_rango": 0,
+  "2b_de_esos_alguna_estatura_fuera": 238,
+  "3_publicable": 81,
+  "3a_publicable_y_dos_estaturas_en_rango": 29,
+  "3b_publicable_y_pasa_fisica": 23,
+  "3c_publicable_y_ancla_fiable": 26,
+  "4_publicable_y_dos_lados_y_fisica": 10,
+  "por_separado_en_los_con_h": {
+   "puerta_dos_lados": {
+    "True": 29,
+    "False": 290,
+    "vacio": 0
+   },
+   "pasa_fisica": {
+    "True": 40,
+    "False": 279,
+    "vacio": 0
+   },
+   "ancla_fiable": {
+    "True": 87,
+    "False": 232,
+    "vacio": 0
+   },
+   "pasa_dpies": {
+    "True": 148,
+    "False": 170,
+    "vacio": 1
+   },
+   "pasa_fuera": {
+    "True": 160,
+    "False": 159,
+    "vacio": 0
+   },
+   "pasa_transv": {
+    "True": 133,
+    "False": 186,
+    "vacio": 0
+   },
+   "fisica_completa": {
+    "True": 318,
+    "False": 1,
+    "vacio": 0
+   }
+  },
+  "v2_sin_h7_con_zona11": 141,
+  "v2_sin_h7_sin_zona11": 103,
+  "v2_con_h7_no_publicable_con_zona11": 139,
+  "v2_frac_cuadros_h11_en_sin_h7_mediana": 0.644
+ },
+ "pista_vacia_txt": 20,
+ "serie_filas": 126235,
+ "serie_motivo_no_publicable": {
+  "(vacio)": 118860,
+  "fuera_de_pista": 2283,
+  "velocidad+desplazamiento+fuera_de_pista": 1534,
+  "desplazamiento+fuera_de_pista": 1209,
+  "velocidad+desplazamiento": 963,
+  "desplazamiento": 833,
+  "velocidad": 374,
+  "velocidad+fuera_de_pista": 179
+ },
+ "serie_lado_no_valido_por": {
+  "es el ARBITRO, no un tirador (verificado a ojo)": 5
+ },
+ "serie_tipo_publicable": {
+  "brazo|False": 43977,
+  "marcha|False": 19409,
+  "romper|False": 18778,
+  "accion|False": 11709,
+  "alto|False": 8664,
+  "fondo|False": 6298,
+  "brazo|True": 4246,
+  "marcha|True": 4041,
+  "romper|True": 3827,
+  "alto|True": 2847,
+  "accion|True": 1197,
+  "fondo|True": 1185,
+  "bote|False": 54,
+  "bote|True": 3
+ },
+ "homografia_csv_antiguo_78": {
+  "sin homografia": 35,
+  "no publicable: C1 NO, marcas afinadas >=2": 31,
+  "publicable": 10,
+  "no publicable: C1 NO, marcas afinadas <2": 2
+ }
+}

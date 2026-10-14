@@ -378,12 +378,79 @@ preproceso de Sapiens va a 38,7 ms por recorte con 12 hilos y a 14,3 con 1, porq
 def _hilos_torch(torch):
     if TORCH_HILOS > 0:
         torch.set_num_threads(TORCH_HILOS)
+
+
+POSE_GRAFO = os.environ.get("FENCINGLY_POSE_GRAFO", "1") == "1"
+"""O12 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-14): LA MISMA PASADA DE SAPIENS, GRABADA EN UN
+`torch.cuda.CUDAGraph`. Nada de `torch.compile` ni de fusiones: se graba la pasada eager tal cual, con los
+mismos nucleos, y se repite sin pagar el lanzamiento de cada uno (son cientos por pasada y pequenios, con
+lotes de 1 o 2 recortes). Un grafo por forma de entrada (lote 1 y lote 2); el postproceso va fuera.
+Prototipo medido en 165 cuadros reales (45 de lote 1, 120 de lote 2): heatmaps IDENTICOS bit a bit
+(diferencia maxima 0) y la pasada de ~79 a ~55 ms por cuadro. ENCENDIDO por defecto desde el 14/10: paso
+(poses_ identicas 20/20 dos veces y 45/45 en paralelo; 1,34x en un proceso, 1,029x con la corrida montada).
+Si grabar un grafo falla, esa forma se queda eager para el resto del proceso (la cuenta de siempre)."""
+
+
+class _SalidaPose:
+    def __init__(self, heatmaps):
+        self.heatmaps = heatmaps
+
+
+class _GrafoPose:
+    """Envuelve al modelo de pose: `mod(**e)` como siempre, pero las entradas de lote 1 o 2 van por un grafo
+    grabado la primera vez que aparece su forma. Las demas (lotes de `LOTE_POSE` > 2) van eager.
+    `post_process_pose_estimation` solo lee `.heatmaps`, que se devuelven copiados: la salida del grafo
+    es un buffer fijo que la siguiente repeticion sobrescribe."""
+
+    def __init__(self, mod, torch):
+        self.mod, self.torch, self.grafos = mod, torch, {}
+
+    def __call__(self, **e):
+        torch = self.torch
+        if e["pixel_values"].shape[0] > 2:
+            return self.mod(**e)
+        clave = tuple((q, tuple(v.shape), v.dtype) for q, v in sorted(e.items()))
+        if self.grafos.get(clave, 0) is None:
+            return self.mod(**e)
+        if clave not in self.grafos:
+            try:
+                self.grafos[clave] = self._graba(e)
+            except Exception as ex:
+                print("   grafo de pose NO grabado para %s (%s): sigue eager" % (tuple(e["pixel_values"].shape), ex),
+                      flush=True)
+                self.grafos[clave] = None
+                torch.cuda.synchronize()
+                return self.mod(**e)
+        g, est, out = self.grafos[clave]
+        for q, v in e.items():
+            est[q].copy_(v)
+        g.replay()
+        return _SalidaPose(out.heatmaps.clone())
+
+    def _graba(self, e):
+        """Tres pasadas de calentamiento en un stream aparte antes de grabar, como pide PyTorch: la primera
+        elige nucleos y reserva memoria, y eso no puede quedar dentro del grafo."""
+        torch = self.torch
+        est = {q: v.clone() for q, v in e.items()}
+        s = torch.cuda.Stream()
+        s.wait_stream(torch.cuda.current_stream())
+        with torch.cuda.stream(s):
+            for _ in range(3):
+                self.mod(**est)
+        torch.cuda.current_stream().wait_stream(s)
+        g = torch.cuda.CUDAGraph()
+        with torch.cuda.graph(g):
+            out = self.mod(**est)
+        return g, est, out
+
+
 """O2 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-13): LA MISMA CUENTA, EN TUBERIA. Un hilo lee los
 cuadros y `HILOS_PREPROC` hilos hacen el preproceso de Sapiens (CPU) mientras la GPU pasa el recorte
 anterior. Cada recorte se preprocesa con la MISMA llamada (`proc(images=[rgb], boxes=[caja])`), la
 pasada y el postproceso van en el mismo orden y de uno en uno, como con `LOTE_POSE = 1`: el
 resultado tiene que salir IDENTICO bit a bit. Solo entra si lo sale (criterio declarado antes de
-medir: diferencia maxima 0,0 px en 20 clips, y >= 1,2 veces mas rapida). Apagada por defecto."""
+medir: diferencia maxima 0,0 px en 20 clips, y >= 1,2 veces mas rapida). Encendida por defecto desde el
+14/10 (paso como O2', con el lote de cada cuadro entero)."""
 
 
 def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frames):
@@ -744,6 +811,8 @@ def fase2(clips, video=True):
     proc = Sapiens2ImageProcessor.from_pretrained(str(snap))
     proc.size = RES_POSE
     mod = Sapiens2ForPoseEstimation.from_pretrained(str(snap), dtype=torch.float16).to("cuda").eval()
+    if POSE_GRAFO:
+        mod = _GrafoPose(mod, torch)
     SALIDA.mkdir(parents=True, exist_ok=True)
     for cid in clips:
         try:

@@ -1,0 +1,25 @@
+{
+ "clips": 144,
+ "con_pista_h": 140,
+ "todos": {
+  "n": 144,
+  "media": 0.624,
+  "mediana": 0.786,
+  "clips_con_>=50%_cuadros": 87,
+  "clips_con_0": 24
+ },
+ "sin_h_en_la_7": {
+  "n": 70,
+  "media": 0.634,
+  "mediana": 0.786,
+  "clips_con_>=50%_cuadros": 44,
+  "clips_con_0": 12
+ },
+ "con_h_en_la_7": {
+  "n": 74,
+  "media": 0.614,
+  "mediana": 0.75,
+  "clips_con_>=50%_cuadros": 43,
+  "clips_con_0": 12
+ }
+}

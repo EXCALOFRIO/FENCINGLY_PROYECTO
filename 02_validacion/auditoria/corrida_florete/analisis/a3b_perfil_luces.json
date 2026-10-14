@@ -1,0 +1,44 @@
+{
+ "PortlyVariableGrosbeak": {
+  "s": 1.57,
+  "via": "v2_fie",
+  "aperturas_VideoCapture": 2,
+  "<cvtColor>_~": {
+   "llamadas": 7,
+   "s": 0.03
+  },
+  "top": [
+   "41992 function calls (41519 primitive calls) in 1.571 seconds",
+   "368    0.824    0.002    0.824    0.002 {method 'read' of 'cv2.VideoCapture' objects}",
+   "2    0.120    0.060    0.120    0.060 D:\\FENCINGLY_PY\\venv\\Lib\\site-packages\\pandas\\core\\indexes\\base.py:3601(get_loc)",
+   "491    0.095    0.000    0.096    0.000 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\luces_v2\\lights_generic.py:92(add)",
+   "13    0.070    0.005    0.070    0.005 {inRange}",
+   "1    0.066    0.066    1.018    1.018 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\luces_v2\\lights_generic.py:149(decode_bands_o",
+   "758    0.054    0.000    0.054    0.000 {method 'reduce' of 'numpy.ufunc' objects}",
+   "123    0.040    0.000    0.040    0.000 {accumulate}"
+  ]
+ },
+ "comfortableRedSpittingCobraBison": {
+  "s": 3.6,
+  "via": "v2_generic",
+  "aperturas_VideoCapture": 2,
+  "<cvtColor>_~": {
+   "llamadas": 13,
+   "s": 0.02
+  },
+  "<resize>_~": {
+   "llamadas": 917,
+   "s": 0.2
+  },
+  "top": [
+   "23274 function calls in 3.605 seconds",
+   "393    2.076    0.005    2.076    0.005 {method 'read' of 'cv2.VideoCapture' objects}",
+   "1089    0.458    0.000    0.458    0.000 {method 'reduce' of 'numpy.ufunc' objects}",
+   "917    0.203    0.000    0.203    0.000 {resize}",
+   "1    0.161    0.161    2.595    2.595 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\luces_v2\\lights_generic.py:149(decode_bands_o",
+   "26    0.136    0.005    0.136    0.005 {inRange}",
+   "1    0.112    0.112    0.771    0.771 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\luces_v2\\lights_generic.py:218(_candidates)",
+   "917    0.108    0.000    0.109    0.000 C:\\Users\\Alejandro\\Desktop\\FENCINGLY_PROYECTO\\01_extraccion\\codigo\\luces_v2\\lights_generic.py:92(add)"
+  ]
+ }
+}
