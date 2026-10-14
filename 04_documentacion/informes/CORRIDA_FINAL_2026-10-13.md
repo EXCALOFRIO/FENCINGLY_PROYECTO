@@ -449,3 +449,29 @@ reserva el guardian.
 
 **El pipeline queda listo. La corrida NO se lanza hasta que el usuario lo diga**:
 `python 01_extraccion/corrida_florete.py --lanza` (y `--estado` / `--para`).
+
+### CALIDAD DE LO QUE DEVUELVE (14/10; scripts en `02_validacion/auditoria/corrida_florete/calidad/`)
+
+Hasta aqui todo era "sale completo, legible e identico". Esto es "dice la verdad", contra lo que se sabe:
+
+| que | contra que | sale |
+|---|---|---|
+| luces (etapa 9) | `touch` del catalogo, 3.914 de florete en `pruebas` | la luz del que toco en **90,2 %**; solo la del otro 5,3 %; ninguna de color 4,5 % |
+| luces en campeonatos | igual, 14 clips de los ensayos | 85,7 % (muestra pequenia) |
+| zona del tocado (etapa 11) | `strip_location` a mano, 1.255 anotados de florete | **0,495**, contra 0,399 de contestar siempre `middle` |
+| posicion de la etapa 7 en el tocado | lo mismo, mismos 1.255 | **0,346** (relativa al ancla) y 0,283 (absoluta): **peor que `middle`** |
+| etapa 7 con homografia | anotados en `pruebas` (5.817) | **51,8 %**; "publicable" 8,8 % |
+| etapa 11 con homografia (zona `ok`) | lo mismo | 60,9 %; en el 28,6 % de los clips la 11 la tiene y la 7 no |
+| `pista_h_` (homografia por cuadro de la 11) | ensayos | H en el 80,6 % de los cuadros de media (mediana 100 %) |
+| desplazamiento de cada evento, etapa 7 contra etapa 11 | 1.239 eventos de los ensayos | mismo sentido 85-93 % en marcha, romper, alto y fondo; \|dif\| p50 0,14-0,22 m; corr 0,6-0,74 (fondo 0,23, brazo 0,35) |
+
+**Lo que dice**: la etapa 7 (scouting) mide bien CUANTO se mueve cada tirador (desplazamientos), pero
+**NO DONDE esta en la pista**: su x va relativa a un ancla porque no sabe donde esta el centro, y como
+posicion absoluta acierta menos que no mirar. Para la posicion en la pista vale la de la etapa 11, que
+ademas cubre mas clips.
+
+**Mejora propuesta (NO cambia la corrida y NO la retrasa)**: el "scouting v2", la posicion de los dos
+tiradores en metros CUADRO A CUADRO con la homografia de la etapa 11 (`pista_h_`, que la corrida ya guarda
+en cada clip con luz, con los pies en pixeles). Se calcula despues, en CPU, de lo guardado. Necesita su
+criterio declarado antes de medirla (contra `strip_location` y la fisica: separacion entre tiradores,
+velocidades) y que el usuario la quiera.
