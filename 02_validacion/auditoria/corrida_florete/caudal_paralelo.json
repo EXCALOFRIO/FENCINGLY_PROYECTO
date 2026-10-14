@@ -1,0 +1,310 @@
+{
+ "inicio": "2026-10-14 03:51",
+ "clips": [
+  "SkeletalIgnorantGrayreefshark",
+  "GorgeousShowyHornedviper",
+  "EnchantedInsidiousBlackpanther",
+  "ChillyEnormousAmericancreamdraft",
+  "MiniatureRichGarpike",
+  "MinorSeriousCavy",
+  "VillainousHeavyIndianspinyloach",
+  "ChiefWebbedEyra",
+  "GreedySevereLcont",
+  "FaintSkinnyIbadanmalimbe",
+  "BestHiddenAssassinbug",
+  "DefiantNimbleAlabamamapturtle",
+  "GeneralMatureAlbertosaurus",
+  "PartialFalseBarnacle",
+  "WideAgileHylaeosaurus",
+  "PolishedFirsthandGermanpinscher",
+  "ElaborateInsignificantAngelwingmussel",
+  "LimpFondIbadanmalimbe",
+  "PoshFlusteredAldabratortoise",
+  "HairyPresentIndigowingedparrot",
+  "BlandPoliteIlladopsis",
+  "FeistyDenseDormouse",
+  "ContentAstonishingAustraliancattledog",
+  "DistortedLinearEthiopianwolf",
+  "BothMammothBinturong",
+  "LargeInsidiousGenet",
+  "ShimmeringInferiorIceblueredtopzebra",
+  "KlutzyMassiveAmericanwirehair",
+  "DismalGranularLeafbird",
+  "FlawedWickedHoatzin",
+  "ThunderousEvenAmericanrobin",
+  "BiodegradableOblongHochstettersfrog",
+  "HairyAllGuernseycow",
+  "InsignificantBlackGypsymoth",
+  "UnfitConsiderateIrishdraughthorse",
+  "WindingMetallicAztecant",
+  "MeagerRipeHartebeest",
+  "OrganicGrandioseElver",
+  "GraveRawHapuka",
+  "WeirdShamelessChrysalis",
+  "ShoddyPhysicalGrayling",
+  "HelpfulGracefulHawaiianmonkseal",
+  "WillingIncompatibleFrog",
+  "RectangularAthleticCowrie",
+  "UnfoldedTightHeron",
+  "BoringDemandingBlueshark",
+  "GorgeousPassionateLice",
+  "UnrealisticMeanAfricangoldencat",
+  "MeekAntiqueHyrax",
+  "FatDeliriousHousefly",
+  "LinearFortunateBlackrussianterrier",
+  "EnchantedGrimIberianbarbel",
+  "BowedGlisteningCrocodile",
+  "RegalFamousJay",
+  "InfamousHappygoluckyFlyingfox",
+  "TautExemplaryDeer",
+  "SkinnyPositiveGannet",
+  "HarmoniousOpulentBufflehead",
+  "EnergeticShowyBarnowl",
+  "InferiorIdleAnemone"
+ ],
+ "brazos": {
+  "base1": {
+   "flags": {},
+   "t14_s": 1906.6599814891815,
+   "tall_s": 2146.7860782146454,
+   "vivos_tras_para": [],
+   "parts": [],
+   "clips_h_14": 113.2871104953359,
+   "gpu_media_14": 78.56050955414013,
+   "cpu_media_14": 72.84373673036092,
+   "incompletos": {},
+   "fallas": []
+  },
+  "exacta": {
+   "flags": {
+    "FENCINGLY_TORCH_HILOS": "2",
+    "FENCINGLY_YOLO_TUBERIA": "1",
+    "FENCINGLY_YOLO_DOS": "1",
+    "FENCINGLY_POSE_TUBERIA": "1",
+    "FENCINGLY_POSE_POR_CUADRO": "1"
+   },
+   "t14_s": 1788.5938098430634,
+   "tall_s": 2048.884657382965,
+   "vivos_tras_para": [],
+   "parts": [],
+   "clips_h_14": 120.76526196797724,
+   "gpu_media_14": 86.74575311438278,
+   "cpu_media_14": 88.66200453001133,
+   "incompletos": {},
+   "fallas": []
+  },
+  "lote16": {
+   "flags": {
+    "FENCINGLY_TORCH_HILOS": "2",
+    "FENCINGLY_YOLO_TUBERIA": "1",
+    "FENCINGLY_YOLO_DOS": "1",
+    "FENCINGLY_POSE_TUBERIA": "1",
+    "FENCINGLY_POSE_POR_CUADRO": "1",
+    "FENCINGLY_LOTE_POSE": "16"
+   },
+   "t14_s": 1817.636393547058,
+   "tall_s": 1937.8075613975525,
+   "vivos_tras_para": [],
+   "parts": [],
+   "clips_h_14": 118.83564873967067,
+   "gpu_media_14": 77.46800222593211,
+   "cpu_media_14": 84.88464106844741,
+   "incompletos": {},
+   "fallas": []
+  },
+  "base2": {
+   "flags": {},
+   "t14_s": 1804.681785106659,
+   "tall_s": 1944.763203382492,
+   "vivos_tras_para": [],
+   "parts": [],
+   "clips_h_14": 119.68869070578785,
+   "gpu_media_14": 83.8848518725545,
+   "cpu_media_14": 68.09513694801565,
+   "incompletos": {},
+   "fallas": []
+  }
+ },
+ "exacta_flags": {
+  "FENCINGLY_TORCH_HILOS": "2",
+  "FENCINGLY_YOLO_TUBERIA": "1",
+  "FENCINGLY_YOLO_DOS": "1",
+  "FENCINGLY_POSE_TUBERIA": "1",
+  "FENCINGLY_POSE_POR_CUADRO": "1"
+ },
+ "identidad2": {
+  "O3_identica": true,
+  "O2p_identica": true,
+  "Q_identica": true
+ },
+ "arranque_s": {
+  "etapa1": [
+   3.428941011428833,
+   3.1012845039367676
+  ],
+  "etapa4": [
+   10.5252206325531,
+   10.18984055519104
+  ],
+  "etapa9": [
+   2.3193984031677246
+  ],
+  "etapa7": [
+   1.192931890487671
+  ]
+ },
+ "identidad_base1_base2": {
+  "det": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "detx": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "revision": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "poses": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "lights": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "zona": {
+   "iguales": 7,
+   "distintos": 53,
+   "faltan": 0
+  },
+  "serie_eventos": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "posicion_clip": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "pista_h": {
+   "iguales": 56,
+   "distintos": 0,
+   "faltan": 4
+  }
+ },
+ "identidad_base1_exacta": {
+  "det": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "detx": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "revision": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "poses": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "lights": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "zona": {
+   "iguales": 4,
+   "distintos": 56,
+   "faltan": 0
+  },
+  "serie_eventos": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "posicion_clip": {
+   "iguales": 60,
+   "distintos": 0,
+   "faltan": 0
+  },
+  "pista_h": {
+   "iguales": 56,
+   "distintos": 0,
+   "faltan": 4
+  }
+ },
+ "lote16_aguas_abajo": {
+  "poses_usables": 8979129,
+  "p50_px": 0.008252903819084167,
+  "p99_px": 0.07487105578184128,
+  "max_px": 494.2652893066406,
+  "eventos": {
+   "a": 854,
+   "b": 856,
+   "a_en_b": 0.9929742388758782,
+   "b_en_a": 0.9906542056074766
+  },
+  "mano": {
+   "n": 106,
+   "igual": 1.0
+  },
+  "zona": {
+   "n": 60,
+   "igual": 0.95,
+   "dx_mediana_m": 0.0,
+   "n_dx": 36
+  }
+ },
+ "base2_aguas_abajo": {
+  "poses_usables": 8979863,
+  "p50_px": 0.0,
+  "p99_px": 0.0,
+  "max_px": 0.0,
+  "eventos": {
+   "a": 854,
+   "b": 854,
+   "a_en_b": 1.0,
+   "b_en_a": 1.0
+  },
+  "mano": {
+   "n": 106,
+   "igual": 1.0
+  },
+  "zona": {
+   "n": 60,
+   "igual": 1.0,
+   "dx_mediana_m": 0.0,
+   "n_dx": 36
+  }
+ },
+ "tipos_no_deterministas": [
+  "zona",
+  "pista_h"
+ ],
+ "exacta_x": 1.0367193617994925,
+ "exacta_pasa": true,
+ "lote16_x": 1.0201544377313423,
+ "lote16_criterios": {
+  "a_pixel": true,
+  "b_eventos": true,
+  "c_zona": false,
+  "d_mano": true,
+  "e_caudal": false
+ },
+ "lote16_pasa": false,
+ "fin": "2026-10-14 06:07"
+}

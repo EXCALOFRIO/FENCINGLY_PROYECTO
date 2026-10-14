@@ -1,0 +1,72 @@
+{
+ "inicio": "2026-10-14 02:39",
+ "clips": [
+  "DismalColorfulFoal",
+  "ReadyCoolChickadee",
+  "PoisedHauntingIcefish",
+  "ObedientPalatableBlackmamba",
+  "UnsightlyAffectionateGrackle",
+  "HappyNeglectedEelelephant",
+  "MeanSlipperyAphid",
+  "WastefulKeyElectriceel",
+  "ThoughtfulWeirdAnophelesmosquito",
+  "TautFlawlessBeauceron",
+  "PinkNastyGhostshrimp",
+  "VictoriousHarmlessAmericanmarten",
+  "DisgustingMeatyKoala",
+  "IllinformedSpiffyKinglet",
+  "SparseLateArmyant",
+  "ReadyBarrenEyas",
+  "SecondThornyBighornsheep",
+  "JubilantCourteousDouglasfirbarkbeetle",
+  "ImmaterialQueasyAlaskanhusky",
+  "MadeupCorruptAsiaticgreaterfreshwaterclam"
+ ],
+ "O3_B1a": {
+  "det": 20,
+  "detx": 20,
+  "revision": 20
+ },
+ "O3_B1b": {
+  "det": 20,
+  "detx": 20,
+  "revision": 20
+ },
+ "poses_A4a": 20,
+ "poses_P4a": 20,
+ "poses_Q4a": 20,
+ "poses_A4b": 20,
+ "poses_P4b": 20,
+ "poses_Q4b": 20,
+ "t_etapa1": {
+  "A1a": 226.17794880003203,
+  "B1a": 204.11731630004942,
+  "A1b": 203.76197869994212,
+  "B1b": 151.7586399000138
+ },
+ "t_etapa4": {
+  "A4a": 640.0849474000279,
+  "P4a": 501.23840429994743,
+  "Q4a": 465.84082159993704,
+  "A4b": 510.28426039998885,
+  "P4b": 404.7830119000282,
+  "Q4b": 396.6058936000336
+ },
+ "medias_s": {
+  "A1": 214.96996374998707,
+  "B1": 177.93797810003161,
+  "A4": 575.1846039000084,
+  "P4": 453.0107080999878,
+  "Q4": 431.2233575999853
+ },
+ "O3_x": 1.2081173791304807,
+ "O2p_x": 1.2696931741689745,
+ "O3_pasa": true,
+ "O2p_pasa": true,
+ "Q_pasa": true,
+ "A4_identico_a_id_A": [
+  20,
+  20
+ ],
+ "fin": "2026-10-14 03:48"
+}

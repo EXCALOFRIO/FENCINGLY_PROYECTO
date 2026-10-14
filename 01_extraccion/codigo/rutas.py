@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import os
 import pathlib
+import threading
 
 RAIZ = pathlib.Path(__file__).resolve().parents[2]
 """El repo, derivado de donde esta este fichero. No se configura: si esto estuviera mal, todo lo
@@ -182,6 +183,7 @@ def _una_vez(clave, texto):
 
 _indice = None
 _indice_arbol = None
+_cerrojo_indice = threading.Lock()
 
 
 def indice_videos(raiz=None, recarga=False):
@@ -216,13 +218,21 @@ def indice_videos(raiz=None, recarga=False):
     un directorio pequenio no cuesta nada."""
     r = pathlib.Path(raiz or VIDEOS)
     if _indice_arbol is None or recarga:
-        _indice_arbol = {}
-        if r.is_dir():
-            for d, _sub, fs in os.walk(r):
-                for f in fs:
-                    if f.lower().endswith(".mp4"):
-                        _indice_arbol.setdefault(f[:-4], os.path.join(d, f))
-        elif not m:
+        with _cerrojo_indice:
+            if _indice_arbol is None or recarga:
+                arbol = {}
+                if r.is_dir():
+                    for d, _sub, fs in os.walk(r):
+                        for f in fs:
+                            if f.lower().endswith(".mp4"):
+                                arbol.setdefault(f[:-4], os.path.join(d, f))
+                _indice_arbol = arbol
+        """EL INDICE SE PUBLICA ENTERO Y CON CERROJO (2026-10-14). Antes se ponia `_indice_arbol = {}` y
+        se llenaba despues: mientras un hilo recorria el arbol (segundos), otro veia el indice a medio
+        llenar y `video()` le devolvia None. Lo cazo el ensayo de 100: los hilos de `prepara` de
+        V-JEPA dieron "sin video" en 6-8 clips por arranque (8 de 45 sin G2, 7 sin V0); reproducido con
+        8 hilos, 17-18 de 24 None. Ahora el que llega mientras se recorre espera y lo ve completo."""
+        if not r.is_dir() and not m:
             _una_vez("sin_videos",
                      "AVISO: no existe %s (FENCINGLY_VIDEOS) y no hay nada bajado. Los clips "
                      "habra que bajarlos del CDN." % r)
@@ -259,6 +269,28 @@ def video(clip, raiz=None):
     Antes, cada clip que no estaba en las descargas volvia a listar `_descargados` (~80.000 ficheros
     en la corrida) y a copiar el indice entero."""
     return indice_videos(raiz).get(clip)
+
+
+def espera_ram(gb, tope_s=1200):
+    """QUE HACE: espera a que haya `gb` GB de RAM fisica disponible (o `tope_s` segundos, y entonces sigue).
+    QUE DEVUELVE: los segundos que espero.
+
+    POR QUE (2026-10-14). En el ensayo de 100, con 3 trabajadores de GPU y 4 de CPU, la fase `resto`
+    (22 de 58 clips a 1080p, hasta 663 cuadros) fue 3-5x mas lenta, con la CPU al 97 % paginando, y dio
+    dos MemoryError (6 y 12 MB). Medido por proceso: etapa 1 RSS hasta 4,3 GB (6,8 de commit), etapa 4
+    3,4 (6,5), etapa 7 en 1080p 3,2 (4,0); la maquina en reposo ya tiene 23 GB de commit y 22 GB
+    disponibles. No cambia ninguna salida: solo retrasa el arranque de una etapa o de un clip cuando no
+    cabe. El tope evita que un trabajador se quede esperando para siempre."""
+    try:
+        import psutil
+    except ImportError:
+        return 0.0
+    import random
+    import time
+    t0 = time.time()
+    while psutil.virtual_memory().available < gb * 1e9 and time.time() - t0 < tope_s:
+        time.sleep(random.uniform(8, 20))
+    return time.time() - t0
 
 
 def pesos_yolo():

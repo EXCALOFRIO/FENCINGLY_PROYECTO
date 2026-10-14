@@ -130,12 +130,17 @@ def fase1(clips, videos=None):
                   flush=True)
 
 
-DOS_YOLO = os.environ.get("FENCINGLY_YOLO_DOS", "0") == "1"
+DOS_YOLO = os.environ.get("FENCINGLY_YOLO_DOS", "1") == "1"
 """O10 (2026-10-13): un SEGUNDO YOLO solo para la redeteccion en recorte. La deteccion va en fp16
 (`quantize=16`) y la redeteccion no lo pasa (fp32); con UN objeto, ultralytics reconstruye el predictor
 (copia, fusiona y calienta el modelo) en cada cambio. Medido: deteccion + redeteccion alternadas 476 ms
 por par, con dos objetos 172 ms, y la redeteccion identica. Entra solo con la prueba de identidad."""
-TUBERIA_YOLO = os.environ.get("FENCINGLY_YOLO_TUBERIA", "0") == "1"
+TUBERIA_YOLO = os.environ.get("FENCINGLY_YOLO_TUBERIA", "1") == "1"
+"""ENCENDIDAS POR DEFECTO (2026-10-14) O3, O10, O2', O2b y O9, que pasaron su criterio (`CORRIDA_FINAL` §10):
+identicas bit a bit en la prueba de identidad 2 (20 clips, dos pasadas intercaladas) y en el caudal en
+paralelo (60 clips, todas las salidas de las etapas 1, 4, 7, 9 y 11); etapa 1 1,21x, etapa 4 1,33x en un
+proceso, 1,04x en la corrida montada. `=0` en el entorno las apaga."""
+
 """O3 de `CORRIDA_FINAL_2026-10-13.md` §10 (2026-10-13): la lectura de cuadros de la etapa 1 en un hilo
 aparte (`LectorHilo`), para que la decodificacion no espere a YOLO ni YOLO a ella. Mismos cuadros, en
 el mismo orden: `det_` y `revision_` tienen que salir IDENTICOS. Apagada por defecto hasta medirlo."""
@@ -191,8 +196,18 @@ def _fase1_uno(cid, yolo, EP, videos, yolo_redet=None):
     if not ruta:
         print("%-40s SIN VIDEO, no se procesa" % cid[:40])
         return
-    ca = PRUEBAS / ("det_%s.pkl" % cid)
     cap = LectorHilo(ruta) if TUBERIA_YOLO else cv2.VideoCapture(ruta)
+    try:
+        _fase1_cap(cid, ruta, cap, yolo, EP, yolo_redet)
+    finally:
+        cap.release()
+    """EL LECTOR SE SUELTA SIEMPRE (2026-10-14). Si `detecta_clip` o `procesa` lanzaban, el `release` de
+    abajo no llegaba: con `LectorHilo` el hilo se quedaba bloqueado para siempre con 32 cuadros en la
+    cola (~200 MB en 1080p) por cada clip que fallara. Soltarlo dos veces no hace nada."""
+
+
+def _fase1_cap(cid, ruta, cap, yolo, EP, yolo_redet):
+    ca = PRUEBAS / ("det_%s.pkl" % cid)
     fps_clip = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
     """LA CADENCIA SE GUARDA EN EL NPZ, y no se vuelve a deducir mas tarde.
 
@@ -347,14 +362,14 @@ en la GPU de Colab, con otro preproceso y otro nucleo, el reparto puede ser dist
 hay que volver a pasarle esta misma puerta -- no darlo por bueno."""
 
 
-TUBERIA_POSE = os.environ.get("FENCINGLY_POSE_TUBERIA", "0") == "1"
+TUBERIA_POSE = os.environ.get("FENCINGLY_POSE_TUBERIA", "1") == "1"
 HILOS_PREPROC = int(os.environ.get("FENCINGLY_POSE_HILOS", "3"))
-POR_CUADRO = os.environ.get("FENCINGLY_POSE_POR_CUADRO", "0") == "1"
+POR_CUADRO = os.environ.get("FENCINGLY_POSE_POR_CUADRO", "1") == "1"
 """O2b (2026-10-13): con la tuberia, las DOS cajas de un cuadro se preprocesan en UNA llamada (la imagen
 se pasa a float una vez y no dos) y luego van al modelo DE UNA EN UNA, como siempre: la entrada del
 modelo es la misma. Medido en CPU en 159 cuadros reales con dos cajas: `pixel_values` identicos, 172 ->
 100 ms por cuadro. Entra solo con la prueba de identidad de las poses."""
-TORCH_HILOS = int(os.environ.get("FENCINGLY_TORCH_HILOS", "0"))
+TORCH_HILOS = int(os.environ.get("FENCINGLY_TORCH_HILOS", "2"))
 """O9 (2026-10-13): hilos de torch en CPU de este proceso (0 = lo de siempre, todos los nucleos). El
 preproceso de Sapiens va a 38,7 ms por recorte con 12 hilos y a 14,3 con 1, porque los hilos se pisan;
 `pixel_values` identicos con 12, 1, 2 y 4 hilos en 122 cuadros. Entra solo con la prueba de identidad."""
@@ -381,6 +396,17 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
     cola = queue.Queue(maxsize=64)
     FIN = object()
     error = []
+    parar = threading.Event()
+
+    def pon(x):
+        while not parar.is_set():
+            try:
+                cola.put(x, timeout=0.5)
+                return
+            except queue.Full:
+                pass
+    """`parar` y `pon` (2026-10-14): si la pasada falla a mitad de clip, nadie vacia la cola y el lector
+    se quedaba bloqueado en `put` para siempre, con hasta 64 cuadros en memoria. Ahora se le avisa."""
 
     def prepara_cuadro(rgb, cajas):
         if POR_CUADRO:
@@ -395,6 +421,8 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
         try:
             cap = cv2.VideoCapture(video)
             for k in range(T):
+                if parar.is_set():
+                    break
                 ok, im = cap.read()
                 if not ok:
                     break
@@ -416,38 +444,51 @@ def _poses_tuberia(proc, mod, torch, video, B, pres, mask, W, H, T, guarda_frame
                     cajas.append([[x, y, float(b[2] * W) - x, float(b[3] * H) - y]])
                     lados.append(lado)
                 if cajas:
-                    cola.put((k, lados, cajas, ex.submit(prepara_cuadro, rgb, cajas)))
+                    pon((k, lados, cajas, ex.submit(prepara_cuadro, rgb, cajas)))
             cap.release()
         except BaseException as e:
             error.append(e)
         finally:
-            cola.put(FIN)
+            pon(FIN)
 
     with ThreadPoolExecutor(HILOS_PREPROC) as ex:
         th = threading.Thread(target=lector, args=(ex,), daemon=True)
         th.start()
-        while True:
-            it = cola.get()
-            if it is FIN:
-                break
-            k, lados, cajas, fut = it
-            e = fut.result()
-            with torch.inference_mode():
-                e = {q: (v.to("cuda").half() if v.is_floating_point() else v.to("cuda"))
-                     for q, v in e.items()}
-                o = mod(**e)
-                r = proc.post_process_pose_estimation(o, boxes=cajas, threshold=None)
-            for j, lado in enumerate(lados):
-                rr = r[j][0] if isinstance(r[j], list) else r[j]
-                kp = np.asarray(rr["keypoints"].cpu(), dtype="float32")
-                sc = np.asarray(rr["scores"].cpu(), dtype="float32")
-                n = min(len(kp), N_PTS)
-                KP[k, lado, :n] = kp[:n]
-                SC[k, lado, :n] = _fuera_de_caja(kp[:n], sc[:n], cajas[j][0])
-        th.join()
+        try:
+            _consume_tuberia(cola, FIN, proc, mod, torch, KP, SC)
+        finally:
+            parar.set()
+            while th.is_alive():
+                try:
+                    cola.get_nowait()
+                except queue.Empty:
+                    pass
+                th.join(timeout=0.05)
     if error:
         raise error[0]
     return KP, SC, frames
+
+
+def _consume_tuberia(cola, FIN, proc, mod, torch, KP, SC):
+    """El hilo principal de `_poses_tuberia`: la pasada y el postproceso, cuadro a cuadro y en orden."""
+    while True:
+        it = cola.get()
+        if it is FIN:
+            break
+        k, lados, cajas, fut = it
+        e = fut.result()
+        with torch.inference_mode():
+            e = {q: (v.to("cuda").half() if v.is_floating_point() else v.to("cuda"))
+                 for q, v in e.items()}
+            o = mod(**e)
+            r = proc.post_process_pose_estimation(o, boxes=cajas, threshold=None)
+        for j, lado in enumerate(lados):
+            rr = r[j][0] if isinstance(r[j], list) else r[j]
+            kp = np.asarray(rr["keypoints"].cpu(), dtype="float32")
+            sc = np.asarray(rr["scores"].cpu(), dtype="float32")
+            n = min(len(kp), N_PTS)
+            KP[k, lado, :n] = kp[:n]
+            SC[k, lado, :n] = _fuera_de_caja(kp[:n], sc[:n], cajas[j][0])
 
 
 def poses_del_clip(proc, mod, torch, video, B, pres, mask, W, H, T, lote=None,

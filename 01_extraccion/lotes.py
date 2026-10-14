@@ -74,6 +74,11 @@ si se cambia hay que decirlo y volver a contar."""
 
 ESTADO = RU.TRABAJO / "estado_lotes.jsonl"
 
+RAM_ETAPA = {1: 4.5, 4: 4.0, 7: 4.0, 9: 1.5, 10: 2.0, 11: 1.5}
+"""GB de RAM fisica disponible para ARRANCAR el proceso de cada etapa (`rutas.espera_ram`), por encima
+de lo medido por proceso el 14/10 (RSS: etapa 1 hasta 4,3, la 4 3,4, la 7 en 1080p 3,2, la 9 y la 11
+~0,7). La 7 vuelve a mirarlo antes de CADA clip, que es donde un 1080p largo dispara la memoria."""
+
 PY_YOLO = RU.interprete("yolo")
 PY_HF = RU.interprete("hf")
 """Se DESCUBREN en `rutas.interprete`, no hay que exportarlos antes de cada lanzamiento. Olvidar
@@ -346,6 +351,7 @@ CODIGO_7 = """
 import grafica_pista as GP
 import rutas as RU
 for c in CLIPS:
+    RU.espera_ram(4.0)
     try:
         f = GP.procesa(c, con_figura=False)
         if f is None and RU.video(c):
@@ -457,6 +463,10 @@ def corre(clips, etapas, descargar=False, borrar=False, lote=25, verboso=True,
                 continue
             corridos.update(cs)
             codigo, cual = CODIGOS[n]
+            w = RU.espera_ram(RAM_ETAPA.get(n, 2.0))
+            if w >= 5:
+                print("   etapa %-2d  espero %.0f s a tener RAM libre" % (n, w))
+                apunta({"lote": i, "etapa": n, "espera_ram_s": round(w, 1)})
             d, err = _lanza(PY_YOLO if cual == "PY_YOLO" else PY_HF, codigo, cs, "etapa%d" % n)
             if verboso:
                 print("   etapa %-2d  %3d clips  %6.1f s  %5.2f s/clip%s"
