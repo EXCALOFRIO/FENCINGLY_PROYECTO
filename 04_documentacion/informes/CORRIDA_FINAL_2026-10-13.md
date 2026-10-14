@@ -433,3 +433,19 @@ clips/h, codigo de entonces y la maquina compartida). Hoy, con todo montado como
 maquina a solas: base 113-120 clips/h y exacta 121. **Si la maquina se usa para otra cosa durante la
 corrida, el ritmo baja hacia el de las noches de anotados.** La parte grande es `resto` (las etapas 1+4
 de los ~86.000 de una luz), y ahi la GPU ya va al 80-87 %: lo que queda por ganar en exacto es poco.
+
+**Ensayo de confirmacion con el codigo final** (14/10 18:08-18:52; `D:/FENCINGLY_SCRATCH/ensayo/e_1014_1808`;
+41 clips: 15 anotados, 15 sin procesar, 4 sin mp4, 4 de campeonatos, 3 no ASCII; **2 de CPU como en la
+corrida**, lote 50, `luces` con 6, tuberias por defecto; interrumpido en `vjepa_g2` y en `resto`):
+- las dos interrupciones: 0 procesos vivos, 0 `.part`; relanzado, siguio. Acabo con todas las fases, 0
+  procesos colgados, 0 `.part`, 0 ficheros vacios;
+- 41/41 con `lights_`, `det_`/`revision_`/`poses_` legibles, `zona_`, series y `pista_h_` (100 %);
+- **V-JEPA G2 y V0 en el 100 % de los 18 con dos luces** (antes de arreglar la carrera, 82-84 %);
+- **0 lineas de fallo** (ni un MemoryError); en `resto` la CPU al 37 % (en el de 100, con 4 de CPU, 97 %).
+
+Memoria con las tuberias encendidas (clip 1080p de 663 cuadros y uno de campeonatos): etapa 4 RSS 3,0-3,2
+GB y 5,8 de commit (sin tuberia 3,4 y 6,5); etapa 1 igual que antes (2,7-4,3). Por debajo de lo que
+reserva el guardian.
+
+**El pipeline queda listo. La corrida NO se lanza hasta que el usuario lo diga**:
+`python 01_extraccion/corrida_florete.py --lanza` (y `--estado` / `--para`).
