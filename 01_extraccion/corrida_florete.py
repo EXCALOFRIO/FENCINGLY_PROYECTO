@@ -69,6 +69,15 @@ MARCAS = RU.TRABAJO / "corrida_florete"
 N_CPU = int(os.environ.get("FENCINGLY_CPU_TRABAJADORES", "2"))
 """Trabajadores de CPU (etapas 7, 9, 11) en las fases con GPU. 2 como en los anotados; O4 de §10 mide
 si mas trabajadores alcanzan mejor a la GPU."""
+N_LUCES = int(os.environ.get("FENCINGLY_LUCES_TRABAJADORES", "6"))
+"""Trabajadores de la fase `luces` (etapa 9 y descargas; CPU y red, ~0,7 GB cada uno). Era 3. Medido el
+14/10 en 120 clips (`D:/FENCINGLY_SCRATCH/luces/luces.json`): 3 -> 3.085 y 3.628 clips/h, 6 -> 3.954,
+1,18x, con los 120 `lights_` identicos byte a byte."""
+LOTE = int(os.environ.get("FENCINGLY_DIRECTOR_LOTE", "50"))
+"""Clips por lote de cada trabajador (era 20). Cada lote arranca un proceso por etapa y carga el modelo:
+medido el 14/10, 3,3 s la etapa 1 y 10,4 s la 4, o sea 0,69 s por clip con 20 y 0,27 con 50. No cambia
+ninguna salida (cada clip se escribe solo y entero); tras la fase `luces` los mp4 ya estan en disco, asi
+que el lote mas grande no retrasa ninguna descarga."""
 PAUSA = int(os.environ.get("FENCINGLY_DIRECTOR_PAUSA", "300"))
 """Segundos entre miradas del director a sus trabajadores (300 en la corrida; los ensayos la bajan)."""
 RESPALDO_MIN = 120
@@ -185,7 +194,7 @@ def espera_noche(pids, clips):
 
 def lanza_noche(conjunto, n_gpu, n_cpu, etapas_gpu, respaldo):
     pids = NO.lanza(n_gpu, n_cpu, str(conjunto), etapas_gpu=etapas_gpu, descarga=True,
-                    respaldo=respaldo, lote=20)
+                    respaldo=respaldo, lote=LOTE)
     if not pids:
         raise RuntimeError("noche.lanza no lanzo nada (prevuelo)")
     return pids
@@ -219,7 +228,7 @@ def acabo_extractor(log_):
 
 def f_luces(cfg):
     clips = ids(cfg["conjunto"])
-    espera_noche(lanza_noche(cfg["conjunto"], 3, 0, "9", cfg["respaldo"]), [])
+    espera_noche(lanza_noche(cfg["conjunto"], N_LUCES, 0, "9", cfg["respaldo"]), [])
     n = cuenta(clips, [9])
     return "lights_ en %d de %d clips" % (n, len(clips))
 

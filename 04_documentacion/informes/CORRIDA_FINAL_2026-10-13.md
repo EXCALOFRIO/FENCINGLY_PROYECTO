@@ -339,3 +339,97 @@ lote16, base2. Criterios, DECLARADOS ANTES DE MEDIR:
 
 **Disco** (medido 14/10): ~1,5 MB por clip en `pruebas` (`poses_` 1,45): los 109.799 de florete +
 campeonatos son ~166 GB en C (360 GB libres). Faltan 81.267 mp4 (~191 GB, a D, 1.510 GB libres).
+
+### Resultados de la noche del 13 al 14/10
+
+**Ensayo de 100** (`D:/FENCINGLY_SCRATCH/ensayo/e_1014_0011/informe.json`; el director de verdad en modo
+`--ensayo`, 103 clips: 30 anotados, 50 sin procesar con mp4, 10 sin mp4, 10 de campeonatos sin mp4, 3 con
+letras fuera de ASCII; 4 trabajadores de CPU; tres interrupciones con `--para`):
+- **Las tres interrupciones** (en `dos_luces`, en `vjepa_g2` y en `resto`): tras cada una, 0 procesos del
+  ensayo vivos y 0 `.part`; relanzado, siguio donde iba. Acabo (`FIN.txt`) con todas las fases y 0
+  procesos colgados, 0 `.part` y 0 ficheros vacios.
+- **Por clip**: `lights_`, `det_`/`revision_`/`poses_` legibles, `zona_` y series (o `pista_vacia_`) en
+  **103 de 103**; `pista_h_` en 96,1 % (los 4 sin luz no tienen tocado que mirar); zona con respuesta en
+  66 %. Los 20 sin mp4 se bajaron; **los 3 de nombre no ASCII, bajados y procesados enteros**.
+- **V-JEPA: G2 en 82,2 % y V0 en 84,4 % de los 45 con dos luces. FALLO REAL, arreglado** (abajo).
+- En los 30 anotados, `poses_` iguales a las de `pruebas` en 4: son los 4 con `revision_` igual; en los
+  demas cambia la etapa 1 (las de `pruebas` son de codigo anterior, p. ej. la puerta de piernas del 09/10).
+  Con la misma entrada, la etapa 4 da lo mismo.
+- **`resto` fue 3-5x mas lento** (etapa 4 a 300-420 s/clip en sus primeros lotes, contra ~80 en
+  `dos_luces`), con la CPU al 97 % y la GPU al 38 %, y dio **2 MemoryError** (6 y 12 MB; los dos clips
+  salieron en la vuelta siguiente). Causa medida abajo: la memoria.
+
+**FALLO 1, la carrera en `rutas.indice_videos`** (introducida el 13/10 con la busqueda rapida del mp4):
+el indice se publicaba vacio y se llenaba despues; los hilos de `prepara` de V-JEPA que llegaban mientras
+se recorria el arbol recibian `None` ("salta: sin video") para clips que SI tienen mp4: 6-8 por arranque.
+Reproducido con 8 hilos: 17-18 de 24 `None`. Arreglado (indice entero y con cerrojo): 0 de 24 en tres
+pasadas. Los 11 clips que faltaban se preparan bien ahora.
+
+**FALLO 2, la memoria.** Medido por proceso (`memoria_por_etapa.json`): etapa 1 RSS hasta 4,3 GB (6,8 de
+commit), etapa 4 3,4 (6,5), etapa 7 en 1080p 3,2 (4,0), la 9 y la 11 ~0,7. La maquina en reposo ya tiene
+23 GB de commit (limite 63) y 22 GB disponibles. Con 3 de GPU y 4 de CPU en clips 1080p se pasa de la RAM
+fisica y se roza el limite de commit. La corrida va con **2 de CPU** (`N_CPU`, el ensayo forzaba 4), que
+bastan: las etapas 7 + 11 son ~25-30 s por clip y trabajador, 2 hacen ~250 clips/h contra ~116 de la GPU.
+Y desde hoy hay un **guardian** (`rutas.espera_ram`): cada etapa espera a tener RAM fisica libre antes de
+arrancar (`lotes.RAM_ETAPA`), y la 7 lo mira antes de cada clip. No cambia ninguna salida.
+
+**FALLO 3, hilos colgados si un clip falla a mitad** (con las tuberias): el lector de la etapa 1 no se
+soltaba si `detecta_clip` lanzaba (32 cuadros retenidos por clip), y el de la tuberia de Sapiens se
+quedaba bloqueado en la cola (hasta 64). Arreglado (`try/finally` y aviso de parada). Probado con fallos
+provocados en las dos etapas: 0 hilos nuestros vivos despues, y el clip siguiente identico a `id_A`.
+
+**Prueba de identidad 2** (`o2p_o3_identidad2.json`; tiempos intercalados con calentamiento):
+
+| | identicas | tiempos (s, 20 clips) | x |
+|---|---|---|---:|
+| O3 (etapa 1: lectura en hilo + O10) | `det_`/`detx_`/`revision_` 20/20 en las dos pasadas | A1 226, 204 / B1 204, 152 | **1,21** |
+| O2' (etapa 4 en tuberia, lote por cuadro) | `poses_` 20/20 en las dos | A4 640, 510 / P4 501, 405 | **1,27** |
+| O2' + O2b + O9 | 20/20 en las dos | Q4 466, 397 | **1,33** |
+
+Las tres **PASAN**.
+
+**Caudal en paralelo** (`caudal_paralelo.json`; 60 anotados, 3 GPU + 4 CPU, desde cero):
+
+| brazo | clips/h (1+4) | GPU | CPU | todas las salidas = base1 |
+|---|---:|---:|---:|---|
+| base1 | 113,3 | 79 % | 73 % | — |
+| exacta (O3 + O10 + O2' + O2b + O9) | **120,8** | 87 % | 89 % | **60/60** en `det_`, `detx_`, `revision_`, `poses_`, `lights_`, series, `zona_` (*) y `pista_h_` |
+| lote16 (O11) | 118,8 | 77 % | 85 % | no (es la prueba) |
+| base2 | 119,7 | 84 % | 68 % | 60/60 (*) |
+
+(*) `zona_` solo cambia en la columna `s` (los segundos que tardo la etapa), tambien entre base1 y base2:
+sin ella, identica en 60/60.
+- **exacta: PASA** (1,037x la media de base1 y base2, y por encima de las dos), pero la ganancia en
+  paralelo es pequenia: con 3 trabajadores la GPU ya va al 79-87 %, y lo que se ahorra en CPU en un
+  proceso solo (1,2-1,3x) casi no se nota. **Encendida por defecto desde hoy**; `=0` la apaga.
+- **O11 (lote 16 en Sapiens): NO PASA**: p50 0,008 px y p99 0,07 px (pasa a), eventos 99,3/99,1 % (pasa
+  b), mano 100 % (pasa d), pero la zona solo igual en 95 % de los clips (pide 98 %) y caudal 1,02x (pide
+  1,15). No se propone.
+- Arranque por lote, medido: etapa 1 3,3 s, etapa 4 10,4 s, 9 2,3 s, 7 1,2 s. El director sube el lote de
+  20 a **50** clips (`FENCINGLY_DIRECTOR_LOTE`): 0,69 -> 0,27 s por clip y trabajador, mismas salidas.
+- Fase `luces` con **6 trabajadores** en vez de 3 (`N_LUCES`; `luces_trabajadores.json`): 3.954 clips/h
+  contra 3.085 y 3.628, **1,18x**, `lights_` identicos en 120/120. Descarga medida: 0,77 s por clip en
+  serie (6,7 MB/s); los mp4 que faltan pesan ~5,2 MB de media, **~420 GB** a D (1.510 libres).
+
+### CUANTO QUEDA, con lo medido el 14/10 (florete + campeonatos, 109.799 clips)
+
+Hecho ya: 4.270 con etapas 1+4 (los anotados). Quedan **105.529** sin 1+4, 105.548 sin `lights_` y
+81.267 sin mp4. Ritmos: 1+4 en paralelo 120,8 clips/h en anotados (exacta); en el corpus los clips son
+algo mas largos (mediana de cuadros 331-423 contra 300; los usados, parecidos), asi que se toma
+**105-116 clips/h**. Dos luces: 19 % en florete (1.119 de 5.856 anotados), 1,2 % en campeonatos.
+
+| fase | clips | ritmo | dias |
+|---|---:|---|---:|
+| `luces` (etapa 9 + bajar 81.267 mp4), 6 trabajadores | 105.548 | ~3.500/h | **~1,3** |
+| `dos_luces` (1+4, con 7, 9, 11 en paralelo) | ~19.500 | 105-116/h | **7,0-7,7** |
+| `vjepa_g2` (6,89 s/clip, medido en el ensayo) | ~20.300 | | **1,6** |
+| `vjepa_v0` (2,28 s/clip; informa la decision de la fase 3B) | ~20.300 | | **0,5** |
+| sondas de `prioridad` | | | ~0,2 |
+| `resto` (1+4, con 7, 9, 11 en paralelo) | ~86.000 | 105-116/h | **30,9-34,1** |
+| **TOTAL** | | | **~41-45 dias** |
+
+Antes de esta tanda (13/10) la cifra era **~51 dias**, con el ritmo real de las noches de anotados (96
+clips/h, codigo de entonces y la maquina compartida). Hoy, con todo montado como en la corrida y la
+maquina a solas: base 113-120 clips/h y exacta 121. **Si la maquina se usa para otra cosa durante la
+corrida, el ritmo baja hacia el de las noches de anotados.** La parte grande es `resto` (las etapas 1+4
+de los ~86.000 de una luz), y ahi la GPU ya va al 80-87 %: lo que queda por ganar en exacto es poco.
