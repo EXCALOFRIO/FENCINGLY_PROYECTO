@@ -123,6 +123,26 @@ Una fila por clip. Medido contra `strip_location` en 582 clips anotados (`ESTADO
 | `conf_h / metodo_h` | `columna` | confianza de la homografia y si viene de rayas o propagada con la camara | 0-1 / texto | SI | rayas 0,538 contra propagada 0,508 de acierto |
 | `frac_cuadros_con_h` | `columna` | fraccion de cuadros del clip con homografia confiable | 0-1 | SI | - |
 
+## 4b · Posicion de los tiradores cuadro a cuadro · `pista_h_<clip>.npz` (etapa 11) y `scout_<clip>.npz` (scouting v2, desde el 2026-10-15)
+
+`pista_h_`: la homografia de CADA cuadro (`H`, `conf`), los pies de cada tirador en pixeles (`pies`),
+`fps`, `cuadro_tocado`, `min_conf`. `scout_` (`codigo/scouting_v2.py`, fase `scouting_v2` del director):
+de ahi, la posicion de cada tirador en metros. Validado en los 4.236 anotados de florete
+(`04_documentacion/informes/SCOUTING_V2_2026-10-14.md`).
+
+| campo | forma | que es | unidad | verificado | error medido |
+|---|---|---|---|---|---|
+| `x`, `y` | `(T, 2)` | posicion de cada tirador (0 izq, 1 der) en la pista, medida o interpolada | m desde la linea central / desde el eje | **SI** | \|x\| <= 7,5 m en 98,7 %; zona del tocado 0,495 (etapa 11 0,492, `middle` 0,399; 3.963 clips) |
+| `estado` | `(T, 2)` | 0 medido, 1 interpolado (huecos <= 0,5 s), -1 sin dato | categoria | SI | con los dos tiradores en >= 50 % de los cuadros utiles: 56,0 % de los clips |
+| `motivo` | `(T, 2)` | por que falta: indice en `motivos` (`sin_h`, `sin_pies`, `fuera`, `salto`, `velocidad`, `cruce`) | categoria | SI | sin homografia el 36 % de los pares cuadro-tirador |
+| `x_suave`, `vel` | `(T, 2)` | x suavizada 0,33 s y su velocidad | m, m/s | SI | \|v\| <= 6 m/s en 99,5 % |
+| `sep` | `(T,)` | separacion der - izq | m | SI | en [0,5, 14] m en 99,6 % |
+| `conf_h`, `util`, `fps`, `cuadro_tocado` | | lo que viene de la etapa 11 y de las poses | | - | - |
+
+Para DONDE esta cada tirador, `scout_`; para cuanto se mueve y los eventos, la etapa 7 (sus
+desplazamientos cuadran con los de `scout_`: mismo sentido en el 88 % de 21.417 eventos). La x de la
+etapa 7 como posicion acierta menos que contestar `middle`.
+
 ## 5 · Luces · `lights_<clip>.csv` (etapa 9), el respaldo
 
 `via = general_tras_roi`: la ROI de sede no encontro ninguna luz y la encontro el detector general.

@@ -538,9 +538,11 @@ def sube(clips, etapas, repo=None, etiqueta=None, verboso=True):
     rutas_ = []
     for c in hechos:
         for p in ("revision_%s.npz", "poses_%s.npz", "detx_%s.npz", "etiquetas_%s.csv", "lights_%s.csv",
-                  "zona_%s.csv", "pista_vacia_%s.txt"):
+                  "zona_%s.csv", "pista_vacia_%s.txt", "pista_h_%s.npz", "scout_%s.npz"):
             """lights_, zona_ y pista_vacia_ se anadieron el 2026-10-08 con las etapas 9 y 11:
-            sin ellos el remoto decia "etapas 9,11 hechas" sin llevar su salida."""
+            sin ellos el remoto decia "etapas 9,11 hechas" sin llevar su salida. `pista_h_` (la
+            homografia de cada cuadro, ~14 KB) y `scout_` (scouting v2, ~4 KB) el 2026-10-15: sin
+            `pista_h_` el scouting v2 no se puede rehacer sin volver a correr la etapa 11."""
             f = RU.TRABAJO / (p % c)
             if f.is_file():
                 rutas_.append(f)

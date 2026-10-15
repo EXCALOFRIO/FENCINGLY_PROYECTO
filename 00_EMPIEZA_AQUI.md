@@ -1,5 +1,10 @@
 # FENCINGLY — empieza aquí
 
+> **LA CORRIDA FINAL (florete + campeonatos, 109.799 clips) está en
+> [`04_documentacion/PIPELINE_FINAL.md`](04_documentacion/PIPELINE_FINAL.md)**: qué hace, cómo se
+> lanza, para y reanuda (`01_extraccion/corrida_florete.py`), todas las pruebas y optimizaciones con
+> su resultado, y lo que falta por decidir. Lista y probada; **sin lanzar** hasta que el usuario lo diga.
+
 **Este es el ÚNICO proyecto.** Extracción de datos de clips de esgrima (florete primero) con
 YOLO11 + Sapiens 2 (308 puntos). El estado medido de hoy está en
 [`04_documentacion/informes/ESTADO_2026-10-08.md`](04_documentacion/informes/ESTADO_2026-10-08.md).
@@ -61,6 +66,8 @@ Tabla completa, con el error medido de cada campo, en
 | 7 | `serie_eventos_`, `posicion_clip_<clip>.csv` | marcha, romper, fondo, brazo, mano armada, pista |
 | 9 | `lights_<clip>.csv` | cuadro del tocado por las luces (`via` dice de dónde sale) |
 | 11 | `zona_<clip>.csv` | x del tocado en metros por las rayas de la pista; `zona_final` tras `zona_fusion.py` |
+| 11 | `pista_h_<clip>.npz` | la homografía de cada cuadro y los pies en píxeles (desde el 13/10) |
+| scouting v2 | `scout_<clip>.npz` | la posición de cada tirador en metros, cuadro a cuadro (desde el 15/10; `codigo/scouting_v2.py`) |
 | 10 | `etiquetas_<clip>.csv` | quién inicia y zona (apagada hasta guardar los pesos) |
 
 ## 4. Las reglas del proyecto

@@ -23,6 +23,8 @@ LAS FASES, en orden:
   sonda_g2     `prioridad` con G2 sobre la lista, y G2 contra V0 por pares
   resto        etapas 1, 4, 7, 9 y 11 sobre el resto del florete (salta lo hecho)
   zona_fusion  la zona final por torneo, con el florete entero
+  scouting_v2  la posicion de los dos tiradores en metros, cuadro a cuadro, de `pista_h_` (CPU;
+               `codigo/scouting_v2.py`, `SCOUTING_V2_2026-10-14.md`; la metio el usuario el 15/10)
 
 Lo que NO hace: la fase 3B (V-JEPA sobre el resto, G2 o V0). La decide el usuario con la
 comparacion de `sonda_g2`.
@@ -84,7 +86,7 @@ RESPALDO_MIN = 120
 """El respaldo a HF privado va con cada fase de `noche.py`, cada 2 h, como en los anotados."""
 
 FASES = ("luces", "lista", "dos_luces", "vjepa_g2", "vjepa_v0", "sonda_v0", "sonda_g2", "resto",
-         "zona_fusion")
+         "zona_fusion", "scouting_v2")
 GPU = {"dos_luces", "vjepa_g2", "vjepa_v0", "sonda_v0", "sonda_g2", "resto"}
 DISCO_MIN_GB = {"D:": 400, "C:": 200}
 """Medido el 13/10: faltan ~180 GB de mp4 en D: y 120-610 GB de V-JEPA; las poses (~150 GB) y los
@@ -325,6 +327,27 @@ def f_zona_fusion(cfg):
     return "zona final escrita (mira %s)" % (SAL / "zona_fusion.txt")
 
 
+N_SCOUT = int(os.environ.get("FENCINGLY_SCOUT_PROCESOS", "4"))
+"""Procesos de CPU de la fase `scouting_v2` (solo lee `pista_h_` y `poses_` y escribe `scout_`)."""
+
+
+def f_scouting_v2(cfg):
+    """Al FINAL y no despues de cada etapa 11: lo decidio el usuario el 15/10, para no tocar el codigo de
+    las fases ya ensayadas. Da lo mismo cuando se corra, porque solo lee lo que la etapa 11 dejo en disco;
+    es reanudable (salta los `scout_` mas nuevos que su `pista_h_`) y no cambia ninguna otra salida."""
+    sal = SAL / "scouting_v2.txt"
+    cod = corre([PY, "-u", "scouting_v2.py", "--conjunto", cfg["conjunto"], "--procesos", str(N_SCOUT)],
+                sal, AQUI / "codigo")
+    if cod != 0:
+        raise RuntimeError("scouting_v2 salio con codigo %s (mira %s)" % (cod, sal))
+    clips = ids(cfg["conjunto"])
+    fs = set(os.listdir(RU.TRABAJO))
+    n_s = sum(("scout_%s.npz" % c) in fs for c in clips)
+    n_h = sum(("pista_h_%s.npz" % c) in fs for c in clips)
+    n_z = sum(("zona_%s.csv" % c) in fs and ("pista_h_%s.npz" % c) not in fs for c in clips)
+    return "scout_ en %d, pista_h_ en %d, de %d (con zona_ y sin pista_h_: %d)" % (n_s, n_h, len(clips), n_z)
+
+
 FUNC = {f: globals()["f_" + f] for f in FASES}
 
 
@@ -438,6 +461,7 @@ def informe(cfg, detallado):
               "--clips-de LISTA; compara_variantes V0 G2" % VJ_G2)
         print("   resto       noche.lanza(3 GPU + 2 CPU, --descarga) sobre %s" % cfg["conjunto"])
         print("   zona_fusion zona_fusion.py --conjunto %s --escribe" % cfg["conjunto"])
+        print("   scouting_v2 codigo/scouting_v2.py --conjunto %s --procesos %d" % (cfg["conjunto"], N_SCOUT))
         print("   (3B, V-JEPA sobre el resto: NO, la decide el usuario)")
 
 

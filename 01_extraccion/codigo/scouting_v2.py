@@ -21,11 +21,17 @@ NO toca la etapa 7 ni la 11: lee `pista_h_` y `poses_` y escribe `scout_<clip>.n
 `pista_h_` (clip sin luz, o la 11 no llego a calibrar) devuelve None.
 
     python scouting_v2.py CLIP [CLIP ...]        escribe scout_ en TRABAJO y saca el resumen
+    python scouting_v2.py --conjunto LISTA [--procesos 4]
+                                                 todos los de la lista con `pista_h_` y `poses_`, en
+                                                 paralelo y reanudable: salta los que ya tienen un
+                                                 `scout_` mas nuevo que su `pista_h_`. Es la fase
+                                                 `scouting_v2` del director (la ultima, 15/10).
 """
 from __future__ import annotations
 
 import os
 import sys
+import time
 
 import numpy as np
 
@@ -262,6 +268,64 @@ def corre(clip, trabajo=None):
     return r
 
 
+def pendientes(clips, trabajo=None):
+    """Los clips con `pista_h_` y `poses_` cuyo `scout_` falta o es mas viejo que su `pista_h_` (si la etapa
+    11 se rehace, el scout_ se rehace). Lee el directorio UNA vez: con ~100.000 clips, mirar fichero a
+    fichero son minutos."""
+    T_ = pathlib_(trabajo)
+    fs = {e.name: e for e in os.scandir(T_)}
+    out = []
+    for c in clips:
+        h, p, s = fs.get("pista_h_%s.npz" % c), fs.get("poses_%s.npz" % c), fs.get("scout_%s.npz" % c)
+        if h is None or p is None:
+            continue
+        if s is None or s.stat().st_mtime < h.stat().st_mtime:
+            out.append(c)
+    return out
+
+
+def _uno(c):
+    try:
+        return corre(c)
+    except Exception as ex:
+        return {"clip": c, "motivo": "FALLA %s: %s" % (type(ex).__name__, str(ex)[:120])}
+
+
+def todos(clips, procesos=4, trabajo=None):
+    """Corre `corre` en los pendientes con `procesos` procesos de CPU. Devuelve las cuentas."""
+    T_ = pathlib_(trabajo)
+    for e in os.scandir(T_):
+        if e.name.startswith("scout_") and e.name.endswith(".npz.part"):
+            os.remove(e.path)
+            """Un `.part` es un `scout_` cortado a mitad (se paro el proceso): se tira y se rehace."""
+    pend = pendientes(clips, trabajo)
+    n = {"lista": len(clips), "pendientes": len(pend), "ok": 0, "fallas": 0}
+    print("scouting_v2: %d clips en la lista, %d pendientes, con %d procesos" % (len(clips), len(pend), procesos),
+          flush=True)
+    if not pend:
+        return n
+    from concurrent.futures import ProcessPoolExecutor
+    t0 = time.time()
+    with ProcessPoolExecutor(procesos) as ex:
+        for i, r in enumerate(ex.map(_uno, pend, chunksize=16), 1):
+            if r.get("motivo") == "ok":
+                n["ok"] += 1
+            else:
+                n["fallas"] += 1
+                print("  %s %s" % (r["clip"], r["motivo"]), flush=True)
+            if i % 2000 == 0:
+                print("  %d de %d en %.0f s" % (i, len(pend), time.time() - t0), flush=True)
+    n["s"] = round(time.time() - t0, 1)
+    print("scouting_v2: %(ok)d escritos, %(fallas)d fallas, en %(s).0f s" % n, flush=True)
+    return n
+
+
 if __name__ == "__main__":
+    if "--conjunto" in sys.argv:
+        lista = sys.argv[sys.argv.index("--conjunto") + 1]
+        npr = int(sys.argv[sys.argv.index("--procesos") + 1]) if "--procesos" in sys.argv else 4
+        r = todos([l.strip() for l in open(lista, encoding="utf-8") if l.strip()], npr)
+        sys.exit(1 if r["fallas"] > max(10, 0.01 * r["pendientes"]) else 0)
+        """Un clip suelto que falla (un npz roto) se dice y no para la corrida; mas del 1 % es otra cosa."""
     for c in sys.argv[1:]:
         print(corre(c))

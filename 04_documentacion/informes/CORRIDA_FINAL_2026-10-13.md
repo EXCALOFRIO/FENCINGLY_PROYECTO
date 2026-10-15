@@ -513,3 +513,11 @@ Si no sale identico, se queda apagado con su numero. YOLO (etapa 1), lo mismo, s
 - YOLO (etapa 1): no se probo. La pasada va dentro del `predictor` de ultralytics (que se rehace y copia el
   modelo), las formas cambian por video y en el ultimo lote, la redeteccion es de tamanio variable en fp32,
   y con lotes de 8 cuadros a 960 los nucleos son grandes: el coste de lanzarlos pesa poco.
+
+### 15/10: el scouting v2 entra como la ultima fase (`scouting_v2`), y la referencia unica
+
+Lo decidio el usuario el 15/10. Fase `scouting_v2` del director, despues de `zona_fusion` (CPU, ~35 min
+para todo el florete, reanudable); el respaldo lleva desde hoy `pista_h_` y `scout_`. Probada sobre el
+ensayo de confirmacion y con un corte a mitad (cifras en `SCOUTING_V2_2026-10-14.md`, al final). Estimacion
+vigente: **~40-44 dias**. El resumen de todo (fases, comandos, pruebas, optimizaciones, calidad,
+decisiones) queda en `04_documentacion/PIPELINE_FINAL.md`.
